@@ -1,3 +1,16 @@
+1.1.0  2026-07-02
+  * New webcam banner above the navigation, aligned to the content width.
+    Configurable via [Extras][[webcam]]: enable, url (local file or remote),
+    optional auto_refresh with a cache-busting reload and a live "Refreshing
+    in Ns" countdown badge, max_width, height, align (left/center/right),
+    title caption, and an optional click-through link. Hides itself if the
+    image fails to load. Off by default.
+  * Header theme switcher (Modern / Classic / Dark) next to the language
+    dropdown; the visitor's choice is remembered and charts re-tint live.
+    Toggle with theme.switcher.
+  * "Latest update" moved under the station name as a single line; the header
+    is more compact.
+
 1.0.2  2026-07-02
   * New "Useful Links" card at the bottom of the left column, configurable via
     [Extras][[links]] (Greece lightning map, Windy, satellite by default).

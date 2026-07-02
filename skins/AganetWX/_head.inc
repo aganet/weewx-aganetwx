@@ -72,17 +72,40 @@
   </script>
 #end if
   <script>
-    // Resolve theme mode (light|dark|auto) before paint to avoid flash.
+    // Resolve the active theme before paint to avoid a flash. A visitor's saved
+    // preset (localStorage) wins over the configured default. Presets map to a
+    // color mode (data-theme) and a layout; the layout class is applied to
+    // <body> as soon as it parses (see the inline script right after <body>).
     (function(){
-      var m = "$th_mode";
-      if (m === "auto") {
+      var PRESETS = {
+        modern:  { mode: "light", layout: "modern"  },
+        classic: { mode: "light", layout: "classic" },
+        dark:    { mode: "dark",  layout: "modern"  }
+      };
+      var def = "$th_layout" === "classic" ? "classic" : ("$th_mode" === "dark" ? "dark" : "modern");
+      var choice = null;
+      try { choice = localStorage.getItem("aganetwx_theme"); } catch (e) {}
+      if (!choice || !PRESETS[choice]) choice = def;
+      var m = PRESETS[choice].mode;
+      if ("$th_mode" === "auto" && choice === def && def !== "dark") {
         m = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
       }
-      document.documentElement.setAttribute("data-theme", m);
+      var d = document.documentElement;
+      d.setAttribute("data-theme", m);
+      d.setAttribute("data-preset", choice);
+      d.setAttribute("data-layout", PRESETS[choice].layout);
     })();
   </script>
 </head>
 <body class="lang-$lang density-$th_density layout-$th_layout" data-lang="$lang">
+  <script>
+    // Sync the layout class from the resolved preset (set in <head>) before paint.
+    (function(){
+      var lay = document.documentElement.getAttribute("data-layout");
+      if (lay) { document.body.classList.remove("layout-modern", "layout-classic");
+                 document.body.classList.add("layout-" + lay); }
+    })();
+  </script>
 
   <div class="header">
     <div class="gradient boxshadow">
@@ -91,12 +114,20 @@
           <div>
             <div class="station_name">$station.location</div>
             <div class="station_sub"><span class="i18n" data-i18n="Weather Station">$gettext("Weather Station")</span></div>
+            <div class="station_update"><span class="i18n" data-i18n="Latest update">$gettext('Latest update')</span>: $current.dateTime</div>
           </div>
           <div class="header_meta">
-            <div class="hm-title">$lbl('Latest update')</div>
-            <div class="hm-time">$current.dateTime</div>
+#if $tf($getVar('Extras.theme.switcher', True))
+            <div class="theme-switch"><label for="theme-select" class="switch-lbl">$lbl('Theme'):</label>
+              <select id="theme-select" aria-label="Theme">
+                <option value="modern">$lbl('Modern')</option>
+                <option value="classic">$lbl('Classic')</option>
+                <option value="dark">$lbl('Dark')</option>
+              </select>
+            </div>
+#end if
 #if $getVar('i18n_enabled', False)
-            <div class="lang-switch">
+            <div class="lang-switch"><label for="lang-select" class="switch-lbl">$lbl('Language label'):</label>
               <select id="lang-select" aria-label="Language">
 #for $l in $i18n_langs
                 <option value="$l.code">$l.name</option>
@@ -109,5 +140,36 @@
       </div>
     </div>
   </div>
+
+## Live webcam banner (aligned to content width). Toggle/configure via
+## [Extras][[webcam]]. The image is cache-busted and refreshed client-side.
+#set $wc = $getVar('Extras.webcam', {})
+#if $wc and $tf($wc.get('enable', False)) and $wc.get('url')
+  ## Effective refresh: 0 (static image, no badge) unless auto_refresh is on.
+  #set $wc_refresh = int($wc.get('refresh', 0)) if $tf($wc.get('auto_refresh', True)) else 0
+  #set $wc_align = str($wc.get('align', 'center')).lower()
+  #if $wc_align not in ('left', 'right', 'center')
+  #set $wc_align = 'center'
+  #end if
+  #set $wc_style = ''
+  #if $wc.get('max_width')#
+  #set $wc_style = $wc_style + 'max-width:' + str(int($wc.get('max_width'))) + 'px;'
+  #end if
+  #if $wc.get('height')#
+  #set $wc_style = $wc_style + 'max-height:' + str(int($wc.get('height'))) + 'px;'
+  #end if
+  <div class="webcam-wrap wc-$wc_align">
+    <div class="webcam-box"#if $wc_style# style="$wc_style"#end if#>
+      #if $wc.get('link')#<a href="$wc.get('link')" target="_blank" rel="noopener">#end if#
+      <img id="webcam-img" class="webcam-img" src="$wc.get('url')" alt="$wc.get('title', 'Webcam')"
+           data-src="$wc.get('url')" data-refresh="$wc_refresh">
+      #if $wc.get('link')#</a>#end if#
+      #if $wc_refresh > 0
+      <div class="webcam-live"><span class="webcam-dot"></span>$lbl('Refreshing in') <span id="webcam-count">$wc_refresh</span>$lbl('s (short for seconds)')</div>
+      #end if
+      #if $wc.get('title')#<div class="webcam-cap">$wc.get('title')</div>#end if#
+    </div>
+  </div>
+#end if
 
 #include "_nav.inc"

@@ -2,10 +2,15 @@
 (function () {
   "use strict";
 
-  var DARK = document.documentElement.getAttribute("data-theme") === "dark";
-  var AX = DARK ? "#9fb0c0" : "#666";        // axis labels
-  var GRID = DARK ? "#2c3c4d" : "#e6e6e6";   // split lines
-  var TITLE = DARK ? "#8ab4f8" : "#0a5ca8";  // chart titles
+  // Theme-derived chart colors. Recomputed when the theme switcher changes mode.
+  var DARK, AX, GRID, TITLE;
+  function readTheme() {
+    DARK = document.documentElement.getAttribute("data-theme") === "dark";
+    AX = DARK ? "#9fb0c0" : "#666";        // axis labels
+    GRID = DARK ? "#2c3c4d" : "#e6e6e6";   // split lines
+    TITLE = DARK ? "#8ab4f8" : "#0a5ca8";  // chart titles
+  }
+  readTheme();
 
   // Language dictionaries for the switcher (code -> {englishKey: translation}).
   // Server-rendered pages carry the default; the switcher swaps client-side.
@@ -407,4 +412,61 @@
     else if (sel) sel.value = choice;
   }
   initLang();
+
+  // Theme switcher: Modern / Classic / Dark presets. The active preset is
+  // applied before paint by the inline head script; here we sync the dropdown
+  // and switch live (mode + layout), persisting the choice, and re-tint charts.
+  function initTheme() {
+    var sel = document.getElementById("theme-select");
+    if (!sel) return;
+    var PRESETS = {
+      modern:  { mode: "light", layout: "modern"  },
+      classic: { mode: "light", layout: "classic" },
+      dark:    { mode: "dark",  layout: "modern"  }
+    };
+    var cur = document.documentElement.getAttribute("data-preset") || "modern";
+    if (!PRESETS[cur]) cur = "modern";
+    sel.value = cur;
+    sel.addEventListener("change", function () {
+      var p = PRESETS[sel.value] ? sel.value : "modern";
+      var d = document.documentElement;
+      d.setAttribute("data-theme", PRESETS[p].mode);
+      d.setAttribute("data-preset", p);
+      d.setAttribute("data-layout", PRESETS[p].layout);
+      document.body.classList.remove("layout-modern", "layout-classic");
+      document.body.classList.add("layout-" + PRESETS[p].layout);
+      try { localStorage.setItem("aganetwx_theme", p); } catch (e) {}
+      readTheme();
+      if (chartData) render(chartData);   // re-tint charts for the new mode
+    });
+  }
+  initTheme();
+
+  // Live webcam: reload the image on an interval with a cache-busting query so
+  // the browser always fetches the current frame. Hides itself if the image
+  // fails to load (camera offline).
+  function initWebcam() {
+    var img = document.getElementById("webcam-img");
+    if (!img) return;
+    var src = img.getAttribute("data-src");
+    var every = parseInt(img.getAttribute("data-refresh"), 10) || 0;
+    var countEl = document.getElementById("webcam-count");
+    function bust() {
+      img.src = src + (src.indexOf("?") >= 0 ? "&" : "?") + "_t=" + (new Date()).getTime();
+    }
+    img.addEventListener("error", function () {
+      var wrap = document.querySelector(".webcam-wrap");
+      if (wrap) wrap.style.display = "none";
+    });
+    if (every > 0) {
+      bust();
+      var left = every;
+      setInterval(function () {
+        left -= 1;
+        if (left <= 0) { bust(); left = every; }
+        if (countEl) countEl.textContent = left;
+      }, 1000);
+    }
+  }
+  initWebcam();
 })();

@@ -30,10 +30,11 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 - **Interactive charts** ([Apache ECharts](https://echarts.apache.org/), self-hosted, no CDN), one per metric: temperature (with dew point, apparent, heat index, wind chill), humidity, barometer, wind speed and gust, wind direction, wind rose, rain, UV, solar radiation, evapotranspiration, cloud base.
 - **Current-conditions hero**: big current temperature, feels-like, and today's high/low range.
 - **Sensor-agnostic**: auto-discovers and displays whatever your station records (extra temp/humidity, soil, leaf, air quality, lightning, battery) with no hardcoded list. Looks complete on Davis, Ecowitt, Tempest, or a bare thermometer.
-- **Config-driven theming**: colors, gradient, font, density, **light / dark / auto** mode, all from `weewx.conf`.
+- **Config-driven theming**: colors, gradient, font, density, **light / dark / auto** mode, all from `weewx.conf`. An optional header switcher lets visitors pick **Modern / Classic / Dark** live (remembered per browser).
 - **Multi-language with a live switcher**: English, Greek, Spanish, French, German, Italian, Portuguese included. A header dropdown swaps every label and chart instantly (no reload); the browser language is auto-picked and remembered. Add a language by dropping in one `lang/<code>.conf` file. No template edits.
 - **NOAA reports**: monthly and yearly climatological text reports, linked from the Archive page.
 - **About page**: station hardware, coordinates, altitude and software versions read automatically, plus editable prose and contact fields. Coordinates hide behind one toggle for privacy.
+- **Optional webcam banner**: a live camera image above the navigation, auto-refreshing (cache-busted) with a countdown, or static. Size, position and a click-through link are all configurable.
 - **Respects your WeeWX units**: US, metric or metricwx, the skin follows your station's `unit_system` (and timezone) rather than forcing its own. Every value, chart axis and label matches the rest of your WeeWX setup. Override per-report if you want this page to differ.
 
 ## Requirements
@@ -46,14 +47,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.0.2.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.1.0.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.0.2.zip
+sudo weectl extension install /path/to/AganetWX-1.1.0.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -132,6 +133,7 @@ touching a template**. Example:
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |
 | `theme.layout` | `modern`,`classic` | `modern` | flat card-tile dashboard vs. compact rows |
 | `theme.mode` | `light`,`dark`,`auto` | `light` | `auto` follows the visitor's OS preference |
+| `theme.switcher` | bool | `true` | Header dropdown to switch Modern/Classic/Dark (remembered per browser) |
 | `theme.accent` | CSS color | `#0a5ca8` | Chart titles, links, headings |
 | `theme.gradient_top` / `gradient_bottom` | CSS color | gold/cream | Header and panel gradient |
 | `theme.page_bg` | CSS color | `#FFFDCA` | Page background |
@@ -149,6 +151,14 @@ touching a template**. Example:
 | `branding.link_url` / `link_text` | string | empty | Optional footer link |
 | `links.show` | bool | `true` | Show the "Useful Links" card (bottom of the left column) |
 | `links.<entry>` | `url`,`text` | Greece maps | Each `[[[entry]]]` adds a link; edit/add/remove freely |
+| `webcam.enable` | bool | `false` | Show the webcam banner above the nav |
+| `webcam.url` | string | `cam.jpg` | Image path (relative to the site) or full URL |
+| `webcam.auto_refresh` | bool | `true` | Reload the image periodically (cache-busted) with a live countdown badge; `false` for a static image |
+| `webcam.refresh` | seconds | `30` | Refresh interval when `auto_refresh` is on |
+| `webcam.max_width` | px | empty | Cap the image width; empty = full content width |
+| `webcam.height` | px | `380` | Cap the display height |
+| `webcam.align` | `left`,`center`,`right` | `center` | Position a narrower image |
+| `webcam.title` / `link` | string | empty | Optional caption and click-through URL |
 
 ### Units
 
@@ -206,6 +216,32 @@ The About page shows station facts automatically and takes prose/contact from
 to `about.inc` in the same directory: when present it replaces the config prose,
 accepts full HTML, and expands WeeWX tags like `$station.hardware`. Delete it to
 fall back. Set `about.show_coordinates = false` to hide exact coordinates.
+
+## Webcam
+
+Enable a webcam banner above the navigation (aligned to the content width, off
+by default):
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            [[[[webcam]]]]
+                enable = true
+                url = "cam.jpg"       # local file or full URL
+                auto_refresh = true   # reload periodically, cache-busted
+                refresh = 30          # seconds
+                max_width = ""        # px; empty = full content width
+                height = 380          # px
+                align = center        # left | center | right
+                title = ""            # optional caption
+                link = ""             # optional click-through URL
+```
+
+With `auto_refresh = true` the image reloads every `refresh` seconds with a
+cache-busting query so it is never stale, and a live "Refreshing in Ns"
+countdown badge is shown. Set `auto_refresh = false` for a static image. If the
+image fails to load (camera offline), the banner hides itself.
 
 ## Useful Links card
 
