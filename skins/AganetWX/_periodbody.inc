@@ -40,7 +40,7 @@
       #set $mood, $mood_key = 'hot', 'Melting!'
       #end if
       #end if
-      <div class="col_sub gradient boxshadow dist hero#if $hero_dyn# hero-dynamic#end if##if $mood# has-mood#end if#"#if $hero_dyn# data-temp-c="#echo round($current.outTemp.degree_C.raw, 1)#" data-cold-c="#echo int($getVar('Extras.theme.hero_cold_c', -5))#" data-hot-c="#echo int($getVar('Extras.theme.hero_hot_c', 40))#"#end if#>
+      <div class="col_sub gradient boxshadow dist hero#if $hero_dyn# hero-dynamic#end if##if $mood# has-mood#end if#"#if $hero_dyn# data-temp-c="#echo round($current.outTemp.degree_C.raw, 1)#"#end if#>
         #if $mood
         <div class="hero-mood mood-$mood">
           #if $mood == 'ice'

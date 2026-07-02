@@ -48,14 +48,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.2.0.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.2.1.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.2.0.zip
+sudo weectl extension install /path/to/AganetWX-1.2.1.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -81,7 +81,14 @@ weectl extension uninstall AganetWX
 
 Everything is optional. Defaults live in `skins/AganetWX/skin.conf`; override any of
 them per-report in `weewx.conf` under `[StdReport] [[AganetWXReport]]` - **without
-touching a template**. Example:
+touching a template**.
+
+> **Put your settings in `weewx.conf`, not in `skin.conf`.** An extension update
+> overwrites `skin.conf`, so edits there are lost on the next upgrade. Values in
+> `weewx.conf` are never touched by updates and take precedence over the skin
+> defaults. Mirror the `[[[Extras]]]` structure under `[[AganetWXReport]]`.
+
+Example:
 
 ```ini
 [StdReport]
@@ -135,9 +142,8 @@ touching a template**. Example:
 | `theme.layout` | `modern`,`classic` | `modern` | flat card-tile dashboard vs. compact rows |
 | `theme.mode` | `light`,`dark`,`auto` | `light` | `auto` follows the visitor's OS preference |
 | `theme.switcher` | bool | `true` | Header dropdown to switch Modern/Classic/Dark (remembered per browser) |
-| `theme.hero_dynamic_color` | bool | `false` | Tint the hero by temperature (cold blue to hot red) |
-| `theme.hero_cold_c` / `hero_hot_c` | degC | `10` / `45` | Ends of the hero color scale |
-| `theme.hero_mood` | bool | `true` | Weather-mood face + caption in the hero |
+| `theme.hero_dynamic_color` | bool | `false` | Tint the hero by temperature: ice-blue when freezing, blue when mild, amber to deep red when hot |
+| `theme.hero_mood` | bool | `true` | Weather-mood face + caption in the hero (Brrr! to Melting!) |
 | `theme.accent` | CSS color | `#0a5ca8` | Chart titles, links, headings |
 | `theme.gradient_top` / `gradient_bottom` | CSS color | gold/cream | Header and panel gradient |
 | `theme.page_bg` | CSS color | `#FFFDCA` | Page background |

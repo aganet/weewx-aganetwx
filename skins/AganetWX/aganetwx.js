@@ -477,15 +477,32 @@
     var el = document.querySelector(".hero-dynamic");
     if (!el) return;
     var t = parseFloat(el.getAttribute("data-temp-c"));
-    var cold = parseFloat(el.getAttribute("data-cold-c"));
-    var hot = parseFloat(el.getAttribute("data-hot-c"));
-    if (isNaN(t) || isNaN(cold) || isNaN(hot) || hot <= cold) return;
-    var f = Math.max(0, Math.min(1, (t - cold) / (hot - cold)));
-    // Hue 210 (blue) at cold -> 0 (red) at hot, passing through cyan/green/yellow.
-    var hue = 210 * (1 - f);
-    var c1 = "hsl(" + hue.toFixed(0) + ",65%,45%)";
-    var c2 = "hsl(" + hue.toFixed(0) + ",70%,32%)";
-    el.style.background = "linear-gradient(160deg, " + c1 + " 0%, " + c2 + " 100%)";
+    if (isNaN(t)) return;
+    // Temperature-keyed color stops (degC -> RGB): bright ice-cyan only at true
+    // freezing, a solid blue through the comfortable range, then amber, orange,
+    // and deep red as it gets hot. No green. Stops are absolute so a given
+    // temperature always maps to the same color.
+    var stops = [
+      [-10, [150, 222, 246]], [3, [120, 200, 235]], [8, [41, 120, 190]],
+      [20, [30, 96, 170]], [25, [42, 104, 170]], [28, [150, 170, 175]],
+      [31, [236, 196, 110]], [35, [240, 158, 66]], [40, [224, 96, 48]],
+      [45, [176, 28, 40]], [50, [150, 20, 34]]
+    ];
+    var c = stops[stops.length - 1][1];
+    for (var i = 0; i < stops.length - 1; i++) {
+      var a = stops[i], b = stops[i + 1];
+      if (t <= b[0]) {
+        var u = Math.max(0, Math.min(1, (t - a[0]) / ((b[0] - a[0]) || 1)));
+        c = a[1].map(function (ca, j) { return Math.round(ca + (b[1][j] - ca) * u); });
+        break;
+      }
+    }
+    var d = c.map(function (x) { return Math.round(x * 0.82); });
+    var rgb = function (v) { return "rgb(" + v[0] + "," + v[1] + "," + v[2] + ")"; };
+    el.style.background = "linear-gradient(160deg, " + rgb(c) + " 0%, " + rgb(d) + " 100%)";
+    // Dark text on a light (cold) background, white on a dark one, for contrast.
+    var lum = 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2];
+    el.classList.toggle("hero-ink-dark", lum > 150);
   }
   initHeroColor();
 })();

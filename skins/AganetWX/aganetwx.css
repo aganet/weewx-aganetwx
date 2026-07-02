@@ -452,6 +452,15 @@ body.layout-modern .hero-lo { color: #bfe0ff; }
 .hero.hero-dynamic .hero-hi { color: #ffe0c4; }
 .hero.hero-dynamic .hero-lo { color: #cfe8ff; }
 .hero.hero-dynamic .hero-temp { text-shadow: 0 1px 3px rgba(0,0,0,.25); }
+/* Light (cold/ice) background: switch to dark text for contrast. */
+.hero.hero-dynamic.hero-ink-dark .hero-temp,
+.hero.hero-dynamic.hero-ink-dark .hero-unit,
+.hero.hero-dynamic.hero-ink-dark .hero-feels,
+.hero.hero-dynamic.hero-ink-dark .hero-mood { color: #0f2233; }
+.hero.hero-dynamic.hero-ink-dark .hero-unit { color: rgba(15,34,51,.7); }
+.hero.hero-dynamic.hero-ink-dark .hero-hi,
+.hero.hero-dynamic.hero-ink-dark .hero-lo { color: #16466b; }
+.hero.hero-dynamic.hero-ink-dark .hero-temp { text-shadow: none; }
 
 /* Celestial card (Sun & Moon) */
 .celestial {
