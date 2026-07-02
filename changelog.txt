@@ -1,3 +1,8 @@
+1.2.3  2026-07-02
+  * Sun and Moon card: the label can wrap and the value stays on one line with a
+    gap, so long translations (e.g. Greek) no longer push the value against the
+    widget edge.
+
 1.2.2  2026-07-02
   * Webcam banner now spans the full screen width on mobile (edge to edge, no
     side gutters or rounded corners); unchanged on wider screens.

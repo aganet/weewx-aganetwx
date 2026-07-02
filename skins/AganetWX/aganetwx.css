@@ -483,14 +483,16 @@ body.layout-modern .hero-lo { color: #bfe0ff; }
 }
 .moon-pct { font-size: 8pt; color: var(--m-muted, #7a8794); margin-top: 6px; font-weight: 600; }
 .celestial-info { flex: 1 1 auto; }
-/* Each row: label left, value right (same sizing as the value rows). */
+/* Each row: label left, value right (same sizing as the value rows). The label
+   can wrap/shrink so long translations (e.g. Greek) never push the value off
+   the edge; the value stays on one line and keeps a small gap from the label. */
 .cel-row {
   display: flex; justify-content: space-between; align-items: baseline;
-  gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--m-rule);
+  gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--m-rule);
 }
 .cel-row:last-child { border-bottom: 0; }
-.cel-lbl { font-size: 11pt; color: var(--m-ink); }
-.cel-row b { font-size: 11pt; font-weight: 600; color: var(--m-ink); white-space: nowrap; }
+.cel-lbl { flex: 1 1 auto; min-width: 0; font-size: 10.5pt; color: var(--m-ink); line-height: 1.25; }
+.cel-row b { flex: 0 0 auto; font-size: 10.5pt; font-weight: 600; color: var(--m-ink); white-space: nowrap; text-align: right; }
 
 /* Modern layout: soft silvery glow around the moon. */
 body.layout-modern .moon { box-shadow: inset 0 0 12px rgba(0,0,0,.3), 0 0 18px rgba(200,210,225,.35); }
