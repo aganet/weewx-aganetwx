@@ -1,3 +1,13 @@
+1.0.1  2026-07-02
+  * Wind row shows a navigation arrow pointing the wind direction (downwind),
+    rotated to the exact bearing.
+  * Barometer shows a 3-hour pressure tendency (rising/steady/falling) with the
+    change, tucked under the value.
+  * Header subtitle changed to "Observations are powered by a Personal Weather
+    Station", translated in all seven languages.
+  * Removed the Sunrise/Sunset rows from Current Values (already shown in the
+    Sun and Moon card).
+
 1.0.0  2026-07-02
   * First public release.
   * Interactive per-metric charts (Apache ECharts, self-hosted): temperature

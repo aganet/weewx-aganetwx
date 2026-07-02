@@ -221,6 +221,25 @@ body.layout-modern {
 }
 /* Wind direction after the speed: same color as the value. */
 .lright .wdir { margin-left: 3px; }
+/* Barometer 3-hour tendency, tucked under the barometer row (no separator). */
+.baro-trend {
+  font-size: 0.82em;
+  opacity: 0.85;
+}
+.baro-trend .bt-arrow { margin-right: 3px; }
+.baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }
+.baro-trend.up   .bt-arrow { color: #c0392b; }
+.baro-trend.down .bt-arrow { color: #2980b9; }
+.baro-trend.steady .bt-arrow { color: #7f8c8d; }
+/* Navigation arrow pointing downwind (windDir + 180). Rotated inline per value. */
+.wind-arrow {
+  width: 1.05em; height: 1.05em;
+  margin-left: 5px;
+  vertical-align: -0.2em;
+  fill: currentColor;
+  stroke: none;
+  transform-origin: 50% 50%;
+}
 /* Flat header: solid accent bar, no gradient/shadow box. */
 body.layout-modern .header { min-height: 0; }
 body.layout-modern .header .gradient {
@@ -281,6 +300,10 @@ body.layout-modern .col_sub:not(.hilows) .lright {
 }
 /* Current value, with the high/low following right after it (not a column). */
 .vrowhl .lright { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px; }
+/* Barometer row carries a trend sub-line: stack value-line over trend. */
+.vrowhl .lright:has(.baro-trend),
+.line .lright:has(.baro-trend) { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+.lright:has(.baro-trend) .vh-line { display: flex; flex-direction: row; align-items: center; gap: 10px; }
 .vrowhl .vh-range {
   display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
   font-size: 7.5pt; font-weight: 600; line-height: 1.2; color: var(--m-muted);

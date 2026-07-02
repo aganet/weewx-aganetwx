@@ -56,15 +56,32 @@
         #if $tf($getVar('Extras.rows.wind', True))
         <div class="line">
           <div class="lleft">$lbl('Wind')</div>
-          <div class="lright">$current.windSpeed.format() <span class="wdir">at $current.windDir.ordinal_compass</span></div>
+          <div class="lright">$current.windSpeed.format()#slurp
+#if $current.windDir.has_data
+ <span class="wdir">$current.windDir.ordinal_compass</span><svg class="wind-arrow" viewBox="0 0 24 24" style="transform:rotate(#echo int(($current.windDir.raw + 180) % 360)#deg)" aria-hidden="true"><path d="M12 2 L18 11 L13 11 L13 22 L11 22 L11 11 L6 11 Z" /></svg>#slurp
+#end if
+</div>
           <div class="clear"></div>
         </div>
         #end if
         #if $tf($getVar('Extras.rows.barometer', True))
-        #if $rng
-        $vrowhl('Barometer', $current.barometer.format(), $day.barometer.max.format(add_label=False), $day.barometer.maxtime, $day.barometer.min.format(add_label=False), $day.barometer.mintime)
+        #if $trend.barometer.has_data
+        #set $bt = $trend.barometer.raw
+        #if $bt > 1.0
+        #set $btkey, $btarrow, $btcls = 'Rising', '&#9650;', 'up'
+        #elif $bt < -1.0
+        #set $btkey, $btarrow, $btcls = 'Falling', '&#9660;', 'down'
         #else
-        $vrow('Barometer', $current.barometer.format())
+        #set $btkey, $btarrow, $btcls = 'Steady', '&#9644;', 'steady'
+        #end if
+        #set $btrend = '<div class="baro-trend ' + $btcls + '"><span class="bt-arrow">' + $btarrow + '</span> ' + $lbl($btkey) + ' <span class="bt-val">' + $trend.barometer.format(add_label=False) + $unit.label.barometer + ' / 3h</span></div>'
+        #else
+        #set $btrend = ''
+        #end if
+        #if $rng
+        <div class="line vrowhl"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line"><span class="vh-now">$current.barometer.format()</span><span class="vh-range"><span>&#9650; $day.barometer.max.format(add_label=False)<span class="vh-at">at</span>$day.barometer.maxtime</span><span>&#9660; $day.barometer.min.format(add_label=False)<span class="vh-at">at</span>$day.barometer.mintime</span></span></div>$btrend</div><div class="clear"></div></div>
+        #else
+        <div class="line"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line">$current.barometer.format()</div>$btrend</div><div class="clear"></div></div>
         #end if
         #end if
         #if $tf($getVar('Extras.rows.rain_today', True))
@@ -116,10 +133,6 @@
         #else
         $vrow('Solar Radiation', $current.radiation.format())
         #end if
-        #end if
-        #if $tf($getVar('Extras.rows.sun', True))
-        $vrow('Sunrise', $almanac.sunrise)
-        $vrow('Sunset', $almanac.sunset)
         #end if
       </div>
       #end if
