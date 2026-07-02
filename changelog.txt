@@ -1,3 +1,7 @@
+1.2.2  2026-07-02
+  * Webcam banner now spans the full screen width on mobile (edge to edge, no
+    side gutters or rounded corners); unchanged on wider screens.
+
 1.2.1  2026-07-02
   * Reworked the temperature-reactive hero palette: bright ice-cyan only at true
     freezing, a solid blue through the comfortable range (no more washed-out

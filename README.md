@@ -48,14 +48,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.2.1.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.2.2.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.2.1.zip
+sudo weectl extension install /path/to/AganetWX-1.2.2.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
