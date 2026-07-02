@@ -114,8 +114,8 @@ body.layout-modern .lang-switch select option { color: var(--m-ink); }
 
 /* Page columns */
 .content { max-width: 1100px; padding: 0 20px; margin: 10px auto 0; }
-.left_col  { width: 370px; float: left; }
-.right_col { margin-left: 390px; }
+.left_col  { width: 320px; float: left; }
+.right_col { margin-left: 340px; }
 
 /* Boxed sub-panels with rounded top + full border */
 .col_sub {
@@ -226,6 +226,15 @@ body.layout-modern {
   font-size: 0.82em;
   opacity: 0.85;
 }
+/* Useful Links card: one link per row. */
+.links-card .link-row {
+  display: block; padding: 9px 16px;
+  color: var(--m-accent); text-decoration: none;
+  border-top: 1px solid var(--m-rule);
+}
+.links-card .link-row:first-of-type { border-top: 0; }
+.links-card .link-row:hover { text-decoration: underline; }
+.links-card .link-row::after { content: " \2197"; opacity: 0.5; font-size: 0.85em; }
 .baro-trend .bt-arrow { margin-right: 3px; }
 .baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }
 .baro-trend.up   .bt-arrow { color: #c0392b; }
@@ -362,7 +371,7 @@ body.layout-modern .archive-month:hover { background: var(--m-accent); color: #f
   font-variant-numeric: tabular-nums;
 }
 .hero-unit { font-size: 46pt; font-weight: 700; color: var(--m-muted); margin-left: 2px; }
-.hero-feels { margin-top: 8px; font-size: 11pt; color: var(--m-muted); }
+.hero-feels { margin-top: 8px; font-size: 14pt; font-weight: 600; color: var(--m-muted); }
 .hero-range {
   margin-top: 12px; display: flex; justify-content: center; gap: 18px;
   font-size: 12pt; font-weight: 600; font-variant-numeric: tabular-nums;

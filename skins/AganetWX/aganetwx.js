@@ -48,6 +48,7 @@
 
   // ECharts plumbing
   var charts = {};
+  var redraw = {};
   window.__aganetwxCharts = charts;
   function chart(id) {
     var el = document.getElementById(id);
@@ -105,13 +106,19 @@
     if (!unit) return "";
     return (unit === "%" || unit.charAt(0) === "°") ? unit : " " + unit;
   }
-  function baseOpt(title, unit) {
+  function baseOpt(title, unit, width) {
     var suffix = unitSuffix(unit);
+    // On narrow (mobile) widths the multi-series legend collides with the title,
+    // so drop it onto its own centered row below the title and lower the grid.
+    var narrow = width && width < 520;
+    var legend = narrow
+      ? { top: 26, left: "center", textStyle: { fontSize: 10, color: AX }, itemWidth: 12, itemHeight: 8, itemGap: 8 }
+      : { top: 4, right: 8, textStyle: { fontSize: 11, color: AX } };
     return {
       title: { text: title, left: 8, top: 4, textStyle: { fontSize: 13, color: TITLE, fontWeight: 600 } },
-      grid: { left: 64, right: 16, top: 42, bottom: 28 },
+      grid: { left: 64, right: 16, top: narrow ? 66 : 42, bottom: 28 },
       tooltip: { trigger: "axis", valueFormatter: function (v) { return v + suffix; } },
-      legend: { top: 4, right: 8, textStyle: { fontSize: 11, color: AX } },
+      legend: legend,
       xAxis: timeAxis(),
       yAxis: { type: "value", scale: true,
                axisLabel: { fontSize: 10, color: AX,
@@ -133,7 +140,11 @@
     if (!c) return;
     var has = series.some(function (s) { return nonEmpty(s.data); });
     if (!has) { c.getDom().style.display = "none"; return; }
-    c.setOption(Object.assign(baseOpt(title, unit), { series: series }), true);
+    var w = c.getDom().clientWidth;
+    c.setOption(Object.assign(baseOpt(title, unit, w), { series: series }), true);
+    redraw[id] = function () {
+      c.setOption(baseOpt(title, unit, c.getDom().clientWidth), false);
+    };
   }
 
   function render(d) {
@@ -303,7 +314,9 @@
 
   window.addEventListener("resize", function () {
     Object.keys(charts).forEach(function (k) {
-      if (charts[k].getDom().style.display !== "none") charts[k].resize();
+      if (charts[k].getDom().style.display === "none") return;
+      if (redraw[k]) redraw[k]();   // re-place legend/grid for the new width
+      charts[k].resize();
     });
   });
 

@@ -78,11 +78,8 @@
         #else
         #set $btrend = ''
         #end if
-        #if $rng
-        <div class="line vrowhl"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line"><span class="vh-now">$current.barometer.format()</span><span class="vh-range"><span>&#9650; $day.barometer.max.format(add_label=False)<span class="vh-at">at</span>$day.barometer.maxtime</span><span>&#9660; $day.barometer.min.format(add_label=False)<span class="vh-at">at</span>$day.barometer.mintime</span></span></div>$btrend</div><div class="clear"></div></div>
-        #else
+        ## Barometer shows value + 3h trend only; its hi/low lives in the Hi/Lows block.
         <div class="line"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line">$current.barometer.format()</div>$btrend</div><div class="clear"></div></div>
-        #end if
         #end if
         #if $tf($getVar('Extras.rows.rain_today', True))
         $vrow("Today's Rain", $day.rain.sum.format())
@@ -201,6 +198,19 @@
           <span class="extra-value">$o.value.format()</span>
         </div>
         #end for
+        #end for
+      </div>
+      #end if
+
+      ## Useful external links (toggle/edit via [Extras][[links]] in weewx.conf).
+      #set $links = $getVar('Extras.links', {})
+      #if $links and $tf($links.get('show', True))
+      <div class="col_sub gradient boxshadow dist links-card">
+        <div class="headline">$lbl('Useful Links')</div>
+        #for $k in $links
+        #if $k not in ('show', 'title') and hasattr($links[$k], 'get') and $links[$k].get('url')
+        <a class="link-row" href="$links[$k].get('url')" target="_blank" rel="noopener">$links[$k].get('text', $k)</a>
+        #end if
         #end for
       </div>
       #end if

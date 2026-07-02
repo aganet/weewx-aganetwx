@@ -46,14 +46,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.0.1.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.0.2.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.0.1.zip
+sudo weectl extension install /path/to/AganetWX-1.0.2.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -147,6 +147,8 @@ touching a template**. Example:
 | `about.show_coordinates` | bool | `true` | Show exact coords and map link on About; `false` for privacy |
 | `branding.show_footer_coords` | bool | `true` | Lat/long/altitude in footer |
 | `branding.link_url` / `link_text` | string | empty | Optional footer link |
+| `links.show` | bool | `true` | Show the "Useful Links" card (bottom of the left column) |
+| `links.<entry>` | `url`,`text` | Greece maps | Each `[[[entry]]]` adds a link; edit/add/remove freely |
 
 ### Units
 
@@ -204,6 +206,29 @@ The About page shows station facts automatically and takes prose/contact from
 to `about.inc` in the same directory: when present it replaces the config prose,
 accepts full HTML, and expands WeeWX tags like `$station.hardware`. Delete it to
 fall back. Set `about.show_coordinates = false` to hide exact coordinates.
+
+## Useful Links card
+
+A "Useful Links" card sits at the bottom of the left column with external links
+(a lightning map, Windy, and a satellite view, defaulting to Greece-wide maps).
+Edit, add, remove, or hide them from `weewx.conf`, no template editing:
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            [[[[links]]]]
+                show = true
+                [[[[[lightning]]]]]
+                    text = "Lightning map"
+                    url = "https://www.lightningmaps.org/"
+                [[[[[windy]]]]]
+                    text = "Windy"
+                    url = "https://www.windy.com/"
+```
+
+Each `[[[[[entry]]]]]` needs a `url` and `text`; order is the display order. Set
+`show = false` to hide the card.
 
 ## How it works
 

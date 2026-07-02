@@ -1,3 +1,13 @@
+1.0.2  2026-07-02
+  * New "Useful Links" card at the bottom of the left column, configurable via
+    [Extras][[links]] (Greece lightning map, Windy, satellite by default).
+  * Chart legends drop below the title on narrow/mobile widths instead of
+    overlapping it.
+  * Larger, bolder "Feels like" line in the hero.
+  * Barometer in Latest Values shows value and 3-hour trend only; its high/low
+    stays in the Hi/Lows card.
+  * Narrower left column so the charts get more width.
+
 1.0.1  2026-07-02
   * Wind row shows a navigation arrow pointing the wind direction (downwind),
     rotated to the exact bearing.
