@@ -1,0 +1,29 @@
+## JSON series feed for the "Day" charts. One series per metric; metrics with
+## no data emit []. ECharts reads this. [[ts_ms, value], ...] via series().
+#errorCatcher Echo
+#encoding utf8
+#set global $agg = 86400      ## 1-day buckets (Seasons year)
+#set $P = $span($day_delta=365)
+#def S($obs, $agg_type, $nd)
+#if $obs.has_data#$obs.series(aggregate_type=$agg_type, aggregate_interval=$agg, time_series='start', time_unit='unix_epoch_ms').round($nd).json#else#[]#end if##slurp
+#end def
+{
+  "period": "year",
+  "generated": $current.dateTime.raw,
+  "outTemp":   $S($P.outTemp,   'avg', 1),
+  "dewpoint":  $S($P.dewpoint,  'avg', 1),
+  "appTemp":   $S($P.appTemp,   'avg', 1),
+  "heatindex": $S($P.heatindex, 'avg', 1),
+  "windchill": $S($P.windchill, 'avg', 1),
+  "outHumidity": $S($P.outHumidity, 'avg', 0),
+  "barometer": $S($P.barometer, 'avg', 1),
+  "windSpeed": $S($P.windSpeed, 'avg', 1),
+  "windGust":  $S($P.windGust,  'max', 1),
+  "windDir":   $S($P.windDir,   'avg', 0),
+  "rain":      $S($P.rain,      'sum', 2),
+  "rainRate":  $S($P.rainRate,  'max', 2),
+  "UV":        $S($P.UV,        'max', 1),
+  "radiation": $S($P.radiation, 'avg', 0),
+  "ET":        $S($P.ET,        'sum', 3),
+  "cloudbase": $S($P.cloudbase, 'avg', 0)
+}

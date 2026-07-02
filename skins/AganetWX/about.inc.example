@@ -1,0 +1,14 @@
+## Copy this file to about.inc (same directory) to take over the About page
+## prose. When about.inc exists, it replaces the Extras.about text; delete it
+## to fall back. Plain HTML, and WeeWX tags like $station.* are expanded.
+<p>
+  Welcome to the aganet.gr weather station in Kamena Vourla, Greece. It has been
+  recording since the station went online and updates every few minutes.
+</p>
+<p>
+  Hardware: <b>$station.hardware</b>. Running WeeWX $station.version.
+</p>
+<p>
+  Questions or corrections? Reach me at
+  <a href="https://anegio.com" rel="noopener">anegio.com</a>.
+</p>

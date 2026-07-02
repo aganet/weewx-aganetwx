@@ -1,0 +1,26 @@
+1.0.0  2026-07-02
+  * First public release.
+  * Interactive per-metric charts (Apache ECharts, self-hosted): temperature
+    and derived, humidity, barometer, wind speed and gust, wind direction,
+    wind vector, wind rose, rain, rain rate, UV, solar radiation,
+    evapotranspiration, cloud base. Each on its own card. Current charts show
+    the last 24 hours; period pages show their calendar span.
+  * Multi-period pages: Current, Yesterday, Week, Month, Year, Last Year,
+    Archive, About. Yesterday is the true midnight-to-midnight day.
+  * Current-conditions hero (temperature, feels-like, today's high/low), with
+    today's high/low and time shown beside each current value.
+  * Sun and Moon card with a rendered moon phase.
+  * Rain totals (today/month/year) and today's ET in the values.
+  * Auto-discovered extra sensors (soil, leaf, air quality, lightning, battery).
+  * About page: station facts read automatically plus editable prose/contact,
+    optional about.inc override, coordinate privacy toggle, hardware override.
+  * Multi-language with an in-page switcher: English, Greek, Spanish, French,
+    German, Italian, Portuguese. The browser language is auto-selected and the
+    choice remembered; labels and charts swap live. Add a language with one
+    lang/*.conf file.
+  * Follows your WeeWX unit system (us/metric/metricwx) and timezone; the skin
+    does not force units. Chart times are shown in the station's timezone.
+  * Config-driven theming: modern and classic layouts, light/dark/auto mode,
+    colors, fonts, density, all from weewx.conf. No template editing.
+  * Auto-refresh, amateur-station disclaimer, footer version, WX favicon.
+  * NOAA monthly and yearly reports.

@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tooling
+        run: pip install configobj pyflakes
+
+      - name: Lint the search list extension
+        run: python -m pyflakes bin/user/aganetwx_extras.py
+
+      - name: Byte-compile Python
+        run: python -m compileall -q bin/user install.py
+
+      - name: Validate skin.conf and language files parse
+        run: |
+          python - <<'PY'
+          import configobj, glob, sys
+          ok = True
+          for f in ["skins/AganetWX/skin.conf"] + glob.glob("skins/AganetWX/lang/*.conf"):
+              try:
+                  configobj.ConfigObj(f, encoding="utf-8", file_error=True)
+                  print("OK   ", f)
+              except Exception as e:
+                  ok = False
+                  print("FAIL ", f, "->", e)
+          sys.exit(0 if ok else 1)
+          PY
+
+      - name: Check language files share the same keys
+        run: |
+          python - <<'PY'
+          import configobj, glob, sys
+          def texts(f):
+              c = configobj.ConfigObj(f, encoding="utf-8")
+              return set(c.get("Texts", {}).keys())
+          en = texts("skins/AganetWX/lang/en.conf")
+          bad = False
+          for f in glob.glob("skins/AganetWX/lang/*.conf"):
+              if f.endswith("en.conf"):
+                  continue
+              missing = en - texts(f)
+              extra = texts(f) - en
+              if missing or extra:
+                  bad = True
+                  print(f"{f}: missing={sorted(missing)} extra={sorted(extra)}")
+              else:
+                  print(f"{f}: keys match en.conf")
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Smoke-check templates are non-empty and reference includes
+        run: |
+          test -s skins/AganetWX/index.html.tmpl
+          grep -q '_periodbody.inc' skins/AganetWX/index.html.tmpl
+          echo "templates present"

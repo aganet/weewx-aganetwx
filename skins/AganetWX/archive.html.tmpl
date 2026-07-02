@@ -1,0 +1,43 @@
+## Archive page: lists all generated NOAA monthly & yearly reports as links.
+## $SummaryByMonth / $SummaryByYear are lists of the generated file basenames,
+## provided by WeeWX when those generators are active.
+#errorCatcher Echo
+#def lbl($key)
+<span class="i18n" data-i18n="$key">$gettext($key)</span>#slurp
+#end def
+#def tf($v)
+#return $str($v).strip().lower() not in ('false','0','no','off','')
+#end def
+#set global $active = 'archive'
+#include "_head.inc"
+
+  <div class="content">
+    <div class="left_col">
+      <div class="col_sub gradient boxshadow dist">
+        <div class="headline">$lbl('Yearly Reports')</div>
+        #for $yspan in $alltime.years
+        #set $yname = $yspan.start.format("%Y")
+        <div class="line">
+          <div class="lleft">$yname</div>
+          <div class="lright"><a href="NOAA/NOAA-${yname}.txt">NOAA-${yname}.txt</a></div>
+          <div class="clear"></div>
+        </div>
+        #end for
+      </div>
+    </div>
+
+    <div class="right_col">
+      <div class="col_sub gradient boxshadow dist">
+        <div class="headline">$lbl('Monthly Reports')</div>
+        <div class="archive-months">
+        #for $mspan in $alltime.months
+        #set $mname = $mspan.start.format("%Y-%m")
+          <a class="archive-month" href="NOAA/NOAA-${mname}.txt">$mname</a>
+        #end for
+        </div>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+
+#include "_foot.inc"

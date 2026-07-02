@@ -1,0 +1,78 @@
+## About page: one centered box with prose/contact, station facts, disclaimer.
+#errorCatcher Echo
+#import os
+#def lbl($key)
+<span class="i18n" data-i18n="$key">$gettext($key)</span>#slurp
+#end def
+#def tf($v)
+#return $str($v).strip().lower() not in ('false','0','no','off','')
+#end def
+#def vrow($key, $value)
+        <div class="line"><div class="lleft">$lbl($key)</div><div class="lright">$value</div><div class="clear"></div></div>
+#end def
+#set global $active = 'about'
+#include "_head.inc"
+
+#set $ab = $getVar('Extras.about', {})
+## Prose in the active language (prose_<lang>), falling back to English.
+#set $prose = $ab.get('prose_' + $lang, '') or $ab.get('prose_en', '')
+#set $lat = $station.stn_info.latitude_f
+#set $lon = $station.stn_info.longitude_f
+
+  <div class="content">
+    <div class="about-page">
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('About')</div>
+
+        <div class="about-body">
+          ## Upgrade-safe override: drop an about.inc next to this template for
+          ## full HTML prose; otherwise fall back to the Extras.about text.
+          #if $os.path.exists($os.path.join($SKIN_ROOT, 'about.inc'))
+          #include "about.inc"
+          #else
+          #if $prose
+          <p>$prose</p>
+          #end if
+          #if $ab.get('operator', '')
+          <p class="about-field"><span class="about-key">$lbl('Operator')</span> $ab.operator</p>
+          #end if
+          #if $ab.get('website_url', '')
+          <p class="about-field"><span class="about-key">$lbl('Website')</span> <a href="$ab.website_url" rel="noopener">#if $ab.get('website_text', '')#$ab.website_text#else#$ab.website_url#end if#</a></p>
+          #end if
+          #if $ab.get('email', '')
+          <p class="about-field"><span class="about-key">$lbl('Contact')</span> <a href="mailto:$ab.email">$ab.email</a></p>
+          #end if
+          #end if
+        </div>
+
+        ## Station facts. Hardware: Extras.about.hardware overrides the value
+        ## WeeWX reports (which can be just "Vantage" when the console is not
+        ## attached at report time); set it to the exact model, e.g. "Vantage Pro2".
+        $vrow('Location', $station.location)
+        #set $hw = $ab.get('hardware', '') or $station.hardware
+        #if $hw
+        $vrow('Hardware', $hw)
+        #end if
+        #if $tf($ab.get('show_coordinates', True))
+        $vrow('Coordinates', "%.4f, %.4f" % ($lat, $lon))
+        #end if
+        $vrow('Altitude', $station.altitude)
+        #if $alltime.years
+        #set $since = $alltime.start.format("%d %b %Y")
+        $vrow('Records since', $since)
+        #end if
+        $vrow('Software', "WeeWX %s" % $station.version)
+        $vrow('Skin', "AganetWX %s" % $getVar('SKIN_VERSION', ''))
+        #if $tf($ab.get('show_coordinates', True))
+        <div class="line">
+          <div class="lleft">$lbl('Map')</div>
+          <div class="lright"><a href="https://www.openstreetmap.org/?mlat=$lat&mlon=$lon#map=13/$lat/$lon" rel="noopener">$lbl('Open in OpenStreetMap')</a></div>
+          <div class="clear"></div>
+        </div>
+        #end if
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+
+#include "_foot.inc"
