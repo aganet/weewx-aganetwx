@@ -469,4 +469,23 @@
     }
   }
   initWebcam();
+
+  // Temperature-reactive hero: tint the hero from cold (blue) to hot (red) by
+  // interpolating hue across the configured range. Unit-independent (reads the
+  // raw Celsius value emitted server-side). Only runs when hero-dynamic is set.
+  function initHeroColor() {
+    var el = document.querySelector(".hero-dynamic");
+    if (!el) return;
+    var t = parseFloat(el.getAttribute("data-temp-c"));
+    var cold = parseFloat(el.getAttribute("data-cold-c"));
+    var hot = parseFloat(el.getAttribute("data-hot-c"));
+    if (isNaN(t) || isNaN(cold) || isNaN(hot) || hot <= cold) return;
+    var f = Math.max(0, Math.min(1, (t - cold) / (hot - cold)));
+    // Hue 210 (blue) at cold -> 0 (red) at hot, passing through cyan/green/yellow.
+    var hue = 210 * (1 - f);
+    var c1 = "hsl(" + hue.toFixed(0) + ",65%,45%)";
+    var c2 = "hsl(" + hue.toFixed(0) + ",70%,32%)";
+    el.style.background = "linear-gradient(160deg, " + c1 + " 0%, " + c2 + " 100%)";
+  }
+  initHeroColor();
 })();

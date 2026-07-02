@@ -1,3 +1,10 @@
+1.2.0  2026-07-02
+  * Temperature-reactive hero: an optional color scale (cold blue to hot red,
+    range configurable via hero_cold_c / hero_hot_c) plus a weather-mood face
+    with a short caption that changes across six bands (Brrr! / Chilly / Crisp
+    / Perfect / Sweating / Melting!), translated in all seven languages. Enable
+    with theme.hero_dynamic_color and theme.hero_mood. Off by default.
+
 1.1.0  2026-07-02
   * New webcam banner above the navigation, aligned to the content width.
     Configurable via [Extras][[webcam]]: enable, url (local file or remote),

@@ -64,9 +64,9 @@ a:focus-visible, button:focus-visible, .navtab:focus-visible {
 /* Header */
 .header { min-height: 0; }
 .header .gradient { padding: 0; }
-.header_contents { max-width: 1100px; margin: 0 auto; padding: 12px 20px; }
-.station_name { font-size: 20px; font-weight: bold; line-height: 1.2; }
-.station_sub  { font-size: 11pt; margin-top: 4px; }
+.header_contents { max-width: 1100px; margin: 0 auto; padding: 9px 20px; }
+.station_name { font-size: 19px; font-weight: bold; line-height: 1.15; }
+.station_sub  { font-size: 10.5pt; margin-top: 2px; }
 .header_top {
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: 12px;
@@ -75,7 +75,8 @@ a:focus-visible, button:focus-visible, .navtab:focus-visible {
 .header_top > div:first-child { flex: 1 1 260px; min-width: 0; }
 .header_meta { flex: 0 0 auto; text-align: right; font-size: 9pt; }
 /* Latest-update line under the station name (single line). */
-.station_update { margin-top: 4px; font-size: 8.5pt; opacity: 0.85; }
+.station_update { margin-top: 3px; font-size: 8.5pt; opacity: 0.9; }
+body.layout-modern .station_update { color: #fff; }
 
 /* Language switcher (in-page, client-side). */
 .lang-switch, .theme-switch {
@@ -402,7 +403,24 @@ body.layout-modern .archive-month:hover { background: var(--m-accent); color: #f
 /* Hero card: current temperature focal point (Current page). */
 .hero {
   padding: 20px 18px; text-align: center; background: var(--m-panel-bg);
+  position: relative;
 }
+/* Weather-mood face + caption, reacting to temperature. */
+.hero-mood {
+  position: absolute; bottom: 14px; right: 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.hero-mood svg { width: 34px; height: 34px; }
+.hero-mood .mood-cap {
+  font-size: 7.5pt; font-weight: 700; letter-spacing: .02em;
+  color: currentColor; opacity: 0.95; white-space: nowrap;
+}
+.hero-mood.mood-ice   { color: #bfe6ff; }
+.hero-mood.mood-cold  { color: #cfe8ff; }
+.hero-mood.mood-crisp { color: #e6f3d8; }
+.hero-mood.mood-mild  { color: #eaf7c8; }
+.hero-mood.mood-warm  { color: #ffe08a; }
+.hero-mood.mood-hot   { color: #ffd83a; }
 .hero-temp {
   font-size: 46pt; font-weight: 700; line-height: 1; color: var(--m-ink);
   font-variant-numeric: tabular-nums;
@@ -426,6 +444,14 @@ body.layout-modern .hero-feels { color: #fff; }
 body.layout-modern .hero-unit { color: rgba(255,255,255,.85); }
 body.layout-modern .hero-hi { color: #ffd0a8; }
 body.layout-modern .hero-lo { color: #bfe0ff; }
+/* Temperature-reactive hero: JS sets the background; keep text legible on it. */
+.hero.hero-dynamic .hero-temp,
+.hero.hero-dynamic .hero-unit,
+.hero.hero-dynamic .hero-feels { color: #fff; }
+.hero.hero-dynamic .hero-unit { color: rgba(255,255,255,.85); }
+.hero.hero-dynamic .hero-hi { color: #ffe0c4; }
+.hero.hero-dynamic .hero-lo { color: #cfe8ff; }
+.hero.hero-dynamic .hero-temp { text-shadow: 0 1px 3px rgba(0,0,0,.25); }
 
 /* Celestial card (Sun & Moon) */
 .celestial {

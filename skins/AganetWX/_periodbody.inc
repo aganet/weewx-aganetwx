@@ -16,7 +16,49 @@
       #if $show_current and $tf($getVar('Extras.hero', True))
       ## Hero: big current temperature, feels-like, and today's range.
       #set $feels = $current.heatindex if $current.heatindex.has_data else ($current.windchill if $current.windchill.has_data else $current.appTemp)
-      <div class="col_sub gradient boxshadow dist hero">
+      ## Optional temperature-reactive hero color (cold blue -> hot red). The raw
+      ## Celsius value is emitted so the JS mapping is unit-independent.
+      #set $hero_dyn = $tf($getVar('Extras.theme.hero_dynamic_color', False)) and $current.outTemp.has_data
+      ## Weather-mood: an icon + short caption that reacts to the temperature,
+      ## in six bands from freezing to melting. Bands (degC): <=2, <=10, <=18,
+      ## <=26, <=34, else. Caption keys are translated in lang/*.conf.
+      #set $mood = ''
+      #set $mood_key = ''
+      #if $tf($getVar('Extras.theme.hero_mood', True)) and $current.outTemp.has_data
+      #set $_tc = $current.outTemp.degree_C.raw
+      #if $_tc <= 2
+      #set $mood, $mood_key = 'ice', 'Brrr!'
+      #elif $_tc <= 10
+      #set $mood, $mood_key = 'cold', 'Chilly'
+      #elif $_tc <= 18
+      #set $mood, $mood_key = 'crisp', 'Crisp'
+      #elif $_tc <= 26
+      #set $mood, $mood_key = 'mild', 'Perfect'
+      #elif $_tc <= 34
+      #set $mood, $mood_key = 'warm', 'Sweating'
+      #else
+      #set $mood, $mood_key = 'hot', 'Melting!'
+      #end if
+      #end if
+      <div class="col_sub gradient boxshadow dist hero#if $hero_dyn# hero-dynamic#end if##if $mood# has-mood#end if#"#if $hero_dyn# data-temp-c="#echo round($current.outTemp.degree_C.raw, 1)#" data-cold-c="#echo int($getVar('Extras.theme.hero_cold_c', -5))#" data-hot-c="#echo int($getVar('Extras.theme.hero_hot_c', 40))#"#end if#>
+        #if $mood
+        <div class="hero-mood mood-$mood">
+          #if $mood == 'ice'
+          <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="currentColor" opacity="0.18"/><circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M13 17 l5 3 M18 17 l-5 3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M26 17 l5 3 M31 17 l-5 3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M15 31 q3 -3 7 0 q3 3 7 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+          #elif $mood == 'cold'
+          <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="currentColor" opacity="0.18"/><circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="16" cy="19" r="1.8" fill="currentColor"/><circle cx="28" cy="19" r="1.8" fill="currentColor"/><path d="M15 30 q7 -4 14 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+          #elif $mood == 'crisp'
+          <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="currentColor" opacity="0.18"/><circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="16" cy="19" r="1.8" fill="currentColor"/><circle cx="28" cy="19" r="1.8" fill="currentColor"/><path d="M15 28 q7 3 14 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+          #elif $mood == 'mild'
+          <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="currentColor" opacity="0.2"/><circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="16" cy="19" r="2" fill="currentColor"/><circle cx="28" cy="19" r="2" fill="currentColor"/><path d="M14 27 q8 7 16 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+          #elif $mood == 'warm'
+          <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="currentColor" opacity="0.2"/><circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="16" cy="19" r="2" fill="currentColor"/><circle cx="28" cy="19" r="2" fill="currentColor"/><path d="M15 28 q7 5 14 0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M34 14 q3 4 0 7 q-3 -3 0 -7Z" fill="currentColor"/></svg>
+          #else
+          <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="currentColor" opacity="0.22"/><circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M13 20 q3 -3 6 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M25 20 q3 -3 6 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M14 30 q4 -3 8 0 q4 3 8 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M35 15 q3 5 0 9 q-3 -4 0 -9Z" fill="currentColor"/><path d="M9 17 q2.5 4 0 7 q-2.5 -3 0 -7Z" fill="currentColor"/></svg>
+          #end if
+          <span class="mood-cap">$lbl($mood_key)</span>
+        </div>
+        #end if
         <div class="hero-temp">$current.outTemp.format(add_label=False)<span class="hero-unit">$unit.label.outTemp</span></div>
         #if $feels.has_data
         <div class="hero-feels">$lbl('Feels like') $feels.format()</div>
