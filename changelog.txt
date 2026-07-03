@@ -1,3 +1,9 @@
+1.2.4  2026-07-03
+  * Cleanup release, no functional changes: removed dead CSS (leftover chart
+    period tabs, unused sr-only and about-disclaimer rules), the no-op clear
+    divs inside value rows, an unused template def and import, and a debug-only
+    JS global.
+
 1.2.3  2026-07-02
   * Sun and Moon card: the label can wrap and the value stays on one line with a
     gap, so long translations (e.g. Greek) no longer push the value against the

@@ -8,7 +8,7 @@
 #return $str($v).strip().lower() not in ('false','0','no','off','')
 #end def
 #def vrow($key, $value)
-        <div class="line"><div class="lleft">$lbl($key)</div><div class="lright">$value</div><div class="clear"></div></div>
+        <div class="line"><div class="lleft">$lbl($key)</div><div class="lright">$value</div></div>
 #end def
 #set global $active = 'about'
 #include "_head.inc"
@@ -67,7 +67,6 @@
         <div class="line">
           <div class="lleft">$lbl('Map')</div>
           <div class="lright"><a href="https://www.openstreetmap.org/?mlat=$lat&mlon=$lon#map=13/$lat/$lon" rel="noopener">$lbl('Open in OpenStreetMap')</a></div>
-          <div class="clear"></div>
         </div>
         #end if
       </div>

@@ -6,9 +6,6 @@
 #def tf($v)
 #return $str($v).strip().lower() not in ('false','0','no','off','')
 #end def
-#def vrow($key, $value)
-        <div class="line"><div class="lleft">$lbl($key)</div><div class="lright">$value</div><div class="clear"></div></div>
-#end def
 #def hlrow($key, $stat)
         <div class="line twocol"><div class="lleft">$lbl($key)</div><div class="lright"><span>&#9650; $stat.max.format()<span class="hl-at">at</span><span class="hl-time">$stat.maxtime</span></span><span>&#9660; $stat.min.format()<span class="hl-at">at</span><span class="hl-time">$stat.mintime</span></span></div></div>
 #end def

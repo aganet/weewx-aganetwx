@@ -54,7 +54,6 @@
   // ECharts plumbing
   var charts = {};
   var redraw = {};
-  window.__aganetwxCharts = charts;
   function chart(id) {
     var el = document.getElementById(id);
     if (!el) return null;

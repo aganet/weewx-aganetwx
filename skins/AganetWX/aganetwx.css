@@ -43,13 +43,9 @@ body { overflow-y: scroll; }
 a { text-decoration: none; color: var(--m-accent); }
 a:hover { text-decoration: underline; }
 
-/* Accessibility: visible keyboard focus + screen-reader-only helper. */
+/* Accessibility: visible keyboard focus. */
 a:focus-visible, button:focus-visible, .navtab:focus-visible {
   outline: 3px solid var(--m-accent); outline-offset: 2px;
-}
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 
 /* Gradient + shadow box primitives (config-driven). */
@@ -168,9 +164,6 @@ body.layout-modern .lang-switch select option, body.layout-modern .theme-switch 
 .hl-at { color: #999; font-size: 8pt; margin: 0 3px 0 6px; }
 .hl-time { color: #777; font-size: 8pt; }
 
-/* .clear is a no-op; flex handles layout. */
-.line .clear { display: none; }
-
 /* Diagrams (right column = interactive charts) */
 .diagrams_holder {
   background: var(--m-panel-bg); font-weight: normal; text-align: center;
@@ -187,15 +180,6 @@ body.layout-modern .lang-switch select option, body.layout-modern .theme-switch 
 /* Wind rose is square, so give it more height for a larger dial. */
 #chart-windrose { height: 420px; }
 body.density-compact #chart-windrose { height: 360px; }
-
-/* Chart period tabs */
-.m-tabs { text-align: center; padding: 8px; background: var(--m-panel-bg); }
-.tab-btn {
-  font-family: inherit; font-size: 9pt; font-weight: bold; cursor: pointer;
-  background: var(--m-gradient-bottom); border: 1px solid var(--m-border);
-  padding: 5px 16px; margin: 0 2px; border-radius: 14px; color: var(--m-ink);
-}
-.tab-btn.active { background: var(--m-gradient-top); }
 
 /* Footer */
 .footer { max-width: 1100px; margin: 24px auto; padding: 0 20px; text-align: center; }
@@ -524,11 +508,6 @@ html[data-theme="dark"] .moon-wrap { background: transparent; }
 body.layout-modern .about-page .col_sub:not(.hilows) .lright {
   white-space: normal; overflow-wrap: anywhere; text-align: left;
 }
-.about-disclaimer {
-  padding: 12px 18px; background: var(--m-panel-bg); color: var(--m-muted);
-  font-size: 8.5pt; line-height: 1.5; border-top: 1px solid var(--m-rule);
-}
-
 /* Amateur-station disclaimer bar under the nav. */
 .disclaimer-bar {
   max-width: 1100px; margin: 10px auto 0; padding: 7px 20px;

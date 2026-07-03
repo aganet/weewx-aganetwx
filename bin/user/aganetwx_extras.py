@@ -55,9 +55,6 @@ GROUP_ORDER = [
 
 
 class AganetWXExtras(SearchList):
-    def __init__(self, generator):
-        SearchList.__init__(self, generator)
-
     def get_extension_list(self, timespan, db_lookup):
         db_manager = db_lookup()
 
@@ -122,10 +119,9 @@ class AganetWXI18n(SearchList):
         codes = extras.get('languages', '')
         if isinstance(codes, str):
             codes = [c.strip() for c in codes.replace(',', ' ').split()]
-        self.codes = [c for c in codes if c]
         skin_dir = self._skin_dir(generator)
         self.dicts, self.names = {}, []
-        for code in self.codes:
+        for code in [c for c in codes if c]:
             texts, name = self._load(skin_dir, code)
             if texts is None:
                 continue

@@ -1,5 +1,4 @@
 ## Shared period-page body. Caller sets $P, $period_key, $show_current, $period_title_key.
-#import time
 #import os
 ## Station IANA timezone (e.g. Europe/Athens) for correct chart-time labels,
 ## from $TZ or /etc/localtime. Falls back to empty (viewer's browser zone).
@@ -103,7 +102,6 @@
  <span class="wdir">$current.windDir.ordinal_compass</span><svg class="wind-arrow" viewBox="0 0 24 24" style="transform:rotate(#echo int(($current.windDir.raw + 180) % 360)#deg)" aria-hidden="true"><path d="M12 2 L18 11 L13 11 L13 22 L11 22 L11 11 L6 11 Z" /></svg>#slurp
 #end if
 </div>
-          <div class="clear"></div>
         </div>
         #end if
         #if $tf($getVar('Extras.rows.barometer', True))
@@ -121,7 +119,7 @@
         #set $btrend = ''
         #end if
         ## Barometer shows value + 3h trend only; its hi/low lives in the Hi/Lows block.
-        <div class="line"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line">$current.barometer.format()</div>$btrend</div><div class="clear"></div></div>
+        <div class="line"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line">$current.barometer.format()</div>$btrend</div></div>
         #end if
         #if $tf($getVar('Extras.rows.rain_today', True))
         $vrow("Today's Rain", $day.rain.sum.format())
