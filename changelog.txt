@@ -1,3 +1,8 @@
+1.3.1  2026-07-04
+  * Threshold highlighting now ships with sensible defaults for a warm
+    Mediterranean/Greek climate (temperature, apparent temperature, wind,
+    humidity, rain rate, UV). Tune or remove them per your climate in weewx.conf.
+
 1.3.0  2026-07-04
   * Threshold highlighting: give any current value high/low limits in
     [Extras][[alerts]] and its row lights up (red above, blue below) when it

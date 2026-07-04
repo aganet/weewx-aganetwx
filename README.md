@@ -30,7 +30,7 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 - **Interactive charts** ([Apache ECharts](https://echarts.apache.org/), self-hosted, no CDN), one per metric: temperature (with dew point, apparent, heat index, wind chill), humidity, barometer, wind speed and gust, wind direction, wind rose, rain, UV, solar radiation, evapotranspiration, cloud base.
 - **Current-conditions hero**: big current temperature, feels-like, and today's high/low. By default it tints by temperature (ice-blue when freezing, through blue, amber and orange to deep red when hot) and shows a small weather-mood face with a one-word caption (Brrr! ... Perfect ... Melting!) in the selected language. Both can be turned off.
 - **Trend arrows**: a small rising / steady / falling arrow next to temperature, humidity and UV, plus a 3-hour pressure tendency under the barometer.
-- **Threshold highlighting**: set high/low limits per metric in `weewx.conf` and the value's row lights up (red above, blue below) when it crosses them. Off until you add a limit.
+- **Threshold highlighting**: a value's row lights up (red above `high`, blue below `low`) when it crosses per-metric limits. Ships with sensible warm-climate defaults; tune them per metric in `weewx.conf`.
 - **All-time records card**: highest/lowest temperature, wind gust, humidity, barometer and rain rate ever recorded in your archive, each with the date it happened.
 - **Last rain**: when it last rained and how many days ago.
 - **Sensor-agnostic**: auto-discovers and displays whatever your station records (extra temp/humidity, soil, leaf, air quality, lightning, battery) with no hardcoded list. Looks complete on Davis, Ecowitt, Tempest, or a bare thermometer.
@@ -52,14 +52,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.3.0.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.3.1.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.3.0.zip
+sudo weectl extension install /path/to/AganetWX-1.3.1.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -158,7 +158,7 @@ Example:
 | `rows.<row>` | bool | `true` | Show/hide a Current-Values row (`humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation`) |
 | `Extras.rows_show_range` | bool | `true` | Today's high/low (with time) beside each current value |
 | `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
-| `alerts.<obs>.high` / `.low` | number | none | Highlight a Current-Values row when the value crosses this limit (in your displayed units) |
+| `alerts.<obs>.high` / `.low` | number | Greek-climate defaults | Highlight a Current-Values row when the value crosses this limit (in your displayed units); defaults set for temp, apparent temp, wind, humidity, rain rate, UV |
 | `about.prose_en` / `prose_el` | string | empty | About-page description (inline HTML ok) |
 | `about.operator` / `website_url` / `website_text` / `email` | string | empty | About-page contact fields |
 | `about.hardware` | string | empty | Override the hardware label (else WeeWX's value) |
@@ -197,8 +197,11 @@ individual groups in your WeeWX config (not the skin):
 ## Threshold highlighting
 
 Give any current value high/low limits and its row lights up when it crosses
-them (red above `high`, blue below `low`). Limits are in your displayed units;
-add only the bounds you care about. Off until you set one.
+them (red above `high`, blue below `low`). Limits are in your displayed units.
+The skin ships with sensible defaults for a warm Mediterranean/Greek climate
+(temperature, apparent temperature, wind, humidity, rain rate, UV); override or
+remove them for your own climate by editing the `[[[[alerts]]]]` block in
+`weewx.conf` (delete a subsection to stop highlighting that value).
 
 ```ini
 [StdReport]
