@@ -457,14 +457,45 @@
       var wrap = document.querySelector(".webcam-wrap");
       if (wrap) wrap.style.display = "none";
     });
+    // Always fetch a fresh frame on load (cache-bust), so no stale image is
+    // shown right after a page load even before the first refresh tick.
+    bust();
     if (every > 0) {
-      bust();
       var left = every;
       setInterval(function () {
         left -= 1;
         if (left <= 0) { bust(); left = every; }
         if (countEl) countEl.textContent = left;
       }, 1000);
+    }
+
+    // Click-to-enlarge (lightbox), when the image is not a click-through link.
+    var box = document.getElementById("webcam-lightbox");
+    if (img.classList.contains("webcam-zoomable") && box) {
+      var big = box.querySelector(".webcam-lightbox-img");
+      var closeBtn = box.querySelector(".webcam-lightbox-close");
+      function openBox() {
+        big.src = img.currentSrc || img.src;   // the frame currently shown
+        box.hidden = false;
+        document.body.style.overflow = "hidden";
+        closeBtn.focus();
+      }
+      function closeBox() {
+        box.hidden = true;
+        document.body.style.overflow = "";
+        img.focus();
+      }
+      img.addEventListener("click", openBox);
+      img.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openBox(); }
+      });
+      closeBtn.addEventListener("click", closeBox);
+      box.addEventListener("click", function (e) {
+        if (e.target === box) closeBox();   // click backdrop, not the image
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !box.hidden) closeBox();
+      });
     }
   }
   initWebcam();

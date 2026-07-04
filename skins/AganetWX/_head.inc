@@ -144,7 +144,7 @@
 ## Live webcam banner (aligned to content width). Toggle/configure via
 ## [Extras][[webcam]]. The image is cache-busted and refreshed client-side.
 #set $wc = $getVar('Extras.webcam', {})
-#if $wc and $tf($wc.get('enable', False)) and $wc.get('url')
+#if $getVar('show_current', False) and $wc and $tf($wc.get('enable', False)) and $wc.get('url')
   ## Effective refresh: 0 (static image, no badge) unless auto_refresh is on.
   #set $wc_refresh = int($wc.get('refresh', 0)) if $tf($wc.get('auto_refresh', True)) else 0
   #set $wc_align = str($wc.get('align', 'center')).lower()
@@ -158,11 +158,13 @@
   #if $wc.get('height')#
   #set $wc_style = $wc_style + 'max-height:' + str(int($wc.get('height'))) + 'px;'
   #end if
+  ## Without a click-through link, the image is click-to-enlarge (lightbox).
+  #set $wc_zoom = not $wc.get('link')
   <div class="webcam-wrap wc-$wc_align">
     <div class="webcam-box"#if $wc_style# style="$wc_style"#end if#>
       #if $wc.get('link')#<a href="$wc.get('link')" target="_blank" rel="noopener">#end if#
-      <img id="webcam-img" class="webcam-img" src="$wc.get('url')" alt="$wc.get('title', 'Webcam')"
-           data-src="$wc.get('url')" data-refresh="$wc_refresh">
+      <img id="webcam-img" class="webcam-img#if $wc_zoom# webcam-zoomable#end if#" src="$wc.get('url')" alt="$wc.get('title', 'Webcam')"
+           data-src="$wc.get('url')" data-refresh="$wc_refresh"#if $wc_zoom# tabindex="0" role="button"#end if#>
       #if $wc.get('link')#</a>#end if#
       #if $wc_refresh > 0
       <div class="webcam-live"><span class="webcam-dot"></span>$lbl('Refreshing in') <span id="webcam-count">$wc_refresh</span>$lbl('s (short for seconds)')</div>
@@ -170,6 +172,12 @@
       #if $wc.get('title')#<div class="webcam-cap">$wc.get('title')</div>#end if#
     </div>
   </div>
+  #if $wc_zoom
+  <div id="webcam-lightbox" class="webcam-lightbox" hidden>
+    <button type="button" class="webcam-lightbox-close" aria-label="Close">&times;</button>
+    <img class="webcam-lightbox-img" src="" alt="$wc.get('title', 'Webcam')">
+  </div>
+  #end if
 #end if
 
 #include "_nav.inc"

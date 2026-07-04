@@ -1,3 +1,11 @@
+1.2.5  2026-07-03
+  * Webcam: click the image to open it full-size in a lightbox (dark overlay);
+    close with Escape, a click on the backdrop, or the close button. Active when
+    no click-through link is set.
+  * Webcam banner now shows only on the Current page, not on every page.
+  * Webcam image is cache-busted on the initial page load too (not only on
+    refresh), so no stale frame is shown right after a page load.
+
 1.2.4  2026-07-03
   * Cleanup release, no functional changes: removed dead CSS (leftover chart
     period tabs, unused sr-only and about-disclaimer rules), the no-op clear

@@ -256,6 +256,27 @@ body.layout-modern {
   background: #e53935; animation: webcam-pulse 1.6s ease-in-out infinite;
 }
 @keyframes webcam-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+/* Click-to-enlarge: the image hints it is clickable and opens a lightbox. */
+.webcam-zoomable { cursor: zoom-in; }
+.webcam-lightbox {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; background: rgba(0,0,0,0.9);
+}
+.webcam-lightbox[hidden] { display: none; }
+.webcam-lightbox-img {
+  max-width: 100%; max-height: 100%;
+  border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  cursor: zoom-out;
+}
+.webcam-lightbox-close {
+  position: absolute; top: 14px; right: 18px;
+  width: 40px; height: 40px; padding: 0;
+  border: 0; border-radius: 50%;
+  background: rgba(255,255,255,0.15); color: #fff;
+  font-size: 26px; line-height: 40px; cursor: pointer;
+}
+.webcam-lightbox-close:hover { background: rgba(255,255,255,0.28); }
 /* Useful Links card: one link per row. */
 .links-card .link-row {
   display: block; padding: 9px 16px;
