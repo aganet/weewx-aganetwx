@@ -142,6 +142,14 @@ body.layout-modern .lang-switch select option, body.layout-modern .theme-switch 
   background: var(--m-panel-bg);
 }
 .line + .line { border-top: 1px solid var(--m-rule); }
+/* Threshold highlighting: a value that crossed a configured limit. A colored
+   left bar plus a tinted value make it stand out at a glance. */
+.line.alert-high { box-shadow: inset 4px 0 0 #d64533; }
+.line.alert-low  { box-shadow: inset 4px 0 0 #2980b9; }
+.line.alert-high .lright, .line.alert-high .vh-now { color: #c0392b; font-weight: 700; }
+.line.alert-low  .lright, .line.alert-low  .vh-now { color: #21618c; font-weight: 700; }
+html[data-theme="dark"] .line.alert-high .lright, html[data-theme="dark"] .line.alert-high .vh-now { color: #ff7a68; }
+html[data-theme="dark"] .line.alert-low  .lright, html[data-theme="dark"] .line.alert-low  .vh-now { color: #7fc0ff; }
 .lleft {
   flex: 0 0 144px; padding: 10px;
   background: var(--m-rowlabel);
@@ -214,6 +222,13 @@ body.layout-modern {
   font-size: 0.82em;
   opacity: 0.85;
 }
+/* Small 3-hour trend arrow next to temperature/humidity values. */
+.trend-arrow { margin-left: 5px; font-size: 0.72em; vertical-align: 0.08em; }
+.trend-arrow.up     { color: #c0392b; }
+.trend-arrow.down   { color: #2980b9; }
+.trend-arrow.steady { color: #8a97a3; }
+html[data-theme="dark"] .trend-arrow.up   { color: #ff7a68; }
+html[data-theme="dark"] .trend-arrow.down { color: #7fc0ff; }
 /* Live webcam banner: aligned to the content width, above the nav. */
 .webcam-wrap {
   max-width: 1100px; margin: 16px auto 4px; padding: 0 20px;
@@ -503,6 +518,16 @@ body.layout-modern .hero-lo { color: #bfe0ff; }
 body.layout-modern .moon { box-shadow: inset 0 0 12px rgba(0,0,0,.3), 0 0 18px rgba(200,210,225,.35); }
 html[data-theme="dark"] .celestial,
 html[data-theme="dark"] .moon-wrap { background: transparent; }
+
+/* All-time records card: label left, record value + date right. */
+.records .rec-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; padding: 8px 16px; border-top: 1px solid var(--m-rule);
+}
+.records .rec-row:first-of-type { border-top: 0; }
+.records .rec-lbl { flex: 1 1 auto; min-width: 0; font-size: 10pt; color: var(--m-ink); line-height: 1.25; }
+.records .rec-row b { flex: 0 0 auto; font-size: 10.5pt; font-weight: 700; color: var(--m-ink); white-space: nowrap; text-align: right; }
+.records .rec-date { display: block; font-size: 8pt; font-weight: 400; color: var(--m-muted); margin-top: 1px; }
 
 /* Extra sensors: compact, self-contained rows (not reusing the .line grid). */
 .extra-sensors .extra-group {

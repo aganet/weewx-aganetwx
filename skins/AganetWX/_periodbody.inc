@@ -1,5 +1,33 @@
 ## Shared period-page body. Caller sets $P, $period_key, $show_current, $period_title_key.
 #import os
+## Threshold highlighting: returns a CSS class when a current value crosses a
+## configured limit. Limits come from [Extras][[alerts]][[[<obs>]]] high/low,
+## expressed in the report's display units. Empty when no alert is configured or
+## the value is within range. Only meaningful for live (current) values.
+#def alertcls($obskey, $obs)
+#set $acfg = $getVar('Extras.alerts', {}).get($obskey, None)
+#if $obs.has_data and $acfg and hasattr($acfg, 'get') and $obs.raw is not None
+#set $hi = $acfg.get('high', None)
+#set $lo = $acfg.get('low', None)
+#if $hi is not None and $obs.raw >= float($hi)# alert-high#slurp
+#elif $lo is not None and $obs.raw <= float($lo)# alert-low#slurp
+#end if
+#end if
+#end def
+## Small 3-hour trend arrow (rising/steady/falling) for a value, mirroring the
+## barometer trend. $tr is a $trend.<obs> object; $band is the dead-band (in the
+## value's units) below which it reads as steady. Emits nothing without data.
+#def trendarrow($tr, $band)
+#if $tr.has_data and $tr.raw is not None
+#if $tr.raw > $band
+<span class="trend-arrow up" title="$gettext('Rising')">&#9650;</span>#slurp
+#elif $tr.raw < -$band
+<span class="trend-arrow down" title="$gettext('Falling')">&#9660;</span>#slurp
+#else
+<span class="trend-arrow steady" title="$gettext('Steady')">&#9644;</span>#slurp
+#end if
+#end if
+#end def
 ## Station IANA timezone (e.g. Europe/Athens) for correct chart-time labels,
 ## from $TZ or /etc/localtime. Falls back to empty (viewer's browser zone).
 #set $_tzname = $os.environ.get('TZ', '')
@@ -76,26 +104,26 @@
         ## Extras.rows_show_range adds today's high/low (with time) beside each value.
         #set global $rng = $tf($getVar('Extras.rows_show_range', False))
         #if $rng
-        $vrowhl('Temperature', $current.outTemp.format(), $day.outTemp.max.format(add_label=False), $day.outTemp.maxtime, $day.outTemp.min.format(add_label=False), $day.outTemp.mintime)
+        $vrowhl('Temperature', $current.outTemp.format() + $trendarrow($trend.outTemp, 0.5), $day.outTemp.max.format(add_label=False), $day.outTemp.maxtime, $day.outTemp.min.format(add_label=False), $day.outTemp.mintime, $alertcls('outTemp', $current.outTemp))
         #else
-        $vrow('Temperature', $current.outTemp.format())
+        $vrow('Temperature', $current.outTemp.format() + $trendarrow($trend.outTemp, 0.5), $alertcls('outTemp', $current.outTemp))
         #end if
         #if $tf($getVar('Extras.rows.humidity', True))
         #if $rng
-        $vrowhl('Humidity', $current.outHumidity.format(), $day.outHumidity.max.format(add_label=False), $day.outHumidity.maxtime, $day.outHumidity.min.format(add_label=False), $day.outHumidity.mintime)
+        $vrowhl('Humidity', $current.outHumidity.format() + $trendarrow($trend.outHumidity, 2), $day.outHumidity.max.format(add_label=False), $day.outHumidity.maxtime, $day.outHumidity.min.format(add_label=False), $day.outHumidity.mintime, $alertcls('outHumidity', $current.outHumidity))
         #else
-        $vrow('Humidity', $current.outHumidity.format())
+        $vrow('Humidity', $current.outHumidity.format() + $trendarrow($trend.outHumidity, 2), $alertcls('outHumidity', $current.outHumidity))
         #end if
         #end if
         #if $tf($getVar('Extras.rows.dewpoint', True))
         #if $rng
-        $vrowhl('Dew Point', $current.dewpoint.format(), $day.dewpoint.max.format(add_label=False), $day.dewpoint.maxtime, $day.dewpoint.min.format(add_label=False), $day.dewpoint.mintime)
+        $vrowhl('Dew Point', $current.dewpoint.format(), $day.dewpoint.max.format(add_label=False), $day.dewpoint.maxtime, $day.dewpoint.min.format(add_label=False), $day.dewpoint.mintime, $alertcls('dewpoint', $current.dewpoint))
         #else
-        $vrow('Dew Point', $current.dewpoint.format())
+        $vrow('Dew Point', $current.dewpoint.format(), $alertcls('dewpoint', $current.dewpoint))
         #end if
         #end if
         #if $tf($getVar('Extras.rows.wind', True))
-        <div class="line">
+        <div class="line$alertcls('windSpeed', $current.windSpeed)">
           <div class="lleft">$lbl('Wind')</div>
           <div class="lright">$current.windSpeed.format()#slurp
 #if $current.windDir.has_data
@@ -119,7 +147,7 @@
         #set $btrend = ''
         #end if
         ## Barometer shows value + 3h trend only; its hi/low lives in the Hi/Lows block.
-        <div class="line"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line">$current.barometer.format()</div>$btrend</div></div>
+        <div class="line$alertcls('barometer', $current.barometer)"><div class="lleft">$lbl('Barometer')</div><div class="lright"><div class="vh-line">$current.barometer.format()</div>$btrend</div></div>
         #end if
         #if $tf($getVar('Extras.rows.rain_today', True))
         $vrow("Today's Rain", $day.rain.sum.format())
@@ -132,6 +160,9 @@
         #end if
         #if $tf($getVar('Extras.rows.rain_year', True))
         $vrow('Yearly Rain', $year.rain.sum.format("%.0f"))
+        #end if
+        #if $tf($getVar('Extras.rows.last_rain', True)) and $getVar('last_rain', None)
+        <div class="line"><div class="lleft">$lbl('Last Rain')</div><div class="lright"><div class="vh-line">$last_rain.time</div><div class="baro-trend"><span class="bt-val">#if $last_rain.days == 0#$lbl('Today')#else#$last_rain.days $lbl('days ago')#end if#</span></div></div></div>
         #end if
         #if $tf($getVar('Extras.rows.et', True)) and $day.ET.has_data
         $vrow("Today's ET", $day.ET.sum.format())
@@ -159,9 +190,9 @@
         #end if
         #if $tf($getVar('Extras.rows.uv', True)) and $current.UV.has_data
         #if $rng
-        $vrowhl('UV Index', $current.UV.format(), $day.UV.max.format(add_label=False), $day.UV.maxtime, $day.UV.min.format(add_label=False), $day.UV.mintime)
+        $vrowhl('UV Index', $current.UV.format() + $trendarrow($trend.UV, 0.5), $day.UV.max.format(add_label=False), $day.UV.maxtime, $day.UV.min.format(add_label=False), $day.UV.mintime)
         #else
-        $vrow('UV Index', $current.UV.format())
+        $vrow('UV Index', $current.UV.format() + $trendarrow($trend.UV, 0.5))
         #end if
         #end if
         #if $tf($getVar('Extras.rows.radiation', True)) and $current.radiation.has_data
@@ -225,6 +256,32 @@
         <div class="line"><div class="lleft">$lbl('Evapotranspiration')</div><div class="lright">$P.ET.sum.format()</div></div>
         #end if
       </div>
+
+      ## All-time records from the whole archive (Current page; toggle with
+      ## Extras.records). Sits below the period hi/lows. Each row: label, record
+      ## value, and the date it occurred.
+      #if $show_current and $tf($getVar('Extras.records', True))
+      <div class="col_sub gradient boxshadow dist records">
+        <div class="headline">$lbl('All-Time Records')</div>
+        #if $alltime.outTemp.has_data
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Temperature')</span><b>$alltime.outTemp.max.format(add_label=False)$unit.label.outTemp<span class="rec-date">$alltime.outTemp.maxtime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Lowest Temperature')</span><b>$alltime.outTemp.min.format(add_label=False)$unit.label.outTemp<span class="rec-date">$alltime.outTemp.mintime.format("%d %b %Y")</span></b></div>
+        #end if
+        #if $alltime.windGust.has_data
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Wind Gust')</span><b>$alltime.windGust.max.format(add_label=False)$unit.label.windGust<span class="rec-date">$alltime.windGust.maxtime.format("%d %b %Y")</span></b></div>
+        #end if
+        #if $alltime.outHumidity.has_data
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Humidity')</span><b>$alltime.outHumidity.max.format(add_label=False)%<span class="rec-date">$alltime.outHumidity.maxtime.format("%d %b %Y")</span></b></div>
+        #end if
+        #if $alltime.barometer.has_data
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Barometer')</span><b>$alltime.barometer.max.format(add_label=False)$unit.label.barometer<span class="rec-date">$alltime.barometer.maxtime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Lowest Barometer')</span><b>$alltime.barometer.min.format(add_label=False)$unit.label.barometer<span class="rec-date">$alltime.barometer.mintime.format("%d %b %Y")</span></b></div>
+        #end if
+        #if $alltime.rainRate.has_data
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Rain Rate')</span><b>$alltime.rainRate.max.format(add_label=False)$unit.label.rainRate<span class="rec-date">$alltime.rainRate.maxtime.format("%d %b %Y")</span></b></div>
+        #end if
+      </div>
+      #end if
 
       ## Auto-discovered extra sensors (Current page; toggle with Extras.extra_sensors).
       #if $show_current and $tf($getVar('Extras.extra_sensors', True)) and $getVar('has_extra_sensors', False)

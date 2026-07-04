@@ -1,3 +1,17 @@
+1.3.0  2026-07-04
+  * Threshold highlighting: give any current value high/low limits in
+    [Extras][[alerts]] and its row lights up (red above, blue below) when it
+    crosses them. Off until you set a limit.
+  * All-Time Records card (below Today's Hi/Lows): highest/lowest temperature,
+    wind gust, humidity, barometer and rain rate ever recorded, each with the
+    date it happened.
+  * Trend arrows (rising/steady/falling) next to temperature, humidity and UV.
+  * Last Rain row: when it last rained and how many days ago.
+  * The temperature-reactive hero color is now on by default (with the
+    weather-mood face); set theme.hero_dynamic_color = false for the plain hero.
+  * NOTE: this version adds a query to the bundled search-list extension, so
+    upgrade by reinstalling the extension (not just copying skin files).
+
 1.2.6  2026-07-04
   * Webcam refresh only reloads the image when the frame actually changed: a
     lightweight HEAD request checks Last-Modified/ETag each tick and swaps the

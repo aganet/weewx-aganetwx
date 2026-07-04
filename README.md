@@ -28,14 +28,18 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 
 - **Multi-period pages**: Current, Yesterday, Week, Month, Year, Last Year, Archive, with a top navigation bar.
 - **Interactive charts** ([Apache ECharts](https://echarts.apache.org/), self-hosted, no CDN), one per metric: temperature (with dew point, apparent, heat index, wind chill), humidity, barometer, wind speed and gust, wind direction, wind rose, rain, UV, solar radiation, evapotranspiration, cloud base.
-- **Current-conditions hero**: big current temperature, feels-like, and today's high/low range.
+- **Current-conditions hero**: big current temperature, feels-like, and today's high/low. By default it tints by temperature (ice-blue when freezing, through blue, amber and orange to deep red when hot) and shows a small weather-mood face with a one-word caption (Brrr! ... Perfect ... Melting!) in the selected language. Both can be turned off.
+- **Trend arrows**: a small rising / steady / falling arrow next to temperature, humidity and UV, plus a 3-hour pressure tendency under the barometer.
+- **Threshold highlighting**: set high/low limits per metric in `weewx.conf` and the value's row lights up (red above, blue below) when it crosses them. Off until you add a limit.
+- **All-time records card**: highest/lowest temperature, wind gust, humidity, barometer and rain rate ever recorded in your archive, each with the date it happened.
+- **Last rain**: when it last rained and how many days ago.
 - **Sensor-agnostic**: auto-discovers and displays whatever your station records (extra temp/humidity, soil, leaf, air quality, lightning, battery) with no hardcoded list. Looks complete on Davis, Ecowitt, Tempest, or a bare thermometer.
-- **Config-driven theming**: colors, gradient, font, density, **light / dark / auto** mode, all from `weewx.conf`. An optional header switcher lets visitors pick **Modern / Classic / Dark** live (remembered per browser).
-- **Optional weather-mood hero**: the current-conditions card can tint by temperature (cold blue to hot red) and show a reactive face with a short caption (Brrr! ... Perfect ... Melting!), in every language.
+- **Config-driven theming**: colors, gradient, font, density, **light / dark / auto** mode, all from `weewx.conf`. A header switcher lets visitors pick **Modern / Classic / Dark** live (remembered per browser).
 - **Multi-language with a live switcher**: English, Greek, Spanish, French, German, Italian, Portuguese included. A header dropdown swaps every label and chart instantly (no reload); the browser language is auto-picked and remembered. Add a language by dropping in one `lang/<code>.conf` file. No template edits.
 - **NOAA reports**: monthly and yearly climatological text reports, linked from the Archive page.
 - **About page**: station hardware, coordinates, altitude and software versions read automatically, plus editable prose and contact fields. Coordinates hide behind one toggle for privacy.
-- **Optional webcam banner**: a live camera image above the navigation, auto-refreshing (cache-busted) with a countdown, or static. Size, position and a click-through link are all configurable.
+- **Optional webcam banner**: a live camera image above the navigation on the Current page. Auto-refreshes only when the frame actually changed (or stays static), shows a countdown, and click-to-enlarge opens it full-size in a lightbox. Size, position and a click-through link are configurable.
+- **Useful Links card**: a small set of external links (a lightning map, Windy, a satellite view; Greece-centered by default), editable in config.
 - **Respects your WeeWX units**: US, metric or metricwx, the skin follows your station's `unit_system` (and timezone) rather than forcing its own. Every value, chart axis and label matches the rest of your WeeWX setup. Override per-report if you want this page to differ.
 
 ## Requirements
@@ -48,14 +52,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.2.6.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.3.0.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.2.6.zip
+sudo weectl extension install /path/to/AganetWX-1.3.0.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -142,7 +146,7 @@ Example:
 | `theme.layout` | `modern`,`classic` | `modern` | flat card-tile dashboard vs. compact rows |
 | `theme.mode` | `light`,`dark`,`auto` | `light` | `auto` follows the visitor's OS preference |
 | `theme.switcher` | bool | `true` | Header dropdown to switch Modern/Classic/Dark (remembered per browser) |
-| `theme.hero_dynamic_color` | bool | `false` | Tint the hero by temperature: ice-blue when freezing, blue when mild, amber to deep red when hot |
+| `theme.hero_dynamic_color` | bool | `true` | Tint the hero by temperature: ice-blue when freezing, blue when mild, amber to deep red when hot |
 | `theme.hero_mood` | bool | `true` | Weather-mood face + caption in the hero (Brrr! to Melting!) |
 | `theme.accent` | CSS color | `#0a5ca8` | Chart titles, links, headings |
 | `theme.gradient_top` / `gradient_bottom` | CSS color | gold/cream | Header and panel gradient |
@@ -151,8 +155,10 @@ Example:
 | `theme.density` | `comfortable`,`compact` | `comfortable` | Row and chart sizing |
 | `nav.<tab>` | bool | `true` | Show/hide a tab (`current`,`yesterday`,`week`,`month`,`year`,`lastyear`,`archive`,`about`) |
 | `charts.<metric>` | bool | `true` | Show/hide a chart (`temp`,`humidity`,`pressure`,`windspeed`,`windvec`,`windvector`,`windrose`,`rain`,`rainrate`,`uv`,`radiation`,`et`,`cloudbase`) |
-| `rows.<row>` | bool | `true` | Show/hide a Current-Values row |
+| `rows.<row>` | bool | `true` | Show/hide a Current-Values row (`humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation`) |
 | `Extras.rows_show_range` | bool | `true` | Today's high/low (with time) beside each current value |
+| `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
+| `alerts.<obs>.high` / `.low` | number | none | Highlight a Current-Values row when the value crosses this limit (in your displayed units) |
 | `about.prose_en` / `prose_el` | string | empty | About-page description (inline HTML ok) |
 | `about.operator` / `website_url` / `website_text` / `email` | string | empty | About-page contact fields |
 | `about.hardware` | string | empty | Override the hardware label (else WeeWX's value) |
@@ -187,6 +193,38 @@ individual groups in your WeeWX config (not the skin):
                 group_rainrate = mm_per_hour
                 group_pressure = hPa
 ```
+
+## Threshold highlighting
+
+Give any current value high/low limits and its row lights up when it crosses
+them (red above `high`, blue below `low`). Limits are in your displayed units;
+add only the bounds you care about. Off until you set one.
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            [[[[alerts]]]]
+                [[[[[outTemp]]]]]
+                    high = 38
+                    low = 0
+                [[[[[windSpeed]]]]]
+                    high = 55
+                [[[[[outHumidity]]]]]
+                    high = 90
+```
+
+Alerts work for any observation shown in Current Values (for example `outTemp`,
+`outHumidity`, `dewpoint`, `windSpeed`, `barometer`).
+
+## All-time records
+
+An "All-Time Records" card (below Today's Hi/Lows on the Current page) shows the
+highest and lowest values ever recorded in your archive, with the date each
+happened: temperature, wind gust, humidity, barometer and rain rate. Set
+`Extras.records = false` to hide it. The current temperature, humidity and UV
+rows also show a small rising / steady / falling trend arrow, and a "Last Rain"
+row shows when it last rained and how many days ago.
 
 ## Languages
 
@@ -229,8 +267,8 @@ fall back. Set `about.show_coordinates = false` to hide exact coordinates.
 
 ## Webcam
 
-Enable a webcam banner above the navigation (aligned to the content width, off
-by default):
+Enable a webcam banner above the navigation on the Current page (aligned to the
+content width, off by default):
 
 ```ini
 [StdReport]
@@ -248,10 +286,14 @@ by default):
                 link = ""             # optional click-through URL
 ```
 
-With `auto_refresh = true` the image reloads every `refresh` seconds with a
-cache-busting query so it is never stale, and a live "Refreshing in Ns"
-countdown badge is shown. Set `auto_refresh = false` for a static image. If the
-image fails to load (camera offline), the banner hides itself.
+With `auto_refresh = true` the image is checked every `refresh` seconds and
+reloaded only when the frame actually changed (a lightweight `Last-Modified`
+check, so identical frames are not re-downloaded), with a live "Refreshing in
+Ns" countdown badge. Set `auto_refresh = false` for a static image. Clicking the
+image opens it full-size in a lightbox (unless a click-through `link` is set);
+close with Escape, a click on the backdrop, or the close button. On phones the
+banner spans the full screen width. If the image fails to load (camera offline),
+the banner hides itself.
 
 ## Useful Links card
 

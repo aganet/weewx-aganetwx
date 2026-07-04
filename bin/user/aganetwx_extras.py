@@ -7,8 +7,11 @@ import os
 
 import configobj
 
+import weewx.units
 from weewx.cheetahgenerator import SearchList
 from weewx.tags import ObservationBinder
+
+
 
 # Types shown by the main/hi-low panels; skipped here.
 CORE = {
@@ -104,7 +107,30 @@ class AganetWXExtras(SearchList):
             if obs:
                 groups.append({'group': grp_key, 'title_key': title, 'obs': obs})
 
-        return [{'extra_groups': groups, 'has_extra_sensors': len(groups) > 0}]
+        # When did it last rain? Newest archive record with rain > 0.
+        last_rain = self._last_rain(db_manager, timespan.stop)
+
+        return [{'extra_groups': groups, 'has_extra_sensors': len(groups) > 0,
+                 'last_rain': last_rain}]
+
+    def _last_rain(self, db_manager, now_ts):
+        """ValueHelper for the timestamp of the last rain, plus an 'ago' string.
+        Returns None if the archive has no rain or the query fails."""
+        try:
+            row = db_manager.getSql(
+                "SELECT MAX(dateTime) FROM %s WHERE rain > 0"
+                % db_manager.table_name)
+        except Exception:
+            return None
+        if not row or row[0] is None:
+            return None
+        ts = int(row[0])
+        vt = weewx.units.ValueTuple(ts, 'unix_epoch', 'group_time')
+        vh = weewx.units.ValueHelper(vt, 'current',
+                                     self.generator.formatter,
+                                     self.generator.converter)
+        days = int((int(now_ts) - ts) // 86400)
+        return {'time': vh, 'days': days}
 
 
 class AganetWXI18n(SearchList):

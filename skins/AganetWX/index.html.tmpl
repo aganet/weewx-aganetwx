@@ -6,13 +6,13 @@
 #def tf($v)
 #return $str($v).strip().lower() not in ('false','0','no','off','')
 #end def
-#def vrow($key, $value)
-        <div class="line"><div class="lleft">$lbl($key)</div><div class="lright">$value</div></div>
+#def vrow($key, $value, $cls='')
+        <div class="line$cls"><div class="lleft">$lbl($key)</div><div class="lright">$value</div></div>
 #end def
 ## Current value, then today's high/low stacked to its right with the time of
 ## each. $hi/$lo/$hit/$lot are pre-formatted (computed at the call site).
-#def vrowhl($key, $value, $hi, $hit, $lo, $lot)
-        <div class="line vrowhl"><div class="lleft">$lbl($key)</div><div class="lright"><span class="vh-now">$value</span><span class="vh-range"><span>&#9650; $hi<span class="vh-at">at</span>$hit</span><span>&#9660; $lo<span class="vh-at">at</span>$lot</span></span></div></div>
+#def vrowhl($key, $value, $hi, $hit, $lo, $lot, $cls='')
+        <div class="line vrowhl$cls"><div class="lleft">$lbl($key)</div><div class="lright"><span class="vh-now">$value</span><span class="vh-range"><span>&#9650; $hi<span class="vh-at">at</span>$hit</span><span>&#9660; $lo<span class="vh-at">at</span>$lot</span></span></div></div>
 #end def
 #def hlrow($key, $stat)
         <div class="line twocol"><div class="lleft">$lbl($key)</div><div class="lright"><span>&#9650; $stat.max.format()<span class="hl-at">at</span><span class="hl-time">$stat.maxtime</span></span><span>&#9660; $stat.min.format()<span class="hl-at">at</span><span class="hl-time">$stat.mintime</span></span></div></div>
