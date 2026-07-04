@@ -457,14 +457,28 @@
       var wrap = document.querySelector(".webcam-wrap");
       if (wrap) wrap.style.display = "none";
     });
-    // Always fetch a fresh frame on load (cache-bust), so no stale image is
-    // shown right after a page load even before the first refresh tick.
+    // Reload the frame only when it actually changed: a lightweight HEAD request
+    // reads Last-Modified/ETag and we swap the image only if it differs. Saves
+    // re-downloading identical frames. If HEAD is unavailable (CORS/older
+    // server), fall back to reloading every tick.
+    var lastTag = null;
+    var headOk = true;
+    function refreshIfNewer() {
+      if (!headOk) { bust(); return; }
+      fetch(src, { method: "HEAD", cache: "no-store" }).then(function (r) {
+        if (!r.ok) throw 0;
+        var tag = r.headers.get("Last-Modified") || r.headers.get("ETag");
+        if (tag === null) { headOk = false; bust(); return; }  // header not exposed
+        if (tag !== lastTag) { lastTag = tag; bust(); }
+      }).catch(function () { headOk = false; bust(); });  // CORS/network: just reload
+    }
+    // Fetch a fresh frame on load so nothing stale shows before the first tick.
     bust();
     if (every > 0) {
       var left = every;
       setInterval(function () {
         left -= 1;
-        if (left <= 0) { bust(); left = every; }
+        if (left <= 0) { refreshIfNewer(); left = every; }
         if (countEl) countEl.textContent = left;
       }, 1000);
     }

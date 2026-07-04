@@ -1,3 +1,10 @@
+1.2.6  2026-07-04
+  * Webcam refresh only reloads the image when the frame actually changed: a
+    lightweight HEAD request checks Last-Modified/ETag each tick and swaps the
+    image only if it differs, saving re-downloads of identical frames. Falls
+    back to reloading every tick if the check is unavailable (e.g. cross-origin
+    without CORS).
+
 1.2.5  2026-07-03
   * Webcam: click the image to open it full-size in a lightbox (dark overlay);
     close with Escape, a click on the backdrop, or the close button. Active when
