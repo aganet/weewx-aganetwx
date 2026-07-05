@@ -450,12 +450,18 @@
     var src = img.getAttribute("data-src");
     var every = parseInt(img.getAttribute("data-refresh"), 10) || 0;
     var countEl = document.getElementById("webcam-count");
+    var wrap = document.querySelector(".webcam-wrap");
+    var loadedOnce = false;
     function bust() {
       img.src = src + (src.indexOf("?") >= 0 ? "&" : "?") + "_t=" + (new Date()).getTime();
     }
+    // A failed frame is treated as transient: keep the banner visible if it has
+    // ever loaded, and retry shortly. Only a camera that never loads at all is
+    // hidden, and even then we keep retrying so it self-heals when it returns.
+    img.addEventListener("load", function () { loadedOnce = true; if (wrap) wrap.style.display = ""; });
     img.addEventListener("error", function () {
-      var wrap = document.querySelector(".webcam-wrap");
-      if (wrap) wrap.style.display = "none";
+      if (!loadedOnce && wrap) wrap.style.display = "none";  // never worked: hide for now
+      setTimeout(bust, 5000);                                 // but always retry
     });
     // Reload the frame only when it actually changed: a lightweight HEAD request
     // reads Last-Modified/ETag and we swap the image only if it differs. Saves
@@ -476,7 +482,20 @@
     bust();
     if (every > 0) {
       var left = every;
-      setInterval(function () {
+      // Stop auto-refreshing after this many seconds so a forgotten/idle tab
+      // does not poll forever. A manual page reload starts a fresh session.
+      var stopAfter = (parseInt(img.getAttribute("data-refresh-stop"), 10) || 3600);
+      var elapsed = 0;
+      var timer = setInterval(function () {
+        elapsed += 1;
+        if (elapsed >= stopAfter) {
+          clearInterval(timer);
+          if (countEl) {
+            var badge = countEl.parentNode;   // the .webcam-live pill
+            if (badge) badge.textContent = t("Paused");
+          }
+          return;
+        }
         left -= 1;
         if (left <= 0) { refreshIfNewer(); left = every; }
         if (countEl) countEl.textContent = left;

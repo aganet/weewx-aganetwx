@@ -43,7 +43,34 @@
 #else
 #set $ar_secs = $int($ar)
 #end if
-  <script>setTimeout(function(){ location.reload(); }, $ar_secs * 1000);</script>
+  <script>
+    // Auto-reload to follow new data, but stop after ~60 min so a forgotten,
+    // idle tab does not reload forever. Elapsed time accrues across auto-reloads
+    // (sessionStorage); a manual reload/navigation starts a fresh 60-min budget.
+    (function () {
+      var interval = $ar_secs * 1000;
+      var budget = 3600 * 1000;               // stop auto-reloading after 60 min
+      var K = "aganetwx_ar_elapsed", F = "aganetwx_ar_auto";
+      var elapsed = 0;
+      try {
+        if (sessionStorage.getItem(F) === "1") {   // this load was our auto-reload
+          elapsed = parseInt(sessionStorage.getItem(K) || "0", 10) || 0;
+        } else {
+          sessionStorage.setItem(K, "0");           // manual load: reset the budget
+        }
+        sessionStorage.removeItem(F);
+      } catch (e) {}
+      if (elapsed + interval <= budget) {
+        setTimeout(function () {
+          try {
+            sessionStorage.setItem(K, String(elapsed + interval));
+            sessionStorage.setItem(F, "1");
+          } catch (e) {}
+          location.reload();
+        }, interval);
+      }
+    })();
+  </script>
 #end if
   <style>
     :root {

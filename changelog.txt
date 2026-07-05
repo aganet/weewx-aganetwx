@@ -1,3 +1,11 @@
+1.3.2  2026-07-05
+  * Webcam: a failed frame no longer hides the banner permanently. It retries
+    and the banner reappears on its own once the image loads again (fixes the
+    webcam vanishing after a brief network blip, needing a manual reload).
+  * Auto-refresh stops after ~60 minutes so a forgotten, idle tab does not keep
+    reloading the page or polling the webcam. A manual page reload starts a
+    fresh 60-minute session. The webcam badge shows "Paused" when stopped.
+
 1.3.1  2026-07-04
   * Threshold highlighting now ships with sensible defaults for a warm
     Mediterranean/Greek climate (temperature, apparent temperature, wind,

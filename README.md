@@ -52,14 +52,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.3.1.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.3.2.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.3.1.zip
+sudo weectl extension install /path/to/AganetWX-1.3.2.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -295,8 +295,13 @@ check, so identical frames are not re-downloaded), with a live "Refreshing in
 Ns" countdown badge. Set `auto_refresh = false` for a static image. Clicking the
 image opens it full-size in a lightbox (unless a click-through `link` is set);
 close with Escape, a click on the backdrop, or the close button. On phones the
-banner spans the full screen width. If the image fails to load (camera offline),
-the banner hides itself.
+banner spans the full screen width. A failed frame is treated as transient: the
+banner keeps retrying and reappears on its own once the image returns, so a
+brief network blip does not hide it until a reload.
+
+Both the webcam refresh and the whole-page auto-reload **stop after about 60
+minutes** so a forgotten, idle tab does not keep polling; the webcam badge then
+shows "Paused". Reloading the page starts a fresh 60-minute session.
 
 ## Useful Links card
 
