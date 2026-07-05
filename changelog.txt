@@ -1,3 +1,8 @@
+1.3.3  2026-07-05
+  * All-time records now format each value with its own unit conversion, so on a
+    US-unit database displayed in metric (or vice versa) the numbers and labels
+    match. Fixes records showing raw stored values with the wrong unit label.
+
 1.3.2  2026-07-05
   * Webcam: a failed frame no longer hides the banner permanently. It retries
     and the banner reappears on its own once the image loads again (fixes the

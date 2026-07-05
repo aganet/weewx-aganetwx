@@ -264,21 +264,21 @@
       <div class="col_sub gradient boxshadow dist records">
         <div class="headline">$lbl('All-Time Records')</div>
         #if $alltime.outTemp.has_data
-        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Temperature')</span><b>$alltime.outTemp.max.format(add_label=False)$unit.label.outTemp<span class="rec-date">$alltime.outTemp.maxtime.format("%d %b %Y")</span></b></div>
-        <div class="rec-row"><span class="rec-lbl">$lbl('Lowest Temperature')</span><b>$alltime.outTemp.min.format(add_label=False)$unit.label.outTemp<span class="rec-date">$alltime.outTemp.mintime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Temperature')</span><b>$alltime.outTemp.max.format()<span class="rec-date">$alltime.outTemp.maxtime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Lowest Temperature')</span><b>$alltime.outTemp.min.format()<span class="rec-date">$alltime.outTemp.mintime.format("%d %b %Y")</span></b></div>
         #end if
         #if $alltime.windGust.has_data
-        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Wind Gust')</span><b>$alltime.windGust.max.format(add_label=False)$unit.label.windGust<span class="rec-date">$alltime.windGust.maxtime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Wind Gust')</span><b>$alltime.windGust.max.format()<span class="rec-date">$alltime.windGust.maxtime.format("%d %b %Y")</span></b></div>
         #end if
         #if $alltime.outHumidity.has_data
-        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Humidity')</span><b>$alltime.outHumidity.max.format(add_label=False)%<span class="rec-date">$alltime.outHumidity.maxtime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Humidity')</span><b>$alltime.outHumidity.max.format()<span class="rec-date">$alltime.outHumidity.maxtime.format("%d %b %Y")</span></b></div>
         #end if
         #if $alltime.barometer.has_data
-        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Barometer')</span><b>$alltime.barometer.max.format(add_label=False)$unit.label.barometer<span class="rec-date">$alltime.barometer.maxtime.format("%d %b %Y")</span></b></div>
-        <div class="rec-row"><span class="rec-lbl">$lbl('Lowest Barometer')</span><b>$alltime.barometer.min.format(add_label=False)$unit.label.barometer<span class="rec-date">$alltime.barometer.mintime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Barometer')</span><b>$alltime.barometer.max.format()<span class="rec-date">$alltime.barometer.maxtime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Lowest Barometer')</span><b>$alltime.barometer.min.format()<span class="rec-date">$alltime.barometer.mintime.format("%d %b %Y")</span></b></div>
         #end if
         #if $alltime.rainRate.has_data
-        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Rain Rate')</span><b>$alltime.rainRate.max.format(add_label=False)$unit.label.rainRate<span class="rec-date">$alltime.rainRate.maxtime.format("%d %b %Y")</span></b></div>
+        <div class="rec-row"><span class="rec-lbl">$lbl('Highest Rain Rate')</span><b>$alltime.rainRate.max.format()<span class="rec-date">$alltime.rainRate.maxtime.format("%d %b %Y")</span></b></div>
         #end if
       </div>
       #end if
