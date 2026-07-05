@@ -1,3 +1,11 @@
+1.4.0  2026-07-05
+  * Stale-data alert: a warning banner appears when the latest observation is
+    older than stale_alert_secs (default 3600, i.e. 1 hour), so a station that
+    stops reporting is visible on the page. The check runs in the visitor's
+    browser against an absolute timestamp, so it is timezone-independent and
+    works even if report generation has stopped. Set stale_alert_secs = 0 to
+    disable. Translated in all seven languages.
+
 1.3.3  2026-07-05
   * All-time records now format each value with its own unit conversion, so on a
     US-unit database displayed in metric (or vice versa) the numbers and labels

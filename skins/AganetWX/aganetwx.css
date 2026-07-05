@@ -566,3 +566,13 @@ body.layout-modern .disclaimer-bar {
 html[data-theme="dark"] body.layout-modern .disclaimer-bar {
   background: #2c2413; color: #d8bd8e; border-color: #4a3c1e;
 }
+/* Stale-data warning banner (shown by JS when the station is behind). */
+.stale-banner {
+  max-width: 1100px; margin: 10px auto 0; padding: 9px 20px;
+  font-size: 9.5pt; font-weight: 600; text-align: center; border-radius: 8px;
+  background: #fbe3e3; color: #a5281f; border: 1px solid #eeb4b0;
+}
+.stale-banner[hidden] { display: none; }
+html[data-theme="dark"] .stale-banner {
+  background: #3a1d1b; color: #ff9d92; border-color: #6a2c27;
+}

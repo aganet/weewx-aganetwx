@@ -35,6 +35,13 @@
 #set $_tzname = $os.readlink('/etc/localtime').split('zoneinfo/')[-1]
 #end if
 
+  ## Stale-data banner: shown by JS when the latest observation is older than
+  ## Extras.stale_alert_secs. Hidden until then; the "$AGE" span is filled in JS.
+  <div id="stale-banner" class="stale-banner" hidden>
+    <span class="i18n" data-i18n="Data stale">$gettext('Data stale')</span>
+    <span id="stale-age"></span>
+  </div>
+
   <div class="content">
 
     ## LEFT COLUMN
@@ -369,6 +376,11 @@
   <script>
     window.AGANETWX_PERIOD = "$period_key";
     window.AGANETWX_TZ = "$_tzname";
+    // Epoch (seconds) of the latest observation, for the client-side stale-data
+    // check. Absolute instant, so it works in any visitor timezone.
+    window.AGANETWX_LAST = #echo int($current.dateTime.raw) if $current.dateTime.has_data else 0#;
+    // Warn when data is older than this many seconds (0 disables).
+    window.AGANETWX_STALE_AFTER = #echo int($getVar('Extras.stale_alert_secs', 3600))#;
     // Unit labels resolved from the configured unit system, so charts follow
     // us/metric/metricwx (e.g. degF/inHg/mph vs degC/hPa/km/h). Trimmed.
     window.AGANETWX_UNITS = {

@@ -533,6 +533,37 @@
   }
   initWebcam();
 
+  // Stale-data banner: compare the latest observation's epoch (absolute, so it
+  // is timezone-independent) to the visitor's clock, and warn if the station
+  // has not reported for longer than the configured limit. Works even on a
+  // frozen page, since the check runs in the browser each load/tick.
+  function initStale() {
+    var banner = document.getElementById("stale-banner");
+    var last = window.AGANETWX_LAST || 0;
+    var limit = window.AGANETWX_STALE_AFTER || 0;
+    if (!banner || !last || !limit) return;
+    var ageEl = document.getElementById("stale-age");
+    function fmtAge(secs) {
+      var d = Math.floor(secs / 86400), h = Math.floor((secs % 86400) / 3600),
+          m = Math.floor((secs % 3600) / 60);
+      if (d) return d + "d " + h + "h";
+      if (h) return h + "h " + m + "m";
+      return m + "m";
+    }
+    function check() {
+      var age = Math.floor(Date.now() / 1000) - last;
+      if (age >= limit) {
+        if (ageEl) ageEl.textContent = " (" + fmtAge(age) + ")";
+        banner.hidden = false;
+      } else {
+        banner.hidden = true;
+      }
+    }
+    check();
+    setInterval(check, 60000);
+  }
+  initStale();
+
   // Temperature-reactive hero: tint the hero from cold (blue) to hot (red) by
   // interpolating hue across the configured range. Unit-independent (reads the
   // raw Celsius value emitted server-side). Only runs when hero-dynamic is set.

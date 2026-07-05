@@ -33,6 +33,7 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 - **Threshold highlighting**: a value's row lights up (red above `high`, blue below `low`) when it crosses per-metric limits. Ships with sensible warm-climate defaults; tune them per metric in `weewx.conf`.
 - **All-time records card**: highest/lowest temperature, wind gust, humidity, barometer and rain rate ever recorded in your archive, each with the date it happened.
 - **Last rain**: when it last rained and how many days ago.
+- **Stale-data alert**: a banner warns when the station has not reported for over an hour (configurable), so an outage is visible on the page. Checked in the browser, so it shows even if generation has stopped, and it is timezone-independent.
 - **Sensor-agnostic**: auto-discovers and displays whatever your station records (extra temp/humidity, soil, leaf, air quality, lightning, battery) with no hardcoded list. Looks complete on Davis, Ecowitt, Tempest, or a bare thermometer.
 - **Config-driven theming**: colors, gradient, font, density, **light / dark / auto** mode, all from `weewx.conf`. A header switcher lets visitors pick **Modern / Classic / Dark** live (remembered per browser).
 - **Multi-language with a live switcher**: English, Greek, Spanish, French, German, Italian, Portuguese included. A header dropdown swaps every label and chart instantly (no reload); the browser language is auto-picked and remembered. Add a language by dropping in one `lang/<code>.conf` file. No template edits.
@@ -52,14 +53,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.3.3.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.4.0.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.3.3.zip
+sudo weectl extension install /path/to/AganetWX-1.4.0.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -143,6 +144,7 @@ Example:
 | `Extras.celestial` | bool | `true` | Sun and Moon card |
 | `Extras.disclaimer` | bool | `true` | Amateur-station disclaimer in the footer |
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |
+| `Extras.stale_alert_secs` | seconds | `3600` | Warn (banner) when the latest observation is older than this; `0` disables |
 | `theme.layout` | `modern`,`classic` | `modern` | flat card-tile dashboard vs. compact rows |
 | `theme.mode` | `light`,`dark`,`auto` | `light` | `auto` follows the visitor's OS preference |
 | `theme.switcher` | bool | `true` | Header dropdown to switch Modern/Classic/Dark (remembered per browser) |
