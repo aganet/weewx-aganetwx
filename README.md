@@ -41,6 +41,7 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 - **About page**: station hardware, coordinates, altitude and software versions read automatically, plus editable prose and contact fields. Coordinates hide behind one toggle for privacy.
 - **Optional webcam banner**: a live camera image above the navigation on the Current page. Auto-refreshes only when the frame actually changed (or stays static), shows a countdown, and click-to-enlarge opens it full-size in a lightbox. Size, position and a click-through link are configurable.
 - **Useful Links card**: a small set of external links (a lightning map, Windy, a satellite view; Greece-centered by default), editable in config.
+- **Optional HF propagation card**: amateur-radio solar-terrestrial data (solar flux, sunspots, A-index, K-index) and a colour-coded HF band-conditions table, fetched server-side from HamQSL. Off by default.
 - **Respects your WeeWX units**: US, metric or metricwx, the skin follows your station's `unit_system` (and timezone) rather than forcing its own. Every value, chart axis and label matches the rest of your WeeWX setup. Override per-report if you want this page to differ.
 
 ## Requirements
@@ -53,14 +54,14 @@ Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/agane
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.4.0.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.5.0.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.4.0.zip
+sudo weectl extension install /path/to/AganetWX-1.5.0.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -160,6 +161,8 @@ Example:
 | `rows.<row>` | bool | `true` | Show/hide a Current-Values row (`humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation`) |
 | `Extras.rows_show_range` | bool | `true` | Today's high/low (with time) beside each current value |
 | `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
+| `Extras.solar` | bool | `false` | HF propagation card (HamQSL solar data + band conditions) |
+| `Extras.solar_timeout` | seconds | `15` | Timeout for the server-side HamQSL fetch |
 | `alerts.<obs>.high` / `.low` | number | Greek-climate defaults | Highlight a Current-Values row when the value crosses this limit (in your displayed units); defaults set for temp, apparent temp, wind, humidity, rain rate, UV |
 | `about.prose_en` / `prose_el` | string | empty | About-page description (inline HTML ok) |
 | `about.operator` / `website_url` / `website_text` / `email` | string | empty | About-page contact fields |
@@ -327,6 +330,26 @@ Edit, add, remove, or hide them from `weewx.conf`, no template editing:
 
 Each `[[[[[entry]]]]]` needs a `url` and `text`; order is the display order. Set
 `show = false` to hide the card.
+
+## HF propagation card
+
+An optional card for amateur-radio operators showing current solar-terrestrial
+conditions: solar flux, sunspot number, A-index, K-index, and a colour-coded HF
+band-conditions table (80m-40m, 30m-20m, 17m-15m, 12m-10m; day and night;
+Good/Fair/Poor). Data comes from [HamQSL](https://www.hamqsl.com) (N0NBH).
+
+It is fetched server-side once per report cycle, so the generated page makes no
+client-side external request. The last good reading is cached, so a temporary
+fetch failure reuses it; the card stays hidden until the first successful fetch.
+It is off by default:
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            solar = true
+            solar_timeout = 15
+```
 
 ## How it works
 

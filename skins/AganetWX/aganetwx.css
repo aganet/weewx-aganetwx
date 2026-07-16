@@ -261,7 +261,7 @@ html[data-theme="dark"] .trend-arrow.down { color: #7fc0ff; }
   color: #fff; font-size: 9pt;
 }
 .webcam-live {
-  position: absolute; top: 8px; right: 8px;
+  position: absolute; bottom: 8px; left: 8px;
   display: flex; align-items: center; gap: 6px;
   padding: 3px 9px; border-radius: 12px;
   background: rgba(0,0,0,0.5); color: #fff; font-size: 8.5pt; line-height: 1;
@@ -301,6 +301,31 @@ html[data-theme="dark"] .trend-arrow.down { color: #7fc0ff; }
 .links-card .link-row:first-of-type { border-top: 0; }
 .links-card .link-row:hover { text-decoration: underline; }
 .links-card .link-row::after { content: " \2197"; opacity: 0.5; font-size: 0.85em; }
+/* HF propagation (HamQSL) card. */
+.solar-card .solar-indices {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 6px; padding: 10px 14px 4px;
+}
+.solar-card .solar-idx {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.solar-card .si-val { font-size: 1.35em; font-weight: 700; line-height: 1.1; }
+.solar-card .si-lbl { font-size: 0.72em; color: var(--m-muted); margin-top: 2px; }
+.solar-bands { width: 100%; border-collapse: collapse; margin: 8px 0 2px; }
+.solar-bands th, .solar-bands td {
+  padding: 5px 14px; text-align: left; font-size: 0.9em;
+  border-top: 1px solid var(--m-rule);
+}
+.solar-bands th { font-weight: 600; color: var(--m-muted); font-size: 0.78em; }
+.solar-bands .sb-band { font-weight: 600; }
+.solar-bands .sb-cond { font-weight: 600; }
+.solar-bands .cond-good { color: #1e8f4e; }
+.solar-bands .cond-fair { color: #c98a00; }
+.solar-bands .cond-poor { color: #c0392b; }
+.solar-card .solar-src {
+  padding: 6px 14px 10px; font-size: 0.72em; color: var(--m-muted);
+}
 .baro-trend .bt-arrow { margin-right: 3px; }
 .baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }
 .baro-trend.up   .bt-arrow { color: #c0392b; }

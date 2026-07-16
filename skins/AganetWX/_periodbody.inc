@@ -319,6 +319,49 @@
       </div>
       #end if
 
+      ## HF propagation (HamQSL/N0NBH), fetched server-side. Hidden until the
+      ## first successful fetch; enable via [Extras] solar in weewx.conf.
+      #def condcls($v)
+#set $vl = $str($v).strip().lower()
+#if $vl == 'good'
+#return 'cond-good'
+#elif $vl == 'fair' or $vl == 'poor - fair'
+#return 'cond-fair'
+#elif $vl == 'poor'
+#return 'cond-poor'
+#else
+#return ''
+#end if
+#end def
+      #if $getVar('solar', None)
+      <div class="col_sub gradient boxshadow dist solar-card">
+        <div class="headline">$lbl('HF Propagation')</div>
+        <div class="solar-indices">
+          <div class="solar-idx"><span class="si-val">$solar.sfi</span><span class="si-lbl">$lbl('Solar Flux')</span></div>
+          <div class="solar-idx"><span class="si-val">$solar.sunspots</span><span class="si-lbl">$lbl('Sunspots')</span></div>
+          <div class="solar-idx"><span class="si-val">$solar.aindex</span><span class="si-lbl">$lbl('A-Index')</span></div>
+          <div class="solar-idx"><span class="si-val">$solar.kindex</span><span class="si-lbl">$lbl('K-Index')</span></div>
+        </div>
+        #if $solar.bands
+        <table class="solar-bands">
+          <thead><tr><th>$lbl('Band')</th><th>$lbl('Day')</th><th>$lbl('Night')</th></tr></thead>
+          <tbody>
+          #for $b in $solar.bands
+          <tr>
+            <td class="sb-band">$b[0]</td>
+            <td class="sb-cond $condcls($b[1])">$lbl($b[1])</td>
+            <td class="sb-cond $condcls($b[2])">$lbl($b[2])</td>
+          </tr>
+          #end for
+          </tbody>
+        </table>
+        #end if
+        #if $solar.updated
+        <div class="solar-src">$lbl('Source') hamqsl.com</div>
+        #end if
+      </div>
+      #end if
+
     </div>
 
     ## RIGHT COLUMN: charts for $period_key

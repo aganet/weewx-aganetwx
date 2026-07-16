@@ -1,3 +1,12 @@
+1.5.0  2026-07-16
+  * HF Propagation card (optional): solar flux, sunspots, A-index and K-index
+    plus a colour-coded HF band-conditions table (day/night, Good/Fair/Poor)
+    for amateur radio. Data is fetched server-side from HamQSL (N0NBH) once per
+    report cycle, so the page stays self-contained with no client-side external
+    calls. The last good reading is cached, so a failed fetch reuses it; the
+    card stays hidden until the first successful fetch. Off by default; enable
+    with solar = true in [Extras]. Translated in all seven languages.
+
 1.4.0  2026-07-05
   * Stale-data alert: a warning banner appears when the latest observation is
     older than stale_alert_secs (default 3600, i.e. 1 hour), so a station that

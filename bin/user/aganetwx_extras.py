@@ -185,3 +185,70 @@ class AganetWXI18n(SearchList):
             'i18n_langs': self.names,
             'i18n_enabled': len(self.names) > 1,
         }]
+
+
+class AganetWXSolar(SearchList):
+    """Fetches HamQSL (N0NBH) solar-terrestrial data once per report cycle and
+    exposes it to the template as $solar. Self-contained: only the server makes
+    the request, so the generated page has no client-side external calls. The
+    last good result is cached, so a failed fetch reuses it rather than blanking
+    the card; the card only stays hidden until the first successful fetch."""
+
+    URL = 'https://www.hamqsl.com/solarxml.php'
+    # Cache shared across instances/cycles in this process.
+    _cache = None
+
+    def get_extension_list(self, timespan, db_lookup):
+        extras = self.generator.skin_dict.get('Extras', {})
+        enabled = str(extras.get('solar', 'false')).strip().lower() \
+            not in ('false', '0', 'no', 'off', '')
+        if not enabled:
+            return [{'solar': None}]
+        try:
+            timeout = int(extras.get('solar_timeout', 15))
+        except (TypeError, ValueError):
+            timeout = 15
+        data = self._fetch(timeout)
+        if data is not None:
+            AganetWXSolar._cache = data
+        return [{'solar': AganetWXSolar._cache}]
+
+    def _fetch(self, timeout):
+        import urllib.request
+        import xml.etree.ElementTree as ET
+        try:
+            with urllib.request.urlopen(self.URL, timeout=timeout) as resp:
+                raw = resp.read()
+            root = ET.fromstring(raw)
+            sd = root.find('solardata')
+            if sd is None:
+                return None
+
+            def txt(tag):
+                el = sd.find(tag)
+                return el.text.strip() if el is not None and el.text else ''
+
+            bands = {}
+            cc = sd.find('calculatedconditions')
+            if cc is not None:
+                for band in cc.findall('band'):
+                    name = band.get('name')
+                    time = band.get('time')
+                    if name and time and band.text:
+                        bands.setdefault(name, {})[time] = band.text.strip()
+
+            return {
+                'updated': txt('updated'),
+                'sfi': txt('solarflux'),
+                'sunspots': txt('sunspots'),
+                'aindex': txt('aindex'),
+                'kindex': txt('kindex'),
+                'xray': txt('xray'),
+                'geomag': txt('geomagfield'),
+                # Ordered list of (band-label, day-condition, night-condition).
+                'bands': [(n, bands[n].get('day', ''), bands[n].get('night', ''))
+                          for n in ('80m-40m', '30m-20m', '17m-15m', '12m-10m')
+                          if n in bands],
+            }
+        except Exception:
+            return None
