@@ -188,15 +188,18 @@ class AganetWXI18n(SearchList):
 
 
 class AganetWXSolar(SearchList):
-    """Fetches HamQSL (N0NBH) solar-terrestrial data once per report cycle and
-    exposes it to the template as $solar. Self-contained: only the server makes
-    the request, so the generated page has no client-side external calls. The
-    last good result is cached, so a failed fetch reuses it rather than blanking
-    the card; the card only stays hidden until the first successful fetch."""
+    """Fetches HamQSL (N0NBH) solar-terrestrial data and exposes it to the
+    template as $solar. Self-contained: only the server makes the request, so
+    the generated page has no client-side external calls.
+
+    The reading is cached on disk with its fetch time. A network fetch happens
+    only when the cache is missing or older than solar_refresh (default 3600s);
+    every other report cycle reads the cache and adds no delay. HamQSL itself
+    updates roughly hourly, so an hour is a sensible default. A failed fetch
+    falls back to the cached reading; the card stays hidden only until the first
+    successful fetch."""
 
     URL = 'https://www.hamqsl.com/solarxml.php'
-    # Cache shared across instances/cycles in this process.
-    _cache = None
 
     def get_extension_list(self, timespan, db_lookup):
         extras = self.generator.skin_dict.get('Extras', {})
@@ -208,10 +211,46 @@ class AganetWXSolar(SearchList):
             timeout = int(extras.get('solar_timeout', 15))
         except (TypeError, ValueError):
             timeout = 15
+        try:
+            refresh = int(extras.get('solar_refresh', 3600))
+        except (TypeError, ValueError):
+            refresh = 3600
+
+        import time
+        cache_path = self._cache_path()
+        cached, age = self._read_cache(cache_path)
+        # Serve from cache unless it is missing or stale.
+        if cached is not None and age is not None and age < refresh:
+            return [{'solar': cached}]
+
         data = self._fetch(timeout)
         if data is not None:
-            AganetWXSolar._cache = data
-        return [{'solar': AganetWXSolar._cache}]
+            self._write_cache(cache_path, data, time.time())
+            return [{'solar': data}]
+        # Fetch failed: reuse the last good reading if we have one.
+        return [{'solar': cached}]
+
+    def _cache_path(self):
+        import tempfile
+        return os.path.join(tempfile.gettempdir(), 'aganetwx_solar.json')
+
+    def _read_cache(self, path):
+        import time
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                obj = json.load(f)
+            return obj.get('data'), time.time() - float(obj.get('fetched', 0))
+        except Exception:
+            return None, None
+
+    def _write_cache(self, path, data, fetched):
+        try:
+            tmp = path + '.tmp'
+            with open(tmp, 'w', encoding='utf-8') as f:
+                json.dump({'fetched': fetched, 'data': data}, f)
+            os.replace(tmp, path)
+        except Exception:
+            pass
 
     def _fetch(self, timeout):
         import urllib.request

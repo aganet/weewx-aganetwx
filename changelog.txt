@@ -1,3 +1,9 @@
+1.5.1  2026-07-16
+  * HF propagation card now caches the HamQSL reading on disk and only re-fetches
+    when it is older than solar_refresh (new setting, default 3600s). HamQSL
+    updates about hourly, so most report cycles now read the cache and add no
+    delay, instead of fetching every cycle.
+
 1.5.0  2026-07-16
   * HF Propagation card (optional): solar flux, sunspots, A-index and K-index
     plus a colour-coded HF band-conditions table (day/night, Good/Fair/Poor)
