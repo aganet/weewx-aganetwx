@@ -1,3 +1,8 @@
+1.5.3  2026-07-17
+  * Reverted the webcam min-height reservation added in 1.5.2: it left a tall
+    empty box when the image was shorter or still loading. The banner again
+    sizes to the image, as before 1.5.2.
+
 1.5.2  2026-07-17
   * Accessibility and SEO pass. Each page now wraps its content in a <main>
     landmark and carries a translated meta description. Inline links in the
