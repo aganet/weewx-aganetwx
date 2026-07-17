@@ -1,3 +1,12 @@
+1.5.2  2026-07-17
+  * Accessibility and SEO pass. Each page now wraps its content in a <main>
+    landmark and carries a translated meta description. Inline links in the
+    footer, About prose and disclaimer are underlined so they no longer rely on
+    colour alone. The HF band-condition colours (Good/Fair/Poor) were darkened
+    to meet WCAG AA contrast in both light and dark themes.
+  * Webcam banner reserves its configured height up front (min-height), so the
+    image loading no longer shifts the page (fixes cumulative layout shift).
+
 1.5.1  2026-07-16
   * HF propagation card now caches the HamQSL reading on disk and only re-fetches
     when it is older than solar_refresh (new setting, default 3600s). HamQSL

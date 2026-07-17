@@ -42,6 +42,10 @@ html, body {
 body { overflow-y: scroll; }
 a { text-decoration: none; color: var(--m-accent); }
 a:hover { text-decoration: underline; }
+/* Inline links inside running text are underlined so they are distinguishable
+   without relying on color alone (WCAG). Nav tabs, link-cards and header
+   controls have their own affordance and stay underline-free. */
+.footer a, .about-body a, .disclaimer-bar a { text-decoration: underline; }
 
 /* Accessibility: visible keyboard focus. */
 a:focus-visible, button:focus-visible, .navtab:focus-visible {
@@ -320,9 +324,13 @@ html[data-theme="dark"] .trend-arrow.down { color: #7fc0ff; }
 .solar-bands th { font-weight: 600; color: var(--m-muted); font-size: 0.78em; }
 .solar-bands .sb-band { font-weight: 600; }
 .solar-bands .sb-cond { font-weight: 600; }
-.solar-bands .cond-good { color: #1e8f4e; }
-.solar-bands .cond-fair { color: #c98a00; }
+/* Band-condition colors chosen to meet WCAG AA (>=4.5:1) on the panel bg. */
+.solar-bands .cond-good { color: #157347; }
+.solar-bands .cond-fair { color: #946200; }
 .solar-bands .cond-poor { color: #c0392b; }
+html[data-theme="dark"] .solar-bands .cond-good { color: #5cd08a; }
+html[data-theme="dark"] .solar-bands .cond-fair { color: #e6b04a; }
+html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
 .solar-card .solar-src {
   padding: 6px 14px 10px; font-size: 0.72em; color: var(--m-muted);
 }

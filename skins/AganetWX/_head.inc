@@ -25,6 +25,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>$station.location</title>
+  <meta name="description" content="$station.location: $gettext('Meta description')">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -183,7 +184,9 @@
   #set $wc_style = $wc_style + 'max-width:' + str(int($wc.get('max_width'))) + 'px;'
   #end if
   #if $wc.get('height')#
-  #set $wc_style = $wc_style + 'max-height:' + str(int($wc.get('height'))) + 'px;'
+  ## Reserve the height up front (min-height) so the image loading does not push
+  ## content down (prevents cumulative layout shift).
+  #set $wc_style = $wc_style + 'max-height:' + str(int($wc.get('height'))) + 'px;min-height:' + str(int($wc.get('height'))) + 'px;'
   #end if
   ## Without a click-through link, the image is click-to-enlarge (lightbox).
   #set $wc_zoom = not $wc.get('link')

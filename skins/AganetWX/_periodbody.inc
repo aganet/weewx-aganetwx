@@ -42,7 +42,7 @@
     <span id="stale-age"></span>
   </div>
 
-  <div class="content">
+  <main class="content" id="main">
 
     ## LEFT COLUMN
     <div class="left_col">
@@ -414,7 +414,7 @@
     </div>
 
     <div class="clear"></div>
-  </div>
+  </main>
 
   <script>
     window.AGANETWX_PERIOD = "$period_key";
