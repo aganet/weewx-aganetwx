@@ -8,6 +8,8 @@ configured entirely from `weewx.conf`, with **no template editing required**.
 
 Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/aganet/weewx-aganetwx)
 
+Live demo: [aganet.gr](https://aganet.gr)
+
 ![Modern layout (default)](screenshot-modern.png)
 
 <details>
