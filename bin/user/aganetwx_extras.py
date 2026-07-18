@@ -294,14 +294,36 @@ class AganetWXSolar(SearchList):
 
 
 class AganetWXForecast(SearchList):
-    """Local Zambretti forecast from the station's own barometer: sea-level
-    pressure, its trend, wind direction and season map to one of 26 short
-    forecast phrases (the classic analogue-barometer method). No external data.
+    """Short local forecast, exposed as $zambretti = {'text_key', 'icon'}.
 
-    This is a faithful port of the pywws implementation (jim-easterbrook/pywws,
-    forecast.py); the formulas, wind/season adjustments and lookup tables match
-    it exactly. Exposed as $zambretti = {'code', 'text_key'}; None when disabled
-    or pressure/trend are unavailable. Off by default (Extras.forecast)."""
+    Two sources, chosen by Extras.forecast_type:
+      davis     - the console's own forecast, read from the Davis forecastIcon
+                  field (authentic to the hardware; needs a Davis station that
+                  records it).
+      zambretti - computed from the station's barometer, its trend, wind and
+                  season (works on any station with a barometer).
+      auto      - prefer Davis when present, otherwise Zambretti (default).
+
+    No external data either way. None when disabled or no data is available.
+    Off by default (Extras.forecast).
+
+    The Zambretti formulas, adjustments and phrase tables are a faithful port of
+    the pywws implementation (jim-easterbrook/pywws, forecast.py). The Davis
+    forecastIcon values are from the Vantage Serial Protocol (Rev 2.6.1)."""
+
+    # Davis forecastIcon byte -> (forecast text, our icon category). From the
+    # Vantage Serial Protocol; the console shows one of these nine states.
+    DAVIS_ICON = {
+        8:  ('Mostly clear', 'sun'),
+        6:  ('Partly cloudy', 'partly'),
+        2:  ('Mostly cloudy', 'cloudy'),
+        3:  ('Mostly cloudy, rain within 12 hours', 'rain'),
+        18: ('Mostly cloudy, snow within 12 hours', 'snow'),
+        19: ('Mostly cloudy, rain or snow within 12 hours', 'rain'),
+        7:  ('Partly cloudy, rain within 12 hours', 'showers'),
+        22: ('Partly cloudy, snow within 12 hours', 'snow'),
+        23: ('Partly cloudy, rain or snow within 12 hours', 'showers'),
+    }
 
     PHRASES = {
         'A': 'Settled fine', 'B': 'Fine weather', 'C': 'Becoming fine',
@@ -340,14 +362,40 @@ class AganetWXForecast(SearchList):
             not in ('false', '0', 'no', 'off', '')
         if not enabled:
             return [{'zambretti': None}]
+        kind = str(extras.get('forecast_type', 'auto')).strip().lower()
+
+        result = None
         try:
-            code = self._code(db_lookup(), timespan.stop)
+            db_manager = db_lookup()
+            if kind in ('auto', 'davis'):
+                result = self._davis(db_manager)
+                if result is not None:
+                    result['source_key'] = 'From the station console'
+            if result is None and kind in ('auto', 'zambretti'):
+                code = self._code(db_manager, timespan.stop)
+                if code is not None:
+                    result = {'text_key': self.PHRASES[code], 'icon': self.ICONS[code],
+                              'source_key': "Based on this station's barometer"}
         except Exception:
-            code = None
-        if code is None:
-            return [{'zambretti': None}]
-        return [{'zambretti': {'code': code, 'text_key': self.PHRASES[code],
-                               'icon': self.ICONS[code]}}]
+            result = None
+        return [{'zambretti': result}]
+
+    def _davis(self, db_manager):
+        """Read the Davis console's own forecast from the latest forecastIcon.
+        Returns None if the field is absent/empty (non-Davis or not recorded)."""
+        table = db_manager.table_name
+        try:
+            row = db_manager.getSql(
+                "SELECT forecastIcon FROM %s WHERE forecastIcon IS NOT NULL "
+                "ORDER BY dateTime DESC LIMIT 1" % table)
+        except Exception:
+            return None   # column does not exist on this station
+        if not row or row[0] is None:
+            return None
+        entry = self.DAVIS_ICON.get(int(row[0]))
+        if entry is None:
+            return None
+        return {'text_key': entry[0], 'icon': entry[1]}
 
     def _hpa(self, value, us_units):
         """Barometer to hPa (US stores inHg; metric systems store mbar == hPa)."""

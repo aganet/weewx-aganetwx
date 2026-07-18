@@ -138,6 +138,11 @@
           #elif $zambretti.icon == 'rain'
             <svg viewBox="0 0 48 48"><path class="fc-cloud" d="M15 26 a7 7 0 0 1 1-13 a9 9 0 0 1 17 2 a6 6 0 0 1 -1 11 Z"/>#slurp
             <line class="fc-drop" x1="16" y1="31" x2="13" y2="40"/><line class="fc-drop" x1="24" y1="31" x2="21" y2="40"/><line class="fc-drop" x1="32" y1="31" x2="29" y2="40"/></svg>
+          #elif $zambretti.icon == 'cloudy'
+            <svg viewBox="0 0 48 48"><path class="fc-cloud" d="M14 32 a8 8 0 0 1 1-15 a10 10 0 0 1 19 2 a7 7 0 0 1 -1 13 Z"/></svg>
+          #elif $zambretti.icon == 'snow'
+            <svg viewBox="0 0 48 48"><path class="fc-cloud" d="M15 26 a7 7 0 0 1 1-13 a9 9 0 0 1 17 2 a6 6 0 0 1 -1 11 Z"/>#slurp
+            <path class="fc-flake" d="M17 33 l0 6 M14 34.5 l6 3 M20 34.5 l-6 3"/><path class="fc-flake" d="M27 33 l0 6 M24 34.5 l6 3 M30 34.5 l-6 3"/></svg>
           #else
             <svg viewBox="0 0 48 48"><path class="fc-cloud" d="M15 24 a7 7 0 0 1 1-13 a9 9 0 0 1 17 2 a6 6 0 0 1 -1 11 Z"/>#slurp
             <path class="fc-bolt" d="M24 28 L19 38 L23 38 L21 45 L29 34 L24 34 Z"/></svg>
@@ -145,7 +150,7 @@
           </div>
           <div class="forecast-copy">
             <div class="forecast-text">$lbl($zambretti.text_key)</div>
-            <div class="forecast-src">$lbl("Based on this station's barometer")</div>
+            <div class="forecast-src">$lbl($zambretti.source_key)</div>
           </div>
         </div>
       </div>

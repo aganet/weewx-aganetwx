@@ -352,6 +352,7 @@ html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
 .forecast-icon .fc-cloud { fill: #9aa7b4; }
 .forecast-icon .fc-drop  { stroke: #2e86de; stroke-width: 3; stroke-linecap: round; }
 .forecast-icon .fc-bolt  { fill: #f1a413; }
+.forecast-icon .fc-flake { stroke: #6aa9d8; stroke-width: 2; stroke-linecap: round; }
 .forecast-icon.fc-storm .fc-cloud { fill: #6b7784; }
 .baro-trend .bt-arrow { margin-right: 3px; }
 .baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }

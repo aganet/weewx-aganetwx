@@ -1,3 +1,11 @@
+1.7.1  2026-07-18
+  * Forecast card can now show the Davis console's own forecast, read from the
+    forecastIcon field (mapped per the Vantage Serial Protocol Rev 2.6.1), with
+    the matching icon and a "From the station console" note. New forecast_type:
+    "auto" (default) prefers the Davis forecast and falls back to Zambretti,
+    "davis" uses only the console, "zambretti" uses only the computed method.
+    Added cloudy and snow icons. Non-Davis stations are unaffected (Zambretti).
+
 1.7.0  2026-07-18
   * New local forecast card (Current page): a short outlook worked out from the
     station's own barometer, its trend, wind direction and season, with a
