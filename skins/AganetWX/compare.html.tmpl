@@ -17,8 +17,12 @@
       #if $tf($getVar('Extras.compare_page', False))
       <div class="col_sub allround gradient boxshadow dist">
         <div class="headline">$lbl('Compare across years')</div>
+        <div class="cmpx-modes">
+          <button type="button" id="cmpx-mode-month" class="cmpx-mode cmpx-mode-on">$lbl('By month')</button>
+          <button type="button" id="cmpx-mode-year" class="cmpx-mode">$lbl('Whole year')</button>
+        </div>
         <div class="cmpx-controls">
-          <label class="cmpx-field">
+          <label class="cmpx-field" id="cmpx-month-field">
             <span>$lbl('Month')</span>
             <select id="cmpx-month">
               #for $i, $mn in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])

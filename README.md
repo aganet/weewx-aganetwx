@@ -36,7 +36,7 @@ Live demo: [aganet.gr](https://aganet.gr)
 - An all-time records card: the highest and lowest temperature, wind gust, humidity, barometer and rain rate in your archive, each with the date it happened. There's also a "last rain" line.
 - A "today in one sentence" summary in plain language, built from the station's own data, with active weather alerts (heat, frost, strong wind, heavy rain, high UV, humidity) appended when today crosses your thresholds. On by default.
 - A "compared to the past" card: today vs yesterday, this month's rain vs the same month in prior years, and today vs this date last year, all from your own archive. Off by default; richer with more history.
-- An optional History page (own nav tab): overlay any metric across every year in your archive, day-by-day for a chosen month, to see which years ran hot, wet or windy. Pick years with checkboxes; the newest is drawn bold. Off by default.
+- An optional History page (own nav tab): overlay any metric across every year in your archive, either day-by-day for a chosen month or across all twelve months of each year, to see which years ran hot, wet or windy. Pick years with checkboxes; the newest is drawn bold. Off by default.
 - A stale-data banner when the station goes quiet for over an hour (configurable). It runs in the browser off an absolute timestamp, so it still shows if report generation has stopped, and it is right in any visitor's timezone.
 - Sensor-agnostic. It discovers whatever your station records, extra temperature and humidity channels, soil, leaf, air quality, lightning, battery, with no hardcoded list, so it looks complete on a Davis, an Ecowitt, a Tempest, or a bare thermometer.
 - Theming from `weewx.conf`: colours, gradient, font, density, and light / dark / auto mode. A header switcher lets visitors flip between Modern, Classic and Dark, and their choice sticks.
@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.7.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.8.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.7.zip
+sudo weectl extension install /path/to/AganetWX-1.8.8.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -295,9 +295,12 @@ An optional page (its own **History** tab) for exploring your whole archive: it
 overlays a chosen metric across every year, day-by-day for a chosen month, so
 you can see at a glance which Julys were hottest or which winters were wettest.
 
-Pick the month and metric (temperature, rain, wind, humidity, pressure, UV,
-solar radiation) from dropdowns, and tick the years to show (with All / None
-buttons). The most recent year is drawn bold; older years fade towards grey.
+A toggle at the top picks the view. "By month" overlays a chosen month day by
+day; "Whole year" overlays all twelve months, one line per year, where rain is
+the monthly total and every other metric the monthly average. Pick the metric
+(temperature, rain, wind, humidity, pressure, UV, solar radiation) from a
+dropdown, and tick the years to show (with All / None buttons). The most recent
+year is drawn bold; older years fade towards grey.
 
 It aggregates the whole archive, so the result is cached on disk and rebuilt
 only once a day by default (set `compare_refresh` in seconds), which keeps

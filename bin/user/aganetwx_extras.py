@@ -601,6 +601,7 @@ class AganetWXCompareData(SearchList):
         years = set()
         data = {}
         for key, col, agg, group in self.METRICS:
+            # Per-day within each month (for the "by month" view).
             month_map = {}
             sql = ("SELECT strftime('%%m', dateTime, 'unixepoch', 'localtime') mo, "
                    "strftime('%%Y', dateTime, 'unixepoch', 'localtime') yr, "
@@ -615,4 +616,20 @@ class AganetWXCompareData(SearchList):
                 if 1 <= dy <= 31:
                     arr[dy - 1] = self._convert(val, group, sysid)
             data[key] = month_map
+
+            # Per-month within each year (for the "whole year" view): rain is a
+            # monthly total, everything else a monthly average.
+            year_agg = 'SUM' if agg == 'sum' else 'AVG'
+            year_map = {}
+            ysql = ("SELECT strftime('%%Y', dateTime, 'unixepoch', 'localtime') yr, "
+                    "CAST(strftime('%%m', dateTime, 'unixepoch', 'localtime') AS INTEGER) mo, "
+                    "%s(%s) FROM %s WHERE %s IS NOT NULL GROUP BY yr, mo"
+                    % (year_agg, col, table, col))
+            for yr, mo, val in db_manager.genSql(ysql):
+                if val is None or mo is None:
+                    continue
+                arr = year_map.setdefault(yr, [None] * 12)
+                if 1 <= mo <= 12:
+                    arr[mo - 1] = self._convert(val, group, sysid)
+            data[key + '_year'] = year_map
         return data, sorted(years)

@@ -364,6 +364,12 @@ html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
   border: 1px solid var(--m-border, #ccc); background: var(--m-panel-bg, #fff);
   color: var(--m-ink);
 }
+.cmpx-modes { display: flex; gap: 8px; padding: 10px 16px 2px; }
+.cmpx-mode {
+  font-size: 9pt; padding: 5px 14px; border-radius: 14px; cursor: pointer;
+  border: 1px solid var(--m-border, #ccc); background: var(--m-panel-bg, #fff); color: var(--m-ink);
+}
+.cmpx-mode.cmpx-mode-on { background: var(--m-accent, #0a5ca8); color: #fff; border-color: var(--m-accent, #0a5ca8); }
 .cmpx-hint { padding: 2px 16px 8px; font-size: 8.5pt; color: var(--m-muted); }
 .cmpx-years { padding: 4px 16px 8px; }
 .cmpx-years-head { display: flex; align-items: center; gap: 10px; font-size: 9pt; color: var(--m-muted); margin-bottom: 6px; }

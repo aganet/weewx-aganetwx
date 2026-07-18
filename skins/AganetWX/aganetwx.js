@@ -786,7 +786,13 @@
       humidity: "%", pressure: u("pressure", "hPa"), uv: "", radiation: u("radiation", "W/m²")
     };
     var chart = null, DB = null;
-    var selected = {};   // year -> shown?
+    var selected = {};       // year -> shown?
+    var mode = "month";      // "month" (days across years) | "year" (months)
+    var monthField = document.getElementById("cmpx-month-field");
+    var modeMonthBtn = document.getElementById("cmpx-mode-month");
+    var modeYearBtn = document.getElementById("cmpx-mode-year");
+    var MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
     // Default the month dropdown to the current month.
     var thisMonth = ("0" + (new Date().getMonth() + 1)).slice(-2);
@@ -809,21 +815,26 @@
 
     function draw() {
       if (!DB || !DB.years || !DB.years.length) { host.style.display = "none"; if (empty) empty.hidden = false; return; }
-      var mo = monthSel.value, metric = metricSel.value;
-      var byYear = (DB.data[metric] || {})[mo] || {};
+      var metric = metricSel.value;
+      var yearData;   // year -> array of values
+      if (mode === "year") {
+        yearData = DB.data[metric + "_year"] || {};
+      } else {
+        yearData = (DB.data[metric] || {})[monthSel.value] || {};
+      }
       // Newest first so rank 0 = most recent.
       var years = shownYears().slice().sort().reverse();
       var series = [];
       years.forEach(function (yr, rank) {
-        var arr = byYear[yr];
+        var arr = yearData[yr];
         if (!arr) return;
         var pts = [];
-        for (var d = 0; d < arr.length; d++) if (arr[d] != null) pts.push([d + 1, arr[d]]);
+        for (var i = 0; i < arr.length; i++) if (arr[i] != null) pts.push([i + 1, arr[i]]);
         if (!pts.length) return;
         var newest = (rank === 0);
         series.push({
-          name: yr, type: "line", showSymbol: false, smooth: true,
-          connectNulls: true, z: newest ? 10 : 1,
+          name: yr, type: "line", showSymbol: mode === "year", symbolSize: 4,
+          smooth: true, connectNulls: true, z: newest ? 10 : 1,
           lineStyle: { width: newest ? 2.6 : 1.4, color: colourFor(rank, years.length),
                        opacity: newest ? 1 : 0.75 },
           itemStyle: { color: colourFor(rank, years.length) }, data: pts
@@ -834,18 +845,34 @@
       if (!chart) chart = echarts.init(host);
       var un = unitFor[metric] || "";
       var suffix = un ? (un.charAt(0) === "°" || un === "%" ? un : " " + un) : "";
+      var xAxis = (mode === "year")
+        ? { type: "category", boundaryGap: false,
+            data: MONTHS_SHORT.map(function (m) { return decode(tr(m) || m); }),
+            axisLabel: { fontSize: 10, color: AX }, splitLine: { lineStyle: { color: GRID } } }
+        : { type: "value", min: 1, max: 31, minInterval: 1,
+            axisLabel: { fontSize: 10, color: AX }, splitLine: { lineStyle: { color: GRID } } };
+      // In year mode the point x is 1..12; map to category index 0..11.
+      if (mode === "year") {
+        series.forEach(function (s) { s.data = s.data.map(function (p) { return [p[0] - 1, p[1]]; }); });
+      }
       chart.setOption({
         tooltip: { trigger: "axis", valueFormatter: function (v) { return v + suffix; } },
         legend: { show: false },
         grid: { left: 56, right: 16, top: 12, bottom: 30 },
-        xAxis: { type: "value", min: 1, max: 31, minInterval: 1,
-                 axisLabel: { fontSize: 10, color: AX },
-                 splitLine: { lineStyle: { color: GRID } } },
+        xAxis: xAxis,
         yAxis: { type: "value", scale: true,
                  axisLabel: { fontSize: 10, color: AX, formatter: function (v) { return v + suffix; } },
                  splitLine: { lineStyle: { color: GRID } } },
         series: series
       }, true);
+    }
+
+    function setMode(m) {
+      mode = m;
+      if (modeMonthBtn) modeMonthBtn.classList.toggle("cmpx-mode-on", m === "month");
+      if (modeYearBtn) modeYearBtn.classList.toggle("cmpx-mode-on", m === "year");
+      if (monthField) monthField.style.display = (m === "year") ? "none" : "";
+      draw();
     }
 
     function buildYearBoxes() {
@@ -876,6 +903,8 @@
     metricSel.addEventListener("change", draw);
     if (btnAll) btnAll.addEventListener("click", function () { setAll(true); });
     if (btnNone) btnNone.addEventListener("click", function () { setAll(false); });
+    if (modeMonthBtn) modeMonthBtn.addEventListener("click", function () { setMode("month"); });
+    if (modeYearBtn) modeYearBtn.addEventListener("click", function () { setMode("year"); });
     window.addEventListener("resize", function () { if (chart) chart.resize(); });
   }
   initCompare();
