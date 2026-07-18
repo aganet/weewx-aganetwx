@@ -56,14 +56,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.5.3.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.5.4.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.5.3.zip
+sudo weectl extension install /path/to/AganetWX-1.5.4.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -148,6 +148,7 @@ Example:
 | `Extras.disclaimer` | bool | `true` | Amateur-station disclaimer in the footer |
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |
 | `Extras.stale_alert_secs` | seconds | `3600` | Warn (banner) when the latest observation is older than this; `0` disables |
+| `Extras.chart_tz` | IANA zone | auto | Timezone for chart-time labels (e.g. `Europe/Athens`); empty auto-detects from the server. Set it if charts are offset for visitors in another timezone |
 | `theme.layout` | `modern`,`classic` | `modern` | flat card-tile dashboard vs. compact rows |
 | `theme.mode` | `light`,`dark`,`auto` | `light` | `auto` follows the visitor's OS preference |
 | `theme.switcher` | bool | `true` | Header dropdown to switch Modern/Classic/Dark (remembered per browser) |

@@ -28,11 +28,23 @@
 #end if
 #end if
 #end def
-## Station IANA timezone (e.g. Europe/Athens) for correct chart-time labels,
-## from $TZ or /etc/localtime. Falls back to empty (viewer's browser zone).
+## Station IANA timezone (e.g. Europe/Athens) for correct chart-time labels.
+## Explicit Extras.chart_tz wins (set it if OS detection below is unreliable on
+## your host); otherwise fall back to $TZ, then /etc/localtime. Empty means the
+## charts use the viewer's own browser zone.
+#set $_tzname = $str($getVar('Extras.chart_tz', '')).strip()
+#if not $_tzname
 #set $_tzname = $os.environ.get('TZ', '')
+#end if
 #if not $_tzname and $os.path.islink('/etc/localtime')
 #set $_tzname = $os.readlink('/etc/localtime').split('zoneinfo/')[-1]
+#end if
+#if not $_tzname and $os.path.exists('/etc/timezone')
+#try
+#set $_tzname = open('/etc/timezone').read().strip()
+#except
+#set $_tzname = ''
+#end try
 #end if
 
   ## Stale-data banner: shown by JS when the latest observation is older than

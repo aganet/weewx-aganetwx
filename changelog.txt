@@ -1,3 +1,12 @@
+1.5.4  2026-07-17
+  * New Extras.chart_tz: set the station's IANA timezone (e.g. Europe/Athens)
+    explicitly for chart-time labels. Charts already tried to label in the
+    station's local time via the server OS timezone, but on hosts where that
+    auto-detection fails the charts fell back to the viewer's browser zone, so a
+    visitor in another timezone saw times offset from "Latest update". Set
+    chart_tz to fix it. Auto-detection (now also reading /etc/timezone) still
+    applies when chart_tz is empty.
+
 1.5.3  2026-07-17
   * Reverted the webcam min-height reservation added in 1.5.2: it left a tall
     empty box when the image was shorter or still loading. The banner again
