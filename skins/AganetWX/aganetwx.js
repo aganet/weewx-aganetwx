@@ -444,40 +444,84 @@
     });
   });
 
-  // Moon phase from data-fullness (0..100): lit/dark halves plus a terminator ellipse; data-waning flips sides.
+  // Realistic moon from data-fullness (0..100). A textured lit disc (warm
+  // moonlight + a few maria) is drawn full, then the un-lit part is covered by
+  // a shadow whose curved edge (the terminator) is a half-circle + an ellipse.
+  // The lit side is on the right when waxing, on the left when waning, matching
+  // the real sky. Reads clearly at every phase.
   function paintOneMoon(m, idx) {
     var f = Math.max(0, Math.min(100, parseFloat(m.getAttribute("data-fullness")) || 0));
     var waning = m.getAttribute("data-waning") === "1";
-    var lit = "#eef1f6", shadow = "#141922";   // bright moonlight, dark limb
     var k = f / 100;
-    var rx = 50 * Math.abs(1 - 2 * k);
-    var leftLit = waning, rightLit = !waning, ellLit = (k >= 0.5);
-    // Edge cases: full moon = both halves lit; new moon = both dark.
-    if (f >= 99.5) { leftLit = rightLit = true; }
-    else if (f <= 0.5) { leftLit = rightLit = false; }
-    function col(b) { return b ? lit : shadow; }
-    var cid = "moonClip" + idx;
-    var svg = '<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block">' +
+    var R = 50, C = 50;
+    var cid = "mc" + idx, tex = "mt" + idx, sh = "ms" + idx;
+
+    // Terminator ellipse half-width (0 at quarter, ->R near new/full).
+    var rx = R * Math.abs(1 - 2 * k);
+    // Which vertical half is lit: waxing lights the RIGHT, waning the LEFT.
+    var litRight = !waning;
+    // The terminator ellipse takes the LIT colour for a gibbous moon (k>0.5,
+    // lit past the meridian) and the DARK colour for a crescent (k<0.5).
+    var ellipseLit = (k >= 0.5);
+
+    var svg =
+      '<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block">' +
       '<defs>' +
         '<clipPath id="' + cid + '"><circle cx="50" cy="50" r="50"/></clipPath>' +
-        // Spherical shading: bright near the light source, softly darker at the limb.
-        '<radialGradient id="sh' + idx + '" cx="36%" cy="32%" r="78%">' +
-          '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/>' +
-          '<stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>' +
-          '<stop offset="100%" stop-color="#000000" stop-opacity="0.30"/>' +
+        // Warm moonlight sphere: bright near top-left, gently darker at the limb.
+        '<radialGradient id="' + tex + '" cx="38%" cy="34%" r="72%">' +
+          '<stop offset="0%" stop-color="#fdfdf5"/>' +
+          '<stop offset="70%" stop-color="#e9ebf0"/>' +
+          '<stop offset="100%" stop-color="#c7ccd6"/>' +
         '</radialGradient>' +
+        // Soft edge for the terminator so it is not a hard line.
+        '<filter id="' + sh + '" x="-20%" y="-20%" width="140%" height="140%">' +
+          '<feGaussianBlur stdDeviation="1.4"/>' +
+        '</filter>' +
       '</defs>' +
       '<g clip-path="url(#' + cid + ')">' +
-        '<rect x="0"  y="0" width="50" height="100" fill="' + col(leftLit) + '"/>' +
-        '<rect x="50" y="0" width="50" height="100" fill="' + col(rightLit) + '"/>';
-    if (f > 0.5 && f < 99.5) {
-      svg += '<ellipse cx="50" cy="50" rx="' + rx + '" ry="50" fill="' + col(ellLit) + '"/>';
+        // Lit disc + subtle maria (the "man in the moon" dark patches).
+        '<circle cx="50" cy="50" r="50" fill="url(#' + tex + ')"/>' +
+        '<g fill="#b9bfca" opacity="0.55">' +
+          '<ellipse cx="38" cy="34" rx="11" ry="9"/>' +
+          '<ellipse cx="58" cy="40" rx="8" ry="7"/>' +
+          '<ellipse cx="46" cy="58" rx="13" ry="10"/>' +
+          '<circle cx="66" cy="63" r="4"/>' +
+          '<circle cx="30" cy="55" r="3"/>' +
+        '</g>' +
+        // A couple of tiny bright-rimmed craters for texture.
+        '<g fill="#d8dce3" opacity="0.5">' +
+          '<circle cx="70" cy="30" r="3.5"/><circle cx="26" cy="40" r="2.5"/>' +
+        '</g>';
+    // Overlay the dark (un-lit) part. Full moon: nothing. New moon: all dark.
+    // Otherwise: the dark vertical half, plus the terminator ellipse painted
+    // dark for a crescent (the lit region is a sliver) so it reads correctly.
+    var dark = "#151a24";
+    if (f <= 0.5) {
+      svg += '<circle cx="50" cy="50" r="50" fill="' + dark + '"/>';
+    } else if (f < 99.5) {
+      // Dark half is the side opposite the lit half.
+      if (litRight) {
+        svg += '<rect x="0" y="0" width="50" height="100" fill="' + dark + '"/>';
+      } else {
+        svg += '<rect x="50" y="0" width="50" height="100" fill="' + dark + '"/>';
+      }
+      // Terminator ellipse: dark when crescent (extends shadow across meridian),
+      // lit when gibbous (extends light across meridian, so paint it lit).
+      var ellFill = ellipseLit ? "url(#" + tex + ")" : dark;
+      svg += '<ellipse cx="50" cy="50" rx="' + rx + '" ry="50" fill="' + ellFill + '" filter="url(#' + sh + ')"/>';
     }
-    svg += '<circle cx="50" cy="50" r="50" fill="url(#sh' + idx + ')"/>';
     svg += '</g></svg>';
     m.innerHTML = svg;
     m.style.overflow = "hidden";
-    m.style.boxShadow = "inset 0 0 12px rgba(0,0,0,.35)";
+    m.style.borderRadius = "50%";
+    // Inner spherical shading (inside the clipped disc) plus a soft dark halo
+    // around it for contrast against the light card. box-shadow's outer part is
+    // clipped by overflow:hidden, so the outer halo goes via drop-shadow, which
+    // renders after the clip and hugs the circle.
+    m.style.boxShadow = "inset 0 0 10px rgba(0,0,0,.45)";
+    m.style.filter =
+      "drop-shadow(0 2px 5px rgba(0,0,0,.5)) drop-shadow(0 0 9px rgba(0,0,0,.35))";
   }
   Array.prototype.forEach.call(document.querySelectorAll(".moon"), paintOneMoon);
 

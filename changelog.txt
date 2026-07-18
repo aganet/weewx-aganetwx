@@ -1,3 +1,9 @@
+1.8.6  2026-07-18
+  * More realistic moon: a textured lit disc (maria, craters, spherical
+    shading) with a correct terminator, so the phase and which side is lit read
+    clearly (verified across all eight phases). Added a soft dark halo around
+    the disc for contrast against the card.
+
 1.8.5  2026-07-18
   * "Today in one sentence" no longer repeats "so far" twice; the high reads
     just "High 23.9C" now that the opening clause already says "so far".
