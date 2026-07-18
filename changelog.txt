@@ -1,3 +1,11 @@
+1.5.6  2026-07-18
+  * Chart timezone fix, properly this time. 1.5.5 shifted timestamps to the
+    station's wall-clock but ECharts still positioned them in the viewer's
+    browser zone, so charts were still offset abroad (and could double-offset).
+    The charts now render with useUTC, so ECharts treats the shifted timestamps
+    as-is with no browser offset. Chart times read in the station timezone
+    identically for every visitor, matching "Latest update". Set chart_tz.
+
 1.5.5  2026-07-18
   * Fixed chart times being wrong for visitors in a different timezone than the
     station. ECharts positions points and gridlines in the viewer's browser

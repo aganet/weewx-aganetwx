@@ -66,13 +66,11 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   var COMPASS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
   function compass(deg) { return COMPASS[Math.round(((deg % 360) / 22.5)) % 16]; }
-  // Chart times must read in the STATION's timezone (IANA name in AGANETWX_TZ)
-  // for every visitor. ECharts "time" axis positions points and gridlines in the
-  // VIEWER's browser zone, so relabeling ticks alone is not enough: a viewer
-  // abroad sees everything shifted by the station-vs-viewer offset. Instead we
-  // shift each real UTC epoch into a "pseudo-UTC" value whose UTC wall-clock
-  // equals the station's local wall-clock, feed those to ECharts, and format
-  // ticks in UTC. Positions and labels then agree for any viewer.
+  // Chart times must read in the STATION's timezone (AGANETWX_TZ) for every
+  // visitor, not the viewer's. The charts run with useUTC (see setOption), so
+  // ECharts renders timestamps as UTC with no browser-offset applied; we shift
+  // each real UTC epoch by the station's offset first, so "UTC" then reads as
+  // the station's wall-clock. One mechanism: shift here, useUTC there.
   var TZ = window.AGANETWX_TZ || undefined;
   // Station UTC offset (ms) at instant ts, via Intl. Handles DST per-timestamp.
   function tzOffsetMs(ts) {
@@ -132,6 +130,7 @@
       ? { top: 26, left: "center", textStyle: { fontSize: 10, color: AX }, itemWidth: 12, itemHeight: 8, itemGap: 8 }
       : { top: 4, right: 8, textStyle: { fontSize: 11, color: AX } };
     return {
+      useUTC: true,
       title: { text: title, left: 8, top: 4, textStyle: { fontSize: 13, color: TITLE, fontWeight: 600 } },
       grid: { left: 64, right: 16, top: narrow ? 66 : 42, bottom: 28 },
       tooltip: { trigger: "axis", valueFormatter: function (v) { return v + suffix; } },
@@ -204,6 +203,7 @@
     if (wv) {
       if (nonEmpty(d.windDir)) {
         wv.setOption({
+          useUTC: true,
           title: { text: t("windvec") + " (°)", left: 8, top: 4, textStyle: { fontSize: 13, color: TITLE, fontWeight: 600 } },
           grid: { left: 52, right: 16, top: 42, bottom: 28 },
           tooltip: { trigger: "item", formatter: function (p) {
@@ -236,6 +236,7 @@
           pts.push([toStationClock(ts), spd, deg]);
         }
         wvec.setOption({
+          useUTC: true,
           title: { text: t("windvector") + " (" + u("wind", "km/h") + ")", left: 8, top: 4, textStyle: { fontSize: 13, color: TITLE, fontWeight: 600 } },
           grid: { left: 64, right: 16, top: 42, bottom: 28 },
           tooltip: { trigger: "item", formatter: function (p) {
