@@ -6,6 +6,23 @@
   * Documented both the summary (Extras.summary) and compare (Extras.compare)
     cards, with how to enable/disable each. Translated in all seven languages.
 
+1.8.3  2026-07-18
+  * New Extras.extra_sensor_groups: choose which extra-sensor groups appear in
+    the Extra Sensors panel (and their order), e.g. "temp" for temperatures
+    only. Empty shows all, as before.
+  * New Extras.temp_chart_series: choose which series the Temperature chart
+    draws, in order, including your own extra temperature sensors, e.g.
+    "outTemp, extraTemp2" to compare outside air with a soil probe. Empty keeps
+    the default series. Extra sensors are added to the chart data automatically.
+  * New "Compared to the past" card (Current page, off by default via
+    Extras.compare): today vs yesterday, vs this date last year, vs a typical
+    month so far (temperature), and month-to-date rain vs the same span in prior
+    years. All like-for-like from your own archive; each line needs enough
+    history. Documented Extras.summary and Extras.compare toggles.
+  * Files changed in this release (for anyone with local edits):
+    bin/user/aganetwx_extras.py, skins/AganetWX/_periodbody.inc,
+    skins/AganetWX/aganetwx.js, skins/AganetWX/data/*.json.tmpl and lang/*.conf.
+
 1.8.2  2026-07-18
   * The "Today in one sentence" summary now appends active weather alerts
     (extreme heat, frost, strong wind, heavy rain, very high UV, very humid)

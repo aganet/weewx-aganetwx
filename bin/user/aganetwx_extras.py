@@ -89,9 +89,21 @@ class AganetWXExtras(SearchList):
             grp = _bucket(key)
             buckets.setdefault(grp, []).append(key)
 
+        # Optional Extras.extra_sensor_groups: a list of group keys to show, in
+        # the given order. Empty/unset shows all groups in the default order.
+        extras = self.generator.skin_dict.get('Extras', {})
+        wanted = extras.get('extra_sensor_groups', '')
+        if isinstance(wanted, str):
+            wanted = [g.strip() for g in wanted.replace(',', ' ').split()]
+        wanted = [g for g in wanted if g]
+        if wanted:
+            order = [(g, dict(GROUP_ORDER).get(g, g)) for g in wanted]
+        else:
+            order = GROUP_ORDER
+
         # Wrap each kept type's latest value as a formattable ValueHelper.
         groups = []
-        for grp_key, title in GROUP_ORDER:
+        for grp_key, title in order:
             keys = buckets.get(grp_key, [])
             if not keys:
                 continue
@@ -110,8 +122,37 @@ class AganetWXExtras(SearchList):
         # When did it last rain? Newest archive record with rain > 0.
         last_rain = self._last_rain(db_manager, timespan.stop)
 
+        # Optional custom temperature-chart series.
+        series, labels = self._temp_chart(extras)
+
         return [{'extra_groups': groups, 'has_extra_sensors': len(groups) > 0,
-                 'last_rain': last_rain}]
+                 'last_rain': last_rain,
+                 'temp_chart_series': series, 'temp_chart_labels': labels}]
+
+    # Built-in temperature series the temp chart already knows.
+    _TEMP_BUILTIN = ('outTemp', 'dewpoint', 'appTemp', 'heatindex', 'windchill')
+
+    def _temp_chart(self, extras):
+        """Resolve Extras.temp_chart_series into an ordered list of observation
+        names plus a label map for the extra (non-built-in) ones. Empty list
+        means the chart uses its default series."""
+        raw = extras.get('temp_chart_series', '')
+        if hasattr(raw, 'split'):
+            raw = raw.replace(',', ' ').split()
+        names = [str(n).strip() for n in raw if str(n).strip()]
+        labels = {}
+        for name in names:
+            if name not in self._TEMP_BUILTIN:
+                labels[name] = self._obs_label(name)
+        return names, labels
+
+    def _obs_label(self, obs):
+        """Display label for an observation, from the skin's label dict."""
+        try:
+            labels = self.generator.skin_dict.get('Labels', {}).get('Generic', {})
+            return labels.get(obs, obs)
+        except Exception:
+            return obs
 
     def _last_rain(self, db_manager, now_ts):
         """ValueHelper for the timestamp of the last rain, plus an 'ago' string.
@@ -374,14 +415,20 @@ class AganetWXCompare(SearchList):
                     'warmer': delta_c > 0,
                 }
 
-        # --- This month's rain vs the same month in prior years ---
+        # --- This month so far vs the same month, up to the same day AND time
+        # of day, in prior years. Truly like-for-like: Jul 1..18 09:00 this year
+        # against Jul 1..18 09:00 of each past year, so today's partial day is
+        # matched against prior years' partial days (accurate even on day 1). ---
         mm = time.strftime('%m', lt)
         cur_year = time.strftime('%Y', lt)
+        # Cutoff as month-day-time within the year; compare as a string.
+        cutoff = time.strftime('%m-%d %H:%M', lt)
         totals = {}
         for yr, tot in db_manager.genSql(
                 "SELECT strftime('%%Y', dateTime, 'unixepoch', 'localtime') yr, "
                 "SUM(rain) FROM %s WHERE strftime('%%m', dateTime, 'unixepoch', "
-                "'localtime') = ? GROUP BY yr" % table, (mm,)):
+                "'localtime') = ? AND strftime('%%m-%%d %%H:%%M', dateTime, "
+                "'unixepoch', 'localtime') <= ? GROUP BY yr" % table, (mm, cutoff)):
             if tot is not None:
                 totals[yr] = tot
         this_month = totals.get(cur_year)
@@ -397,14 +444,46 @@ class AganetWXCompare(SearchList):
                         'years': len(prior),
                     }
 
-        # --- Today's high vs the same calendar date one year ago ---
-        # A single day year-to-year is weather, not climate, but it is a fun
-        # data point; phrased as a plain warmer/cooler difference.
-        ly = '%04d-%s' % (int(cur_year) - 1, time.strftime('%m-%d', lt))
-        row_ly = db_manager.getSql(
-            "SELECT MAX(outTemp) FROM %s WHERE "
+        # --- This month's average temperature so far vs the same month up to
+        # the same day in prior years (like-for-like, same as the rain). ---
+        avgs = {}
+        for yr, avgt in db_manager.genSql(
+                "SELECT strftime('%%Y', dateTime, 'unixepoch', 'localtime') yr, "
+                "AVG(outTemp) FROM %s WHERE strftime('%%m', dateTime, 'unixepoch', "
+                "'localtime') = ? AND strftime('%%m-%%d %%H:%%M', dateTime, "
+                "'unixepoch', 'localtime') <= ? GROUP BY yr" % table, (mm, cutoff)):
+            if avgt is not None:
+                avgs[yr] = temp_c(avgt, us)
+        this_avg = avgs.get(cur_year)
+        prior_avg = [v for y, v in avgs.items() if y != cur_year]
+        if this_avg is not None and len(prior_avg) >= 2:
+            mean = sum(prior_avg) / len(prior_avg)
+            delta_c = this_avg - mean
+            if abs(delta_c) >= 0.1:
+                out['month_temp'] = {
+                    'delta': self._temp_vh(abs(delta_c)),
+                    'warmer': delta_c > 0,
+                    'month_name_key': self.MONTHS[int(mm) - 1],
+                    'years': len(prior_avg),
+                }
+
+        # --- Today's high so far vs the same calendar date last year, up to the
+        # same time of day (like-for-like, not today-so-far vs a full past day).
+        # A single day year-to-year is weather not climate, but it is a fun
+        # data point; phrased as a plain warmer/cooler difference. ---
+        ly_date = '%04d-%s' % (int(cur_year) - 1, time.strftime('%m-%d', lt))
+        ly_start = None
+        row_ls = db_manager.getSql(
+            "SELECT MIN(dateTime) FROM %s WHERE "
             "strftime('%%Y-%%m-%%d', dateTime, 'unixepoch', 'localtime') = ?" % table,
-            (ly,))
+            (ly_date,))
+        if row_ls and row_ls[0] is not None:
+            ly_start = int(row_ls[0]) - 1   # just before that day's first record
+        row_ly = None
+        if ly_start is not None:
+            row_ly = db_manager.getSql(
+                "SELECT MAX(outTemp) FROM %s WHERE dateTime > ? AND dateTime <= ?" % table,
+                (ly_start, ly_start + secs_into_day))
         if (row_ly and row_ly[0] is not None
                 and row_t and row_t[0] is not None):
             ly_c = temp_c(row_ly[0], us)

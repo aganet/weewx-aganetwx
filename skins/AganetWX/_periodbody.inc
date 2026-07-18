@@ -184,22 +184,30 @@ $lbl('High so far') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#
       #set $C = $compare
       <div class="col_sub gradient boxshadow dist compare-card">
         <div class="headline">$lbl('Compared to the past')</div>
+        ## Temperature comparisons first (yesterday, last year, monthly history),
+        ## then rain last.
         #if $C.get('temp_vs_yesterday')
         <div class="cmp-row">
           <span class="cmp-val #if $C.temp_vs_yesterday.warmer#cmp-up#else#cmp-down#end if#">$C.temp_vs_yesterday.delta.format()</span>
           <span class="cmp-lbl">#if $C.temp_vs_yesterday.warmer#$lbl('warmer than yesterday')#else#$lbl('cooler than yesterday')#end if#</span>
         </div>
         #end if
-        #if $C.get('month_rain')
-        <div class="cmp-row">
-          <span class="cmp-val #if $C.month_rain.more#cmp-up#else#cmp-down#end if#">$C.month_rain.pct%</span>
-          <span class="cmp-lbl">#if $C.month_rain.more#$lbl('more rain than a typical')#else#$lbl('less rain than a typical')#end if# $lbl($C.month_rain.month_name_key) <span class="cmp-note">($lbl('from') $C.month_rain.years $lbl('years'))</span></span>
-        </div>
-        #end if
         #if $C.get('vs_lastyear')
         <div class="cmp-row">
           <span class="cmp-val #if $C.vs_lastyear.warmer#cmp-up#else#cmp-down#end if#">$C.vs_lastyear.delta.format()</span>
           <span class="cmp-lbl">#if $C.vs_lastyear.warmer#$lbl('warmer than the same date last year')#else#$lbl('cooler than the same date last year')#end if#</span>
+        </div>
+        #end if
+        #if $C.get('month_temp')
+        <div class="cmp-row">
+          <span class="cmp-val #if $C.month_temp.warmer#cmp-up#else#cmp-down#end if#">$C.month_temp.delta.format()</span>
+          <span class="cmp-lbl">#if $C.month_temp.warmer#$lbl('warmer than a typical')#else#$lbl('cooler than a typical')#end if# $lbl($C.month_temp.month_name_key) $lbl('so far') <span class="cmp-note">($lbl('based on') $C.month_temp.years $lbl('years of records'))</span></span>
+        </div>
+        #end if
+        #if $C.get('month_rain')
+        <div class="cmp-row">
+          <span class="cmp-val #if $C.month_rain.more#cmp-up#else#cmp-down#end if#">$C.month_rain.pct%</span>
+          <span class="cmp-lbl">#if $C.month_rain.more#$lbl('more rain than a typical')#else#$lbl('less rain than a typical')#end if# $lbl($C.month_rain.month_name_key) $lbl('so far') <span class="cmp-note">($lbl('based on') $C.month_rain.years $lbl('years of records'))</span></span>
         </div>
         #end if
       </div>
@@ -530,6 +538,16 @@ $lbl('High so far') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#
   <script>
     window.AGANETWX_PERIOD = "$period_key";
     window.AGANETWX_TZ = "$_tzname";
+    // Optional custom temperature-chart series (Extras.temp_chart_series),
+    // resolved server-side into $temp_chart_series / $temp_chart_labels.
+    window.AGANETWX_TEMP_SERIES = [#echo ', '.join(['"' + $s + '"' for $s in $getVar('temp_chart_series', [])])#];
+    window.AGANETWX_EXTRA_LABELS = {#slurp
+#set $_lf = True
+#for $_s, $_lbl in $getVar('temp_chart_labels', {}).items()
+#if not $_lf#, #end if#"$_s": "$_lbl"#slurp
+#set $_lf = False
+#end for
+};
     // Epoch (seconds) of the latest observation, for the client-side stale-data
     // check. Absolute instant, so it works in any visitor timezone.
     window.AGANETWX_LAST = #echo int($current.dateTime.raw) if $current.dateTime.has_data else 0#;

@@ -14,6 +14,17 @@
 {
   "period": "day",
   "generated": $current.dateTime.raw,
+  ## Extra sensors chosen for the temperature chart (keys of the SLE-provided
+  ## temp_chart_labels) are emitted here so the chart can plot them.
+  "extra": {##
+#set $_first = True
+#for $_x in $getVar('temp_chart_labels', {}).keys()
+#if $hasattr($P, $_x)
+#if not $_first#, #end if#"$_x": $S($getattr($P, $_x), 'avg', 1)##
+#set $_first = False
+#end if
+#end for
+},
   "outTemp":   $S($P.outTemp,   'avg', 1),
   "dewpoint":  $S($P.dewpoint,  'avg', 1),
   "appTemp":   $S($P.appTemp,   'avg', 1),

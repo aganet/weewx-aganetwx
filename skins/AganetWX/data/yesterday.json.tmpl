@@ -10,6 +10,17 @@
 {
   "period": "yesterday",
   "generated": $current.dateTime.raw,
+  ## Extra sensors chosen for the temperature chart (keys of the SLE-provided
+  ## temp_chart_labels) are emitted here so the chart can plot them.
+  "extra": {##
+#set $_first = True
+#for $_x in $getVar('temp_chart_labels', {}).keys()
+#if $hasattr($P, $_x)
+#if not $_first#, #end if#"$_x": $S($getattr($P, $_x), 'avg', 1)##
+#set $_first = False
+#end if
+#end for
+},
   "start": #echo int($yesterday.start.raw) * 1000#,
   "end": #echo int($yesterday.end.raw) * 1000#,
   "outTemp":   $S($P.outTemp,   'avg', 1),

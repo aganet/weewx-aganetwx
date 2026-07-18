@@ -233,11 +233,29 @@
     // Temperature + derived
     defer("chart-temp", function () {
       var ts = [];
-      if (nonEmpty(d.outTemp))   ts.push(line(t("temp"), COLORS.temp, d.outTemp, true));
-      if (nonEmpty(d.dewpoint))  ts.push(line(t("dewpoint"), COLORS.dewpoint, d.dewpoint));
-      if (nonEmpty(d.appTemp))   ts.push(line(t("appTemp"), COLORS.appTemp, d.appTemp));
-      if (nonEmpty(d.heatindex)) ts.push(line(t("heatindex"), COLORS.heatindex, d.heatindex));
-      if (nonEmpty(d.windchill)) ts.push(line(t("windchill"), COLORS.windchill, d.windchill));
+      var custom = window.AGANETWX_TEMP_SERIES;
+      if (custom && custom.length) {
+        // Config-chosen series (Extras.temp_chart_series), in order. Built-in
+        // temperatures come from d.*; extra sensors from d.extra.*, labelled
+        // from AGANETWX_EXTRA_LABELS. A small palette keeps extra lines distinct.
+        var labels = window.AGANETWX_EXTRA_LABELS || {};
+        var extraColors = ["#8e44ad", "#16a085", "#d35400", "#2c3e50", "#c0392b"];
+        var ei = 0;
+        custom.forEach(function (name) {
+          if (COLORS[name] !== undefined && nonEmpty(d[name])) {
+            ts.push(line(t(name === "outTemp" ? "temp" : name), COLORS[name], d[name], name === "outTemp"));
+          } else if (d.extra && nonEmpty(d.extra[name])) {
+            var lbl = decode(labels[name] || name);
+            ts.push(line(lbl, extraColors[ei++ % extraColors.length], d.extra[name]));
+          }
+        });
+      } else {
+        if (nonEmpty(d.outTemp))   ts.push(line(t("temp"), COLORS.temp, d.outTemp, true));
+        if (nonEmpty(d.dewpoint))  ts.push(line(t("dewpoint"), COLORS.dewpoint, d.dewpoint));
+        if (nonEmpty(d.appTemp))   ts.push(line(t("appTemp"), COLORS.appTemp, d.appTemp));
+        if (nonEmpty(d.heatindex)) ts.push(line(t("heatindex"), COLORS.heatindex, d.heatindex));
+        if (nonEmpty(d.windchill)) ts.push(line(t("windchill"), COLORS.windchill, d.windchill));
+      }
       draw("chart-temp", t("temp"), u("temp", "°C"), ts);
     });
 
