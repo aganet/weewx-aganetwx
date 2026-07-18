@@ -1,3 +1,7 @@
+1.8.5  2026-07-18
+  * "Today in one sentence" no longer repeats "so far" twice; the high reads
+    just "High 23.9C" now that the opening clause already says "so far".
+
 1.8.4  2026-07-18
   * New Extras.extra_sensor_groups: choose which extra-sensor groups appear in
     the Extra Sensors panel (and their order), e.g. "temp" for temperatures

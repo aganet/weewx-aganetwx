@@ -169,7 +169,7 @@
         <div class="summary-text">#slurp
 $lbl($_cond) $lbl('so far')#slurp
 #if $_rained#, $lbl('with rain.')#else#. #end if##slurp
-$lbl('High so far') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
+$lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
 #if $day.windGust.has_data and $day.windGust.max.raw#, $lbl('gusts to') $day.windGust.max.format()#end if##slurp
 #if $_rained#, $day.rain.sum.format() $lbl('of rain')#else#, $lbl('no rain yet')#end if#.#slurp
 #for $_f in $_flags# <span class="alert-flag">&#9888; $_f</span>#end for##slurp
