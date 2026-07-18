@@ -116,6 +116,35 @@
       </div>
       #end if
 
+      ## "Today in one sentence": a plain-language summary built from today's own
+      ## stats. On the Current page; toggle with Extras.summary. Condition word
+      ## from the day's max temperature and whether it rained; the numbers use
+      ## .format() so units follow the report, and every fragment is translated.
+      #if $show_current and $tf($getVar('Extras.summary', True)) and $day.outTemp.max.has_data
+      #set $_tmax = $day.outTemp.max.degree_C.raw
+      #set $_rained = $day.rain.has_data and $day.rain.sum.raw and $day.rain.sum.raw > 0.2
+      #if $_tmax <= 2
+      #set $_cond = 'A cold day'
+      #elif $_tmax <= 12
+      #set $_cond = 'A cool day'
+      #elif $_tmax <= 20
+      #set $_cond = 'A mild day'
+      #elif $_tmax <= 30
+      #set $_cond = 'A warm day'
+      #else
+      #set $_cond = 'A hot day'
+      #end if
+      <div class="col_sub gradient boxshadow dist summary-card">
+        <div class="summary-text">#slurp
+$lbl($_cond) $lbl('so far')#slurp
+#if $_rained#, $lbl('with rain.')#else#. #end if##slurp
+$lbl('High so far') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
+#if $day.windGust.has_data and $day.windGust.max.raw#, $lbl('gusts to') $day.windGust.max.format()#end if##slurp
+#if $_rained#, $day.rain.sum.format() $lbl('of rain')#else#, $lbl('no rain yet')#end if#.#slurp
+</div>
+      </div>
+      #end if
+
       #if $show_current
       ## Live current values. Each row is gated by Extras.rows.*
       <div class="col_sub gradient boxshadow dist">

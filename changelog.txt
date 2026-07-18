@@ -1,3 +1,9 @@
+1.8.1  2026-07-18
+  * New "Today in one sentence" summary on the Current page: a plain-language
+    line built from the station's own data (e.g. "A warm day so far. High so far
+    32.5C, gusts to 25.7 km/h, no rain yet."), so the day reads at a glance.
+    On by default (Extras.summary); translated in all seven languages.
+
 1.8.0  2026-07-18
   * Charts now load lazily: each one is built only when its card scrolls near
     the viewport, instead of initialising all of them on page load. Faster first
