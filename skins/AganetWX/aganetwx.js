@@ -60,6 +60,23 @@
     if (!charts[id]) charts[id] = echarts.init(el);
     return charts[id];
   }
+  // Re-tint live charts for a light/dark switch by merging only the theme-derived
+  // colors (axis labels, gridlines, titles, legend), leaving series data and the
+  // rest of each option untouched. Much lighter than rebuilding every option.
+  function retint() {
+    readTheme();
+    var patch = {
+      title:  { textStyle: { color: TITLE } },
+      legend: { textStyle: { color: AX } },
+      xAxis:  { axisLabel: { color: AX }, splitLine: { lineStyle: { color: GRID } } },
+      yAxis:  { axisLabel: { color: AX }, splitLine: { lineStyle: { color: GRID } } },
+      radiusAxis: { axisLabel: { color: AX } },
+      angleAxis:  { axisLabel: { color: AX } }
+    };
+    for (var id in charts) {
+      if (charts[id]) charts[id].setOption(patch, false);   // merge, keep everything else
+    }
+  }
   function nonEmpty(arr) { return Array.isArray(arr) && arr.length > 0; }
 
   var PERIOD = window.AGANETWX_PERIOD || "day";
@@ -458,8 +475,7 @@
       document.body.classList.remove("layout-modern", "layout-classic");
       document.body.classList.add("layout-" + PRESETS[p].layout);
       try { localStorage.setItem("aganetwx_theme", p); } catch (e) {}
-      readTheme();
-      if (chartData) render(chartData);   // re-tint charts for the new mode
+      retint();   // merge new theme colors into the live charts, no full rebuild
     });
   }
   initTheme();

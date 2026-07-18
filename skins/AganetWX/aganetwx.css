@@ -334,6 +334,25 @@ html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
 .solar-card .solar-src {
   padding: 6px 14px 10px; font-size: 0.72em; color: var(--m-muted);
 }
+/* Local Zambretti forecast card. */
+.forecast-card .forecast-body {
+  display: flex; align-items: center; gap: 12px; padding: 10px 16px 12px;
+}
+.forecast-card .forecast-icon { flex: 0 0 auto; width: 46px; height: 46px; }
+.forecast-card .forecast-icon svg { width: 100%; height: 100%; }
+.forecast-card .forecast-text {
+  font-size: 1.15em; font-weight: 700; color: var(--m-ink); line-height: 1.3;
+}
+.forecast-card .forecast-src {
+  font-size: 0.72em; color: var(--m-muted); margin-top: 2px;
+}
+/* Forecast icon parts (theme-aware, coloured by weather type). */
+.forecast-icon .fc-sun   { fill: #f1a413; }
+.forecast-icon .fc-ray   { stroke: #f1a413; stroke-width: 3; stroke-linecap: round; }
+.forecast-icon .fc-cloud { fill: #9aa7b4; }
+.forecast-icon .fc-drop  { stroke: #2e86de; stroke-width: 3; stroke-linecap: round; }
+.forecast-icon .fc-bolt  { fill: #f1a413; }
+.forecast-icon.fc-storm .fc-cloud { fill: #6b7784; }
 .baro-trend .bt-arrow { margin-right: 3px; }
 .baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }
 .baro-trend.up   .bt-arrow { color: #c0392b; }

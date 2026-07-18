@@ -291,3 +291,119 @@ class AganetWXSolar(SearchList):
             }
         except Exception:
             return None
+
+
+class AganetWXForecast(SearchList):
+    """Local Zambretti forecast from the station's own barometer: sea-level
+    pressure, its trend, wind direction and season map to one of 26 short
+    forecast phrases (the classic analogue-barometer method). No external data.
+
+    This is a faithful port of the pywws implementation (jim-easterbrook/pywws,
+    forecast.py); the formulas, wind/season adjustments and lookup tables match
+    it exactly. Exposed as $zambretti = {'code', 'text_key'}; None when disabled
+    or pressure/trend are unavailable. Off by default (Extras.forecast)."""
+
+    PHRASES = {
+        'A': 'Settled fine', 'B': 'Fine weather', 'C': 'Becoming fine',
+        'D': 'Fine, becoming less settled', 'E': 'Fine, possible showers',
+        'F': 'Fairly fine, improving', 'G': 'Fairly fine, possible showers early',
+        'H': 'Fairly fine, showery later', 'I': 'Showery early, improving',
+        'J': 'Changeable, mending', 'K': 'Fairly fine, showers likely',
+        'L': 'Rather unsettled clearing later', 'M': 'Unsettled, probably improving',
+        'N': 'Showery, bright intervals', 'O': 'Showery, becoming less settled',
+        'P': 'Changeable, some rain', 'Q': 'Unsettled, short fine intervals',
+        'R': 'Unsettled, rain later', 'S': 'Unsettled, some rain',
+        'T': 'Mostly very unsettled', 'U': 'Occasional rain, worsening',
+        'V': 'Rain at times, very unsettled', 'W': 'Rain at frequent intervals',
+        'X': 'Rain, very unsettled', 'Y': 'Stormy, may improve', 'Z': 'Stormy, much rain',
+    }
+    # Weather-type icon per forecast code (rendered as an SVG in the template).
+    ICONS = {
+        'A': 'sun', 'B': 'sun', 'C': 'sun',
+        'D': 'partly', 'E': 'partly', 'F': 'partly', 'G': 'partly',
+        'H': 'showers', 'I': 'showers', 'J': 'partly', 'K': 'partly',
+        'L': 'partly', 'M': 'partly', 'N': 'showers', 'O': 'showers',
+        'P': 'rain', 'Q': 'partly', 'R': 'rain', 'S': 'rain',
+        'T': 'rain', 'U': 'rain', 'V': 'rain', 'W': 'rain',
+        'X': 'rain', 'Y': 'storm', 'Z': 'storm',
+    }
+    _WIND = (5.2, 4.2, 3.2, 1.05, -1.1, -3.15, -5.2, -8.35,
+             -11.5, -9.4, -7.3, -5.25, -3.2, -1.15, 0.9, 3.05)
+    _RISING = ('A', 'B', 'B', 'C', 'F', 'G', 'I', 'J', 'L', 'M', 'M', 'Q', 'T', 'Y')
+    _FALLING = ('B', 'D', 'H', 'O', 'R', 'U', 'V', 'X', 'X', 'Z')
+    _STEADY = ('A', 'B', 'B', 'B', 'E', 'K', 'N', 'N', 'P', 'P', 'S', 'W', 'W',
+               'X', 'X', 'X', 'Z')
+
+    def get_extension_list(self, timespan, db_lookup):
+        extras = self.generator.skin_dict.get('Extras', {})
+        enabled = str(extras.get('forecast', 'false')).strip().lower() \
+            not in ('false', '0', 'no', 'off', '')
+        if not enabled:
+            return [{'zambretti': None}]
+        try:
+            code = self._code(db_lookup(), timespan.stop)
+        except Exception:
+            code = None
+        if code is None:
+            return [{'zambretti': None}]
+        return [{'zambretti': {'code': code, 'text_key': self.PHRASES[code],
+                               'icon': self.ICONS[code]}}]
+
+    def _hpa(self, value, us_units):
+        """Barometer to hPa (US stores inHg; metric systems store mbar == hPa)."""
+        return value * 33.8639 if us_units == 1 else value
+
+    def _code(self, db_manager, now_ts):
+        import time
+        table = db_manager.table_name
+        row = db_manager.getSql(
+            "SELECT barometer, windDir, windSpeed, usUnits FROM %s "
+            "WHERE barometer IS NOT NULL ORDER BY dateTime DESC LIMIT 1" % table)
+        if not row or row[0] is None:
+            return None
+        rel_pressure = self._hpa(row[0], row[3])
+        wind_dir, wind_speed = row[1], row[2]
+
+        past = db_manager.getSql(
+            "SELECT barometer, usUnits FROM %s WHERE dateTime <= ? AND "
+            "barometer IS NOT NULL ORDER BY dateTime DESC LIMIT 1" % table,
+            (int(now_ts) - 10800,))
+        if not past or past[0] is None:
+            return None
+        # Trend in hPa per hour (3-hour change / 3), as pywws expects.
+        trend = (rel_pressure - self._hpa(past[0], past[1])) / 3.0
+
+        try:
+            north = float(self.generator.stn_info.latitude_f) >= 0
+        except Exception:
+            north = True
+
+        # Normalise into the 950..1050 band (identity in range; clamps outside).
+        pressure = 950.0 + (1050.0 - 950.0) * (rel_pressure - 950.0) / (1050.0 - 950.0)
+
+        # Wind adjustment (only when there is meaningful wind).
+        if wind_dir is not None and wind_speed is not None and wind_speed > 0.3:
+            wind = int(wind_dir / 22.5 + 0.5) % 16
+            if not north:
+                wind = (wind + 8) % 16
+            pressure += self._WIND[wind]
+
+        month = int(time.strftime('%m', time.localtime(now_ts)))
+        summer = north == (4 <= month <= 9)
+
+        if trend >= 0.1:
+            if summer:
+                pressure += 3.2
+            f = 0.1740 * (1031.40 - pressure)
+            lut = self._RISING
+        elif trend <= -0.1:
+            if summer:
+                pressure -= 3.2
+            f = 0.1553 * (1029.95 - pressure)
+            lut = self._FALLING
+        else:
+            f = 0.2314 * (1030.81 - pressure)
+            lut = self._STEADY
+
+        f = min(max(int(f + 0.5), 0), len(lut) - 1)
+        return lut[f]

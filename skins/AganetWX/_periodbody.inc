@@ -116,6 +116,41 @@
       </div>
       #end if
 
+      ## Local Zambretti forecast (Current page). $zambretti is None unless
+      ## Extras.forecast is on and pressure/trend are available.
+      #if $show_current and $getVar('zambretti', None)
+      <div class="col_sub gradient boxshadow dist forecast-card">
+        <div class="headline">$lbl('Forecast')</div>
+        <div class="forecast-body">
+          <div class="forecast-icon fc-$zambretti.icon" aria-hidden="true">
+          #if $zambretti.icon == 'sun'
+            <svg viewBox="0 0 48 48"><circle class="fc-sun" cx="24" cy="24" r="9"/>#slurp
+            #for $a in (0, 45, 90, 135, 180, 225, 270, 315)
+            <line class="fc-ray" x1="24" y1="24" x2="24" y2="6" style="transform:rotate(${a}deg);transform-origin:24px 24px"/>#slurp
+            #end for
+            </svg>
+          #elif $zambretti.icon == 'partly'
+            <svg viewBox="0 0 48 48"><circle class="fc-sun" cx="18" cy="17" r="7"/>#slurp
+            <path class="fc-cloud" d="M16 34 a7 7 0 0 1 1-13 a9 9 0 0 1 17 2 a6 6 0 0 1 -1 11 Z"/></svg>
+          #elif $zambretti.icon == 'showers'
+            <svg viewBox="0 0 48 48"><path class="fc-cloud" d="M15 28 a7 7 0 0 1 1-13 a9 9 0 0 1 17 2 a6 6 0 0 1 -1 11 Z"/>#slurp
+            <line class="fc-drop" x1="18" y1="33" x2="16" y2="39"/><line class="fc-drop" x1="26" y1="33" x2="24" y2="39"/></svg>
+          #elif $zambretti.icon == 'rain'
+            <svg viewBox="0 0 48 48"><path class="fc-cloud" d="M15 26 a7 7 0 0 1 1-13 a9 9 0 0 1 17 2 a6 6 0 0 1 -1 11 Z"/>#slurp
+            <line class="fc-drop" x1="16" y1="31" x2="13" y2="40"/><line class="fc-drop" x1="24" y1="31" x2="21" y2="40"/><line class="fc-drop" x1="32" y1="31" x2="29" y2="40"/></svg>
+          #else
+            <svg viewBox="0 0 48 48"><path class="fc-cloud" d="M15 24 a7 7 0 0 1 1-13 a9 9 0 0 1 17 2 a6 6 0 0 1 -1 11 Z"/>#slurp
+            <path class="fc-bolt" d="M24 28 L19 38 L23 38 L21 45 L29 34 L24 34 Z"/></svg>
+          #end if
+          </div>
+          <div class="forecast-copy">
+            <div class="forecast-text">$lbl($zambretti.text_key)</div>
+            <div class="forecast-src">$lbl("Based on this station's barometer")</div>
+          </div>
+        </div>
+      </div>
+      #end if
+
       #if $show_current
       ## Live current values. Each row is gated by Extras.rows.*
       <div class="col_sub gradient boxshadow dist">

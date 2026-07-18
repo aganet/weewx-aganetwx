@@ -43,6 +43,7 @@ Live demo: [aganet.gr](https://aganet.gr)
 - An optional webcam banner above the nav on the Current page. It only reloads the image when the frame actually changed (or stays static), shows a countdown, and opens full-size in a lightbox on click. Size, position and a click-through link are yours to set.
 - A "Useful Links" card, a few external links (a lightning map, Windy, a satellite view; Greek by default) you edit in config.
 - An optional HF propagation card for radio amateurs: solar flux, sunspots, A- and K-index, and a colour-coded band-conditions table from HamQSL. Off unless you turn it on.
+- An optional local forecast worked out from your own barometer (pressure, trend, wind, season) with a matching weather icon, no external service. Off by default.
 - It follows your WeeWX units (us, metric or metricwx) and timezone rather than imposing its own, so every value, axis and label matches the rest of your setup. Override per-report if you want this one page to differ.
 
 ## Requirements
@@ -55,14 +56,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.6.0.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.7.0.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.6.0.zip
+sudo weectl extension install /path/to/AganetWX-1.7.0.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -164,6 +165,7 @@ Example:
 | `Extras.rows_show_range` | bool | `true` | Today's high/low (with time) beside each current value |
 | `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
 | `Extras.solar` | bool | `false` | HF propagation card (HamQSL solar data + band conditions) |
+| `Extras.forecast` | bool | `false` | Local Zambretti forecast card (from your barometer, no external data) |
 | `Extras.solar_timeout` | seconds | `15` | Timeout for the server-side HamQSL fetch |
 | `alerts.<obs>.high` / `.low` | number | Greek-climate defaults | Highlight a Current-Values row when the value crosses this limit (in your displayed units); defaults set for temp, apparent temp, wind, humidity, rain rate, UV |
 | `about.prose_en` / `prose_el` | string | empty | About-page description (inline HTML ok) |
@@ -353,6 +355,27 @@ It is off by default:
             solar_timeout = 15
 ```
 
+## Local forecast
+
+An optional card on the Current page with a short outlook, "Fine weather",
+"Changeable, some rain", "Stormy, much rain" and so on, plus a matching weather
+icon. It is worked out entirely from your own station: the barometric pressure,
+its trend over the last three hours, the wind direction and the season. No
+external service is involved. Off by default:
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            forecast = true
+```
+
+It uses the Zambretti method (the algorithm behind old analogue forecasting
+barometers). The forecast reflects a general pressure-based tendency for the
+next few hours, not a precise meteorological forecast. The algorithm and phrase
+wording are ported from [pywws](https://github.com/jim-easterbrook/pywws)
+(GPL v2 or later).
+
 ## Troubleshooting
 
 **Charts don't show up.** Load the page through your web server
@@ -405,4 +428,5 @@ so on.
 
 AganetWX is a skin for [WeeWX](https://weewx.com), released under the GNU GPL v3.
 Bundled [Apache ECharts](https://echarts.apache.org/) is under the Apache-2.0
-license.
+license. The local forecast is a port of the Zambretti implementation from
+[pywws](https://github.com/jim-easterbrook/pywws) (GPL v2 or later).
