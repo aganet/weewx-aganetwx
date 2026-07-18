@@ -1,10 +1,10 @@
 # AganetWX, a WeeWX skin
 
-A weather dashboard skin for [WeeWX](https://weewx.com) 5.x. After years of
-running other people's skins I wanted one that did exactly what I had in mind,
-so I wrote this. Interactive charts, a page per time period, it shows whatever
-sensors you have, and it translates. Everything is set in `weewx.conf`; you
-never edit a template.
+A weather dashboard skin for [WeeWX](https://weewx.com) 5.x. There are several
+great skins out there, but I wanted the exact layout and data I had in mind, so
+I gave making my own a try. Interactive charts, a page per time period, it shows
+whatever sensors you have, and it translates. Everything is set in `weewx.conf`;
+you never edit a template.
 
 Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/aganet/weewx-aganetwx)
 
