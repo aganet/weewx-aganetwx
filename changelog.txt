@@ -6,20 +6,16 @@
     draws, in order, including your own extra temperature sensors, e.g.
     "outTemp, extraTemp2" to compare outside air with a soil probe. Empty keeps
     the default series. Extra sensors are added to the chart data automatically.
-  * Compare card refined: temperature comparisons first (yesterday, this date
-    last year, this month so far), then rain, and the month comparisons now cut
-    every year at the same day-of-month AND time of day for a true like-for-like.
+  * New "Compared to the past" card (Current page, off by default via
+    Extras.compare): temperature comparisons first (vs yesterday, vs this date
+    last year, vs a typical month so far), then month-to-date rain vs prior
+    years. All like-for-like from your own archive, cutting every year at the
+    same day-of-month and time of day; each line appears only with enough
+    history. Both the summary (Extras.summary) and compare cards are documented
+    with how to enable/disable each. Translated in all seven languages.
   * Files changed (for anyone with local edits): bin/user/aganetwx_extras.py,
     skins/AganetWX/_periodbody.inc, skins/AganetWX/aganetwx.js,
     skins/AganetWX/data/*.json.tmpl and lang/*.conf.
-
-1.8.3  2026-07-18
-  * New "Compared to the past" card (Current page, off by default via
-    Extras.compare): today vs yesterday at the same time of day, this month's
-    rain vs the same month in prior years, and today vs this date last year, all
-    from your own archive. Each line appears only with enough history.
-  * Documented both the summary (Extras.summary) and compare (Extras.compare)
-    cards, with how to enable/disable each. Translated in all seven languages.
 
 1.8.2  2026-07-18
   * The "Today in one sentence" summary now appends active weather alerts
