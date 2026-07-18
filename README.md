@@ -36,6 +36,7 @@ Live demo: [aganet.gr](https://aganet.gr)
 - An all-time records card: the highest and lowest temperature, wind gust, humidity, barometer and rain rate in your archive, each with the date it happened. There's also a "last rain" line.
 - A "today in one sentence" summary in plain language, built from the station's own data, with active weather alerts (heat, frost, strong wind, heavy rain, high UV, humidity) appended when today crosses your thresholds. On by default.
 - A "compared to the past" card: today vs yesterday, this month's rain vs the same month in prior years, and today vs this date last year, all from your own archive. Off by default; richer with more history.
+- An optional History page (own nav tab): overlay any metric across every year in your archive, day-by-day for a chosen month, to see which years ran hot, wet or windy. Pick years with checkboxes; the newest is drawn bold. Off by default.
 - A stale-data banner when the station goes quiet for over an hour (configurable). It runs in the browser off an absolute timestamp, so it still shows if report generation has stopped, and it is right in any visitor's timezone.
 - Sensor-agnostic. It discovers whatever your station records, extra temperature and humidity channels, soil, leaf, air quality, lightning, battery, with no hardcoded list, so it looks complete on a Davis, an Ecowitt, a Tempest, or a bare thermometer.
 - Theming from `weewx.conf`: colours, gradient, font, density, and light / dark / auto mode. A header switcher lets visitors flip between Modern, Classic and Dark, and their choice sticks.
@@ -144,9 +145,13 @@ Example:
 | `unit_system` | `us`,`metric`,`metricwx` | (inherited) | Optional per-report override; by default follows your WeeWX config |
 | `Extras.languages` | code list | all 7 | Languages in the in-page switcher; single code hides it |
 | `Extras.extra_sensors` | bool | `true` | Auto-discovered extra-sensor panel |
+| `Extras.extra_sensor_groups` | group list | all | Limit which sensor groups show in that panel, in order (`temp`,`humidity`,`soil`,`leaf`,`air`,`lightning`,`other`,`status`); empty shows all |
+| `Extras.temp_chart_series` | obs list | default | Which series the Temperature chart draws, in order, incl. extra sensors (e.g. `outTemp, extraTemp2`); empty = default set |
 | `Extras.hero` | bool | `true` | Current-conditions hero card (Current page) |
 | `Extras.summary` | bool | `true` | "Today in one sentence" plain-language summary with active weather alerts (Current page) |
 | `Extras.compare` | bool | `false` | "Compared to the past" card: vs yesterday, vs the monthly average, vs this date last year (Current page) |
+| `Extras.compare_page` | bool | `false` | History page (own nav tab): overlay a metric across every year, day-by-day for a chosen month |
+| `Extras.compare_refresh` | seconds | `86400` | How often the History page's whole-archive aggregation is rebuilt (cached on disk) |
 | `Extras.celestial` | bool | `true` | Sun and Moon card |
 | `Extras.disclaimer` | bool | `true` | Amateur-station disclaimer in the footer |
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |
@@ -265,21 +270,66 @@ On by default. Turn it off with:
 
 An optional card that puts today in context using your own archive:
 
-- **vs yesterday**, the temperature difference compared at the same time of day
-  (a fair like-for-like, not today-so-far against a whole day).
-- **vs the monthly average**, this month's rainfall against the average of the
-  same month in previous years (needs at least two prior years).
+- **vs yesterday**, the temperature difference at the same time of day (a fair
+  like-for-like, not today-so-far against a whole day).
 - **vs this date last year**, how today's high compares with the same calendar
-  date a year ago. This is a single-day curiosity, not a climate trend.
+  date a year ago. A single-day curiosity, not a climate trend.
+- **vs a typical month so far**, this month's average temperature and its
+  rainfall total against the same month up to the same day and time in previous
+  years (needs at least two prior years).
 
-The more history your archive holds, the more of it appears; each line is hidden
-when there is not enough data. Off by default:
+Every comparison is like-for-like (each year cut at the same point of the
+month). The more history your archive holds, the more appears; each line is
+hidden when there is not enough data. Off by default:
 
 ```ini
 [StdReport]
     [[AganetWXReport]]
         [[[Extras]]]
             compare = true
+```
+
+## History page
+
+An optional page (its own **History** tab) for exploring your whole archive: it
+overlays a chosen metric across every year, day-by-day for a chosen month, so
+you can see at a glance which Julys were hottest or which winters were wettest.
+
+Pick the month and metric (temperature, rain, wind, humidity, pressure, UV,
+solar radiation) from dropdowns, and tick the years to show (with All / None
+buttons). The most recent year is drawn bold; older years fade towards grey.
+
+It aggregates the whole archive, so the result is cached on disk and rebuilt
+only once a day by default (set `compare_refresh` in seconds), which keeps
+report generation fast even on many years of data. Off by default:
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            compare_page = true
+            compare_refresh = 86400
+```
+
+## Choosing sensors and temperature-chart series
+
+Two settings let you tailor what shows without editing any template:
+
+- `extra_sensor_groups` limits the Extra Sensors panel to the groups you list,
+  in order, e.g. `extra_sensor_groups = temp` for temperatures only. Empty shows
+  every group that was discovered.
+- `temp_chart_series` sets exactly which series the Temperature chart draws, in
+  order, and can include your own extra temperature sensors. For example
+  `temp_chart_series = outTemp, extraTemp2` compares outside air with a soil
+  probe. Empty keeps the default set (outTemp, dewpoint, apparent, heat index,
+  wind chill).
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            extra_sensor_groups = temp
+            temp_chart_series = outTemp, extraTemp2
 ```
 
 ## Languages
