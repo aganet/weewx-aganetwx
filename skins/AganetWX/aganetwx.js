@@ -66,23 +66,36 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   var COMPASS = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
   function compass(deg) { return COMPASS[Math.round(((deg % 360) / 22.5)) % 16]; }
-  // Chart times are labeled in the STATION's timezone (IANA name injected as
-  // AGANETWX_TZ), so they're correct for any viewer. Intl handles offset + DST;
-  // an empty/invalid zone falls back to the viewer's browser timezone.
+  // Chart times must read in the STATION's timezone (IANA name in AGANETWX_TZ)
+  // for every visitor. ECharts "time" axis positions points and gridlines in the
+  // VIEWER's browser zone, so relabeling ticks alone is not enough: a viewer
+  // abroad sees everything shifted by the station-vs-viewer offset. Instead we
+  // shift each real UTC epoch into a "pseudo-UTC" value whose UTC wall-clock
+  // equals the station's local wall-clock, feed those to ECharts, and format
+  // ticks in UTC. Positions and labels then agree for any viewer.
   var TZ = window.AGANETWX_TZ || undefined;
-  function tzParts(ts) {
-    var p = {};
+  // Station UTC offset (ms) at instant ts, via Intl. Handles DST per-timestamp.
+  function tzOffsetMs(ts) {
+    if (!TZ) return 0;
     try {
-      new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour12: false,
-        year: "2-digit", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+      var p = {};
+      new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour12: false,
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit" })
         .formatToParts(new Date(ts)).forEach(function (x) { p[x.type] = x.value; });
-    } catch (e) {
-      var d = new Date(ts);
-      p = { hour: pad(d.getHours()), minute: pad(d.getMinutes()),
-            day: pad(d.getDate()), month: pad(d.getMonth() + 1),
-            year: pad(d.getFullYear() % 100) };
-    }
-    return p;
+      var asUTC = Date.UTC(+p.year, +p.month - 1, +p.day,
+                           +(p.hour === "24" ? "0" : p.hour), +p.minute, +p.second);
+      return asUTC - ts;
+    } catch (e) { return 0; }
+  }
+  // Shift a real epoch so its UTC representation is the station wall-clock.
+  function toStationClock(ts) { return ts + tzOffsetMs(ts); }
+  // Parts of a pre-shifted (pseudo-UTC) timestamp, read in UTC.
+  function tzParts(ts) {
+    var d = new Date(ts);
+    return { hour: pad(d.getUTCHours()), minute: pad(d.getUTCMinutes()),
+             day: pad(d.getUTCDate()), month: pad(d.getUTCMonth() + 1),
+             year: pad(d.getUTCFullYear() % 100) };
   }
   // Axis tick label by period: intraday shows time, longer spans show a date.
   function axisTime(ts) {
@@ -130,13 +143,21 @@
                splitLine: { lineStyle: { color: GRID } } }
     };
   }
+  // Shift each [ts_ms, value] point into the station-clock (pseudo-UTC) domain.
+  function shiftSeries(data) {
+    if (!Array.isArray(data)) return data;
+    return data.map(function (pt) {
+      return Array.isArray(pt) ? [toStationClock(pt[0])].concat(pt.slice(1)) : pt;
+    });
+  }
   function line(name, color, data, area) {
     return { name: name, type: "line", showSymbol: false, smooth: true,
              lineStyle: { width: 1.8, color: color }, itemStyle: { color: color },
-             areaStyle: area ? { opacity: 0.12, color: color } : undefined, data: data };
+             areaStyle: area ? { opacity: 0.12, color: color } : undefined,
+             data: shiftSeries(data) };
   }
   function bar(name, color, data) {
-    return { name: name, type: "bar", itemStyle: { color: color }, data: data };
+    return { name: name, type: "bar", itemStyle: { color: color }, data: shiftSeries(data) };
   }
   // Draw a chart with its unit on the y-axis and tooltip. Hidden if no data.
   function draw(id, title, unit, series) {
@@ -154,9 +175,10 @@
   function render(d) {
     if (!d) return;
     // Pin the time axis to the day's midnight bounds when provided (UTC epochs
-    // of the station's local midnight, computed server-side).
-    axisMin = (typeof d.start === "number") ? d.start : null;
-    axisMax = (typeof d.end === "number") ? d.end : null;
+    // of the station's local midnight, computed server-side). Shift into the
+    // station-clock domain so they line up with the shifted data points.
+    axisMin = (typeof d.start === "number") ? toStationClock(d.start) : null;
+    axisMax = (typeof d.end === "number") ? toStationClock(d.end) : null;
 
     // Temperature + derived
     var ts = [];
@@ -194,7 +216,7 @@
                      return ({0:"N",90:"E",180:"S",270:"W",360:"N"})[v] || v; } },
                    splitLine: { lineStyle: { color: GRID } } },
           series: [{ name: t("windvec"), type: "scatter", symbolSize: 5,
-                     itemStyle: { color: COLORS.windvec }, data: d.windDir }]
+                     itemStyle: { color: COLORS.windvec }, data: shiftSeries(d.windDir) }]
         }, true);
       } else { wv.getDom().style.display = "none"; }
     }
@@ -211,7 +233,7 @@
           var ts = d.windSpeed[i][0], spd = d.windSpeed[i][1], deg = dir[ts];
           if (spd == null || deg == null) continue;
           if (spd > maxSpd) maxSpd = spd;
-          pts.push([ts, spd, deg]);
+          pts.push([toStationClock(ts), spd, deg]);
         }
         wvec.setOption({
           title: { text: t("windvector") + " (" + u("wind", "km/h") + ")", left: 8, top: 4, textStyle: { fontSize: 13, color: TITLE, fontWeight: 600 } },

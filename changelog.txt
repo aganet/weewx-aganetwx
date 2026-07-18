@@ -1,3 +1,13 @@
+1.5.5  2026-07-18
+  * Fixed chart times being wrong for visitors in a different timezone than the
+    station. ECharts positions points and gridlines in the viewer's browser
+    zone, so relabeling ticks with chart_tz was not enough: a visitor abroad saw
+    the plot shifted by the station-vs-viewer offset (e.g. one hour off in
+    Switzerland for a Greek station). Timestamps are now shifted into the
+    station's wall-clock before plotting, so both point positions and labels
+    read in the station's timezone for every visitor, DST included. Requires
+    chart_tz set (or a detectable server timezone).
+
 1.5.4  2026-07-17
   * New Extras.chart_tz: set the station's IANA timezone (e.g. Europe/Athens)
     explicitly for chart-time labels. Charts already tried to label in the
