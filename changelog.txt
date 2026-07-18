@@ -1,3 +1,10 @@
+1.6.0  2026-07-18
+  * Wind row now shows a small compass dial: a fixed face with N marked and a
+    needle pointing where the wind is coming from, next to the speed and
+    ordinal (e.g. "4.3 km/h ENE"). Replaces the previous single arrow.
+  * Updated the bundled Apache ECharts to 6.1.0 (from 5.6.0). All charts render
+    unchanged; this keeps the charting engine current.
+
 1.5.7  2026-07-18
   * Webcam: fixed the banner sometimes disappearing on page refresh. The initial
     frame is now cache-busted at generation (fresh without a client-side src

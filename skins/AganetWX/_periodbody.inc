@@ -146,7 +146,17 @@
           <div class="lleft">$lbl('Wind')</div>
           <div class="lright">$current.windSpeed.format()#slurp
 #if $current.windDir.has_data
- <span class="wdir">$current.windDir.ordinal_compass</span><svg class="wind-arrow" viewBox="0 0 24 24" style="transform:rotate(#echo int(($current.windDir.raw + 180) % 360)#deg)" aria-hidden="true"><path d="M12 2 L18 11 L13 11 L13 22 L11 22 L11 11 L6 11 Z" /></svg>#slurp
+ <span class="wdir">$current.windDir.ordinal_compass</span>#slurp
+## Compass dial: fixed N/E/S/W ticks with a needle rotated to the wind bearing
+## (points the way the wind comes FROM). Server-rendered, no JS.
+<svg class="wind-compass" viewBox="0 0 40 40" role="img" aria-label="$current.windDir.ordinal_compass">
+<circle class="wc-face" cx="20" cy="20" r="18"/>
+<text class="wc-n" x="20" y="8.5">N</text>
+<g class="wc-needle" style="transform:rotate(#echo int($current.windDir.raw) % 360#deg)">
+<path class="wc-from" d="M20 5 L23 20 L17 20 Z"/><path class="wc-to" d="M20 35 L23 20 L17 20 Z"/>
+</g>
+<circle class="wc-hub" cx="20" cy="20" r="2.4"/>
+</svg>#slurp
 #end if
 </div>
         </div>

@@ -340,14 +340,22 @@ html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
 .baro-trend.down .bt-arrow { color: #2980b9; }
 .baro-trend.steady .bt-arrow { color: #7f8c8d; }
 /* Navigation arrow pointing downwind (windDir + 180). Rotated inline per value. */
-.wind-arrow {
-  width: 1.05em; height: 1.05em;
-  margin-left: 5px;
-  vertical-align: -0.2em;
-  fill: currentColor;
-  stroke: none;
-  transform-origin: 50% 50%;
+/* Wind compass dial: fixed face + N marker, a needle rotated to the bearing. */
+.wind-compass {
+  width: 2.4em; height: 2.4em;
+  margin-left: 7px; vertical-align: -0.9em;
 }
+.wind-compass .wc-face {
+  fill: none; stroke: var(--m-rule); stroke-width: 1.5;
+}
+.wind-compass .wc-n {
+  font-size: 7px; font-weight: 700; text-anchor: middle;
+  fill: var(--m-muted);
+}
+.wind-compass .wc-needle { transform-origin: 50% 50%; }
+.wind-compass .wc-from { fill: #c0392b; }              /* points where wind is FROM */
+.wind-compass .wc-to   { fill: var(--m-muted); opacity: 0.45; }
+.wind-compass .wc-hub  { fill: var(--m-ink); }
 /* Flat header: solid accent bar, no gradient/shadow box. */
 body.layout-modern .header { min-height: 0; }
 body.layout-modern .header .gradient {
