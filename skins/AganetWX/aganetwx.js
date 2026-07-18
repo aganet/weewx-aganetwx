@@ -60,6 +60,33 @@
     if (!charts[id]) charts[id] = echarts.init(el);
     return charts[id];
   }
+
+  // Lazy building: each chart's build closure is registered by DOM id and only
+  // run when its element first nears the viewport, so a page full of charts
+  // does not initialise them all at once on load. Charts already visible build
+  // immediately. Falls back to building everything if IntersectionObserver is
+  // unavailable.
+  var builders = {};
+  var built = {};
+  var observer = null;
+  function runBuilder(id) {
+    if (built[id] || !builders[id]) return;
+    built[id] = true;
+    builders[id]();
+  }
+  function defer(id, build) {
+    builders[id] = build;
+    var el = document.getElementById(id);
+    if (!el || !("IntersectionObserver" in window)) { runBuilder(id); return; }
+    if (!observer) {
+      observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { observer.unobserve(e.target); runBuilder(e.target.id); }
+        });
+      }, { rootMargin: "200px 0px" });   // start just before it scrolls in
+    }
+    observer.observe(el);
+  }
   // Re-tint live charts for a light/dark switch by merging only the theme-derived
   // colors (axis labels, gridlines, titles, legend), leaving series data and the
   // rest of each option untouched. Much lighter than rebuilding every option.
@@ -196,26 +223,42 @@
     axisMin = (typeof d.start === "number") ? toStationClock(d.start) : null;
     axisMax = (typeof d.end === "number") ? toStationClock(d.end) : null;
 
+    // On a re-render (e.g. language switch), rebuild charts that are already
+    // built with the new closure; charts not yet seen stay deferred. defer()
+    // below re-registers each builder, so just clear the built-flags of the
+    // ones already drawn and re-run them after registration.
+    var wasBuilt = Object.keys(built);
+    built = {};
+
     // Temperature + derived
-    var ts = [];
-    if (nonEmpty(d.outTemp))   ts.push(line(t("temp"), COLORS.temp, d.outTemp, true));
-    if (nonEmpty(d.dewpoint))  ts.push(line(t("dewpoint"), COLORS.dewpoint, d.dewpoint));
-    if (nonEmpty(d.appTemp))   ts.push(line(t("appTemp"), COLORS.appTemp, d.appTemp));
-    if (nonEmpty(d.heatindex)) ts.push(line(t("heatindex"), COLORS.heatindex, d.heatindex));
-    if (nonEmpty(d.windchill)) ts.push(line(t("windchill"), COLORS.windchill, d.windchill));
-    draw("chart-temp", t("temp"), u("temp", "°C"), ts);
+    defer("chart-temp", function () {
+      var ts = [];
+      if (nonEmpty(d.outTemp))   ts.push(line(t("temp"), COLORS.temp, d.outTemp, true));
+      if (nonEmpty(d.dewpoint))  ts.push(line(t("dewpoint"), COLORS.dewpoint, d.dewpoint));
+      if (nonEmpty(d.appTemp))   ts.push(line(t("appTemp"), COLORS.appTemp, d.appTemp));
+      if (nonEmpty(d.heatindex)) ts.push(line(t("heatindex"), COLORS.heatindex, d.heatindex));
+      if (nonEmpty(d.windchill)) ts.push(line(t("windchill"), COLORS.windchill, d.windchill));
+      draw("chart-temp", t("temp"), u("temp", "°C"), ts);
+    });
 
-    draw("chart-humidity", t("humidity"), "%",
-         [line(t("humidity"), COLORS.humidity, d.outHumidity, true)]);
+    defer("chart-humidity", function () {
+      draw("chart-humidity", t("humidity"), "%",
+           [line(t("humidity"), COLORS.humidity, d.outHumidity, true)]);
+    });
 
-    draw("chart-pressure", t("pressure"), u("pressure", "hPa"),
-         [line(t("pressure"), COLORS.pressure, d.barometer)]);
+    defer("chart-pressure", function () {
+      draw("chart-pressure", t("pressure"), u("pressure", "hPa"),
+           [line(t("pressure"), COLORS.pressure, d.barometer)]);
+    });
 
-    draw("chart-windspeed", t("windSpeed"), u("wind", "km/h"),
-         [line(t("windSpeed"), COLORS.windSpeed, d.windSpeed, true),
-          line(t("windGust"), COLORS.windGust, d.windGust)]);
+    defer("chart-windspeed", function () {
+      draw("chart-windspeed", t("windSpeed"), u("wind", "km/h"),
+           [line(t("windSpeed"), COLORS.windSpeed, d.windSpeed, true),
+            line(t("windGust"), COLORS.windGust, d.windGust)]);
+    });
 
     // Wind direction scatter (bearing 0..360). Exact degree shown on hover.
+    defer("chart-windvec", function () {
     var wv = chart("chart-windvec");
     if (wv) {
       if (nonEmpty(d.windDir)) {
@@ -237,8 +280,10 @@
         }, true);
       } else { wv.getDom().style.display = "none"; }
     }
+    });
 
     // Wind vector: arrow per point, y = speed, rotated to direction, thinned to avoid overlap.
+    defer("chart-windvector", function () {
     var wvec = chart("chart-windvector");
     if (wvec) {
       if (nonEmpty(d.windSpeed) && nonEmpty(d.windDir)) {
@@ -286,15 +331,32 @@
         }, true);
       } else { wvec.getDom().style.display = "none"; }
     }
+    });
 
-    windRose(d);
+    defer("chart-windrose", function () { windRose(d); });
 
-    draw("chart-rain", t("rain"), u("rain", "mm"), [bar(t("rain"), COLORS.rain, d.rain)]);
-    draw("chart-rainrate", t("rainRate"), u("rainRate", "mm/h"), [line(t("rainRate"), COLORS.rainRate, d.rainRate, true)]);
-    draw("chart-uv", t("UV"), "", [line(t("UV"), COLORS.UV, d.UV, true)]);
-    draw("chart-radiation", t("radiation"), u("radiation", "W/m²"), [line(t("radiation"), COLORS.radiation, d.radiation, true)]);
-    draw("chart-et", t("ET"), u("ET", "mm"), [bar(t("ET"), COLORS.ET, d.ET)]);
-    draw("chart-cloudbase", t("cloudbase"), u("cloudbase", "m"), [line(t("cloudbase"), COLORS.cloudbase, d.cloudbase)]);
+    defer("chart-rain", function () {
+      draw("chart-rain", t("rain"), u("rain", "mm"), [bar(t("rain"), COLORS.rain, d.rain)]);
+    });
+    defer("chart-rainrate", function () {
+      draw("chart-rainrate", t("rainRate"), u("rainRate", "mm/h"), [line(t("rainRate"), COLORS.rainRate, d.rainRate, true)]);
+    });
+    defer("chart-uv", function () {
+      draw("chart-uv", t("UV"), "", [line(t("UV"), COLORS.UV, d.UV, true)]);
+    });
+    defer("chart-radiation", function () {
+      draw("chart-radiation", t("radiation"), u("radiation", "W/m²"), [line(t("radiation"), COLORS.radiation, d.radiation, true)]);
+    });
+    defer("chart-et", function () {
+      draw("chart-et", t("ET"), u("ET", "mm"), [bar(t("ET"), COLORS.ET, d.ET)]);
+    });
+    defer("chart-cloudbase", function () {
+      draw("chart-cloudbase", t("cloudbase"), u("cloudbase", "m"), [line(t("cloudbase"), COLORS.cloudbase, d.cloudbase)]);
+    });
+
+    // Re-run any chart that was already built before this render (a re-render
+    // from a language switch), so it redraws with the new labels immediately.
+    wasBuilt.forEach(runBuilder);
   }
 
   // Wind rose: direction frequency (16 sectors) stacked by speed band, as % of all obs; calm shown as a centre %.
