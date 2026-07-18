@@ -1,10 +1,10 @@
 # AganetWX, a WeeWX skin
 
-A clean, fast, **fully configurable** weather dashboard skin for
-[WeeWX](https://weewx.com) 5.x. After running many different skins over the
-years, I built my own to get exactly the layout, data and feel I wanted.
-Interactive charts, multi-period pages, sensor-agnostic, and translatable,
-configured entirely from `weewx.conf`, with **no template editing required**.
+A weather dashboard skin for [WeeWX](https://weewx.com) 5.x. After years of
+running other people's skins I wanted one that did exactly what I had in mind,
+so I wrote this. Interactive charts, a page per time period, it shows whatever
+sensors you have, and it translates. Everything is set in `weewx.conf`; you
+never edit a template.
 
 Source and releases: [github.com/aganet/weewx-aganetwx](https://github.com/aganet/weewx-aganetwx)
 
@@ -28,23 +28,22 @@ Live demo: [aganet.gr](https://aganet.gr)
 
 ## Highlights
 
-- **Multi-period pages**: Current, Yesterday, Week, Month, Year, Last Year, Archive, with a top navigation bar.
-- **Interactive charts** ([Apache ECharts](https://echarts.apache.org/), self-hosted, no CDN), one per metric: temperature (with dew point, apparent, heat index, wind chill), humidity, barometer, wind speed and gust, wind direction, wind rose, rain, UV, solar radiation, evapotranspiration, cloud base.
-- **Current-conditions hero**: big current temperature, feels-like, and today's high/low. By default it tints by temperature (ice-blue when freezing, through blue, amber and orange to deep red when hot) and shows a small weather-mood face with a one-word caption (Brrr! ... Perfect ... Melting!) in the selected language. Both can be turned off.
-- **Trend arrows**: a small rising / steady / falling arrow next to temperature, humidity and UV, plus a 3-hour pressure tendency under the barometer.
-- **Threshold highlighting**: a value's row lights up (red above `high`, blue below `low`) when it crosses per-metric limits. Ships with sensible warm-climate defaults; tune them per metric in `weewx.conf`.
-- **All-time records card**: highest/lowest temperature, wind gust, humidity, barometer and rain rate ever recorded in your archive, each with the date it happened.
-- **Last rain**: when it last rained and how many days ago.
-- **Stale-data alert**: a banner warns when the station has not reported for over an hour (configurable), so an outage is visible on the page. Checked in the browser, so it shows even if generation has stopped, and it is timezone-independent.
-- **Sensor-agnostic**: auto-discovers and displays whatever your station records (extra temp/humidity, soil, leaf, air quality, lightning, battery) with no hardcoded list. Looks complete on Davis, Ecowitt, Tempest, or a bare thermometer.
-- **Config-driven theming**: colors, gradient, font, density, **light / dark / auto** mode, all from `weewx.conf`. A header switcher lets visitors pick **Modern / Classic / Dark** live (remembered per browser).
-- **Multi-language with a live switcher**: English, Greek, Spanish, French, German, Italian, Portuguese included. A header dropdown swaps every label and chart instantly (no reload); the browser language is auto-picked and remembered. Add a language by dropping in one `lang/<code>.conf` file. No template edits.
-- **NOAA reports**: monthly and yearly climatological text reports, linked from the Archive page.
-- **About page**: station hardware, coordinates, altitude and software versions read automatically, plus editable prose and contact fields. Coordinates hide behind one toggle for privacy.
-- **Optional webcam banner**: a live camera image above the navigation on the Current page. Auto-refreshes only when the frame actually changed (or stays static), shows a countdown, and click-to-enlarge opens it full-size in a lightbox. Size, position and a click-through link are configurable.
-- **Useful Links card**: a small set of external links (a lightning map, Windy, a satellite view; Greece-centered by default), editable in config.
-- **Optional HF propagation card**: amateur-radio solar-terrestrial data (solar flux, sunspots, A-index, K-index) and a colour-coded HF band-conditions table, fetched server-side from HamQSL. Off by default.
-- **Respects your WeeWX units**: US, metric or metricwx, the skin follows your station's `unit_system` (and timezone) rather than forcing its own. Every value, chart axis and label matches the rest of your WeeWX setup. Override per-report if you want this page to differ.
+- Seven pages behind a top nav: Current, Yesterday, Week, Month, Year, Last Year, Archive (plus About).
+- An interactive chart per metric, drawn with [Apache ECharts](https://echarts.apache.org/) (self-hosted, no CDN): temperature and its friends (dew point, apparent, heat index, wind chill), humidity, barometer, wind speed and gust, wind direction, wind rose, rain, UV, solar radiation, evapotranspiration and cloud base.
+- A current-conditions hero with the big temperature, feels-like and today's high/low. By default it tints by temperature, ice-blue when freezing through to deep red when hot, and shows a little weather-mood face with a one-word caption (Brrr! ... Perfect ... Melting!). Turn either off if you prefer.
+- Trend arrows (rising / steady / falling) next to temperature, humidity and UV, and a 3-hour pressure tendency under the barometer.
+- Threshold highlighting: give a value a high/low limit and its row lights up red or blue when it crosses. Ships with defaults tuned for a warm climate; change them in `weewx.conf`.
+- An all-time records card: the highest and lowest temperature, wind gust, humidity, barometer and rain rate in your archive, each with the date it happened. There's also a "last rain" line.
+- A stale-data banner when the station goes quiet for over an hour (configurable). It runs in the browser off an absolute timestamp, so it still shows if report generation has stopped, and it is right in any visitor's timezone.
+- Sensor-agnostic. It discovers whatever your station records, extra temperature and humidity channels, soil, leaf, air quality, lightning, battery, with no hardcoded list, so it looks complete on a Davis, an Ecowitt, a Tempest, or a bare thermometer.
+- Theming from `weewx.conf`: colours, gradient, font, density, and light / dark / auto mode. A header switcher lets visitors flip between Modern, Classic and Dark, and their choice sticks.
+- Seven languages built in (English, Greek, Spanish, French, German, Italian, Portuguese), with a header dropdown that relabels the whole page, charts included, without a reload. The browser language is picked on the first visit. Adding one is a single `lang/<code>.conf` file, no template edits.
+- NOAA monthly and yearly reports, linked from the Archive page.
+- An About page that reads the station hardware, coordinates, altitude and software versions on its own, plus your own prose and contact fields. One toggle hides the exact coordinates.
+- An optional webcam banner above the nav on the Current page. It only reloads the image when the frame actually changed (or stays static), shows a countdown, and opens full-size in a lightbox on click. Size, position and a click-through link are yours to set.
+- A "Useful Links" card, a few external links (a lightning map, Windy, a satellite view; Greek by default) you edit in config.
+- An optional HF propagation card for radio amateurs: solar flux, sunspots, A- and K-index, and a colour-coded band-conditions table from HamQSL. Off unless you turn it on.
+- It follows your WeeWX units (us, metric or metricwx) and timezone rather than imposing its own, so every value, axis and label matches the rest of your setup. Override per-report if you want this one page to differ.
 
 ## Requirements
 
@@ -303,9 +302,9 @@ check, so identical frames are not re-downloaded), with a live "Refreshing in
 Ns" countdown badge. Set `auto_refresh = false` for a static image. Clicking the
 image opens it full-size in a lightbox (unless a click-through `link` is set);
 close with Escape, a click on the backdrop, or the close button. On phones the
-banner spans the full screen width. A failed frame is treated as transient: the
-banner keeps retrying and reappears on its own once the image returns, so a
-brief network blip does not hide it until a reload.
+banner runs edge to edge. If a frame fails to load the banner doesn't panic: it
+keeps the last good image, retries, and comes back on its own once the camera
+does, so a brief network hiccup won't leave you staring at a gap.
 
 Both the webcam refresh and the whole-page auto-reload **stop after about 60
 minutes** so a forgotten, idle tab does not keep polling; the webcam badge then
@@ -353,6 +352,43 @@ It is off by default:
             solar = true
             solar_timeout = 15
 ```
+
+## Troubleshooting
+
+**Charts don't show up.** Load the page through your web server
+(`http://.../aganetwx/`), not by double-clicking the HTML file. The charts pull
+their data with `fetch()`, and browsers refuse that on a `file://` URL. If they
+are still missing over HTTP, open the browser console: an error on
+`data/<period>.json` means the server isn't serving the `data/` folder (wrong
+path, or the wrong MIME type).
+
+**A sensor shows the wrong unit** (a temperature reading as `%`, say, or a value
+with no unit at all). The skin prints whatever unit group WeeWX has attached to
+that reading, so a wrong unit means the reading is filed under the wrong group
+in WeeWX itself, not here. WeeWX 5.x still can't set that from `weewx.conf`, so
+you fix it with a small service. Drop this in `bin/user/fix_groups.py`:
+
+```python
+import weewx.units
+from weewx.engine import StdService
+
+class FixGroups(StdService):
+    def __init__(self, engine, config_dict):
+        super().__init__(engine, config_dict)
+        weewx.units.obs_group_dict['extraTemp2'] = 'group_temperature'
+```
+
+then tell WeeWX to load it:
+
+```ini
+[Engine]
+    [[Services]]
+        prep_services = weewx.engine.StdTimeSynch, user.fix_groups.FixGroups
+```
+
+Restart WeeWX and the value comes back as a temperature. Pick the group that
+matches the sensor: `group_temperature`, `group_percent`, `group_moisture`, and
+so on.
 
 ## How it works
 
