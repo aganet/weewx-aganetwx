@@ -1,18 +1,4 @@
-1.7.1  2026-07-18
-  * Forecast card can now show the Davis console's own forecast, read from the
-    forecastIcon field (mapped per the Vantage Serial Protocol Rev 2.6.1), with
-    the matching icon and a "From the station console" note. New forecast_type:
-    "auto" (default) prefers the Davis forecast and falls back to Zambretti,
-    "davis" uses only the console, "zambretti" uses only the computed method.
-    Added cloudy and snow icons. Non-Davis stations are unaffected (Zambretti).
-
-1.7.0  2026-07-18
-  * New local forecast card (Current page): a short outlook worked out from the
-    station's own barometer, its trend, wind direction and season, with a
-    matching weather icon (sun / partly / showers / rain / storm). No external
-    data. Off by default (Extras.forecast = true). Translated in all seven
-    languages. The Zambretti algorithm and phrasing are ported from pywws
-    (jim-easterbrook/pywws, GPL v2+).
+1.7.2  2026-07-18
   * Theme switch (Modern/Classic/Dark) now re-tints the charts in place instead
     of rebuilding them, so switching is smoother.
 
