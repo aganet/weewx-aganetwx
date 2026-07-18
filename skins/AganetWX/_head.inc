@@ -30,7 +30,7 @@
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="theme-color" content="$th_accent">
-  <link rel="stylesheet" href="aganetwx.css">
+  <link rel="stylesheet" href="aganetwx.css?v=$getVar('SKIN_VERSION', '')">
 ## Auto-refresh: reload after the archive interval (+60s buffer) so the page
 ## follows new data. Extras.auto_refresh: "auto" (default), seconds, or off.
 #set $ar = $str($getVar('Extras.auto_refresh', 'auto')).strip().lower()
@@ -90,7 +90,7 @@
       --m-ink: $th_dink;
     }
   </style>
-  <script src="lib/echarts.min.js" defer></script>
+  <script src="lib/echarts.min.js?v=$getVar('SKIN_VERSION', '')" defer></script>
 #if $getVar('i18n_enabled', False)
   <script>
     // All enabled languages' strings, for the client-side switcher. The page is

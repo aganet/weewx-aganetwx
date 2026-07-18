@@ -1,3 +1,10 @@
+1.8.9  2026-07-18
+  * Cache-busting for the skin's own assets: the CSS, JavaScript and bundled
+    ECharts are now requested with a ?v=<version> query tied to SKIN_VERSION, so
+    a browser fetches the new files on every release instead of serving a stale
+    cached copy. No more hard-refresh needed after an update. (The JSON data
+    files were already fetched with no-store.)
+
 1.8.8  2026-07-18
   * History page gains a "Whole year" mode alongside the day-by-day view: a
     toggle at the top switches between "By month" (a chosen month, day by day)

@@ -17,6 +17,6 @@ Powered by <a href="https://weewx.com">WeeWX</a> $station.version</small>
     <small><a href="https://github.com/aganet/weewx-aganetwx">AganetWX</a> $getVar('SKIN_VERSION', '') theme by <a href="https://anegio.com" rel="author">anegio.com</a></small>
   </div>
 
-  <script src="aganetwx.js" defer></script>
+  <script src="aganetwx.js?v=$getVar('SKIN_VERSION', '')" defer></script>
 </body>
 </html>
