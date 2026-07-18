@@ -403,5 +403,6 @@ so on.
 
 ## License
 
-The skin is released under the GNU GPL v3 (same as WeeWX). Bundled
-[Apache ECharts](https://echarts.apache.org/) is under the Apache-2.0 license.
+AganetWX is a skin for [WeeWX](https://weewx.com), released under the GNU GPL v3.
+Bundled [Apache ECharts](https://echarts.apache.org/) is under the Apache-2.0
+license.
