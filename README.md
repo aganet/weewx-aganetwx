@@ -34,6 +34,8 @@ Live demo: [aganet.gr](https://aganet.gr)
 - Trend arrows (rising / steady / falling) next to temperature, humidity and UV, and a 3-hour pressure tendency under the barometer.
 - Threshold highlighting: give a value a high/low limit and its row lights up red or blue when it crosses. Ships with defaults tuned for a warm climate; change them in `weewx.conf`.
 - An all-time records card: the highest and lowest temperature, wind gust, humidity, barometer and rain rate in your archive, each with the date it happened. There's also a "last rain" line.
+- A "today in one sentence" summary in plain language, built from the station's own data, with active weather alerts (heat, frost, strong wind, heavy rain, high UV, humidity) appended when today crosses your thresholds. On by default.
+- A "compared to the past" card: today vs yesterday, this month's rain vs the same month in prior years, and today vs this date last year, all from your own archive. Off by default; richer with more history.
 - A stale-data banner when the station goes quiet for over an hour (configurable). It runs in the browser off an absolute timestamp, so it still shows if report generation has stopped, and it is right in any visitor's timezone.
 - Sensor-agnostic. It discovers whatever your station records, extra temperature and humidity channels, soil, leaf, air quality, lightning, battery, with no hardcoded list, so it looks complete on a Davis, an Ecowitt, a Tempest, or a bare thermometer.
 - Theming from `weewx.conf`: colours, gradient, font, density, and light / dark / auto mode. A header switcher lets visitors flip between Modern, Classic and Dark, and their choice sticks.
@@ -55,14 +57,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.2.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.3.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.2.zip
+sudo weectl extension install /path/to/AganetWX-1.8.3.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -143,6 +145,8 @@ Example:
 | `Extras.languages` | code list | all 7 | Languages in the in-page switcher; single code hides it |
 | `Extras.extra_sensors` | bool | `true` | Auto-discovered extra-sensor panel |
 | `Extras.hero` | bool | `true` | Current-conditions hero card (Current page) |
+| `Extras.summary` | bool | `true` | "Today in one sentence" plain-language summary with active weather alerts (Current page) |
+| `Extras.compare` | bool | `false` | "Compared to the past" card: vs yesterday, vs the monthly average, vs this date last year (Current page) |
 | `Extras.celestial` | bool | `true` | Sun and Moon card |
 | `Extras.disclaimer` | bool | `true` | Amateur-station disclaimer in the footer |
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |
@@ -235,6 +239,48 @@ happened: temperature, wind gust, humidity, barometer and rain rate. Set
 `Extras.records = false` to hide it. The current temperature, humidity and UV
 rows also show a small rising / steady / falling trend arrow, and a "Last Rain"
 row shows when it last rained and how many days ago.
+
+## Today in one sentence
+
+A plain-language summary near the top of the Current page, e.g. "A warm day so
+far. High so far 32.5C, gusts to 25.7 km/h, no rain yet.", built entirely from
+this station's own data. The wording says "so far" because it reflects
+midnight until now, not a finished day.
+
+When today's own extremes cross the limits you set in `[[alerts]]` (the same
+limits used for row highlighting), a short alert is appended to the sentence,
+for example "Strong wind, gusts to 55 km/h." or "Extreme heat 38.4C.". Covered:
+heat, frost, strong wind, heavy rain, very high UV and very high humidity.
+
+On by default. Turn it off with:
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            summary = false
+```
+
+## Compared to the past
+
+An optional card that puts today in context using your own archive:
+
+- **vs yesterday**, the temperature difference compared at the same time of day
+  (a fair like-for-like, not today-so-far against a whole day).
+- **vs the monthly average**, this month's rainfall against the average of the
+  same month in previous years (needs at least two prior years).
+- **vs this date last year**, how today's high compares with the same calendar
+  date a year ago. This is a single-day curiosity, not a climate trend.
+
+The more history your archive holds, the more of it appears; each line is hidden
+when there is not enough data. Off by default:
+
+```ini
+[StdReport]
+    [[AganetWXReport]]
+        [[[Extras]]]
+            compare = true
+```
 
 ## Languages
 

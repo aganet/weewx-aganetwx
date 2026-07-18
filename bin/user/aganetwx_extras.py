@@ -291,3 +291,129 @@ class AganetWXSolar(SearchList):
             }
         except Exception:
             return None
+
+
+class AganetWXCompare(SearchList):
+    """Compares today with the recent past using the station's own archive,
+    exposed as $compare on the Current page. All comparisons use only local
+    data. None of the fields are shown unless there is enough history for them.
+
+    Fields (each may be None):
+      temp_vs_yesterday : {'delta': ValueHelper, 'warmer': bool}
+          Today's highest temperature so far vs yesterday up to the SAME time of
+          day (a fair like-for-like comparison, not today-so-far vs a full day).
+      month_rain        : {'pct': int, 'more': bool, 'month_name_key': str,
+                           'years': int}
+          This month's rain total vs the average of the same month in prior
+          years (needs at least two prior years). Percentage difference.
+      lastyear_hi       : ValueHelper
+          The highest temperature on this calendar date one year ago, as a plain
+          factual data point (a single day is weather, not climate, so it is not
+          phrased as a trend).
+
+    Off unless Extras.compare is set."""
+
+    MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+              'August', 'September', 'October', 'November', 'December']
+
+    def get_extension_list(self, timespan, db_lookup):
+        extras = self.generator.skin_dict.get('Extras', {})
+        enabled = str(extras.get('compare', 'false')).strip().lower() \
+            not in ('false', '0', 'no', 'off', '')
+        if not enabled:
+            return [{'compare': None}]
+        try:
+            result = self._compare(db_lookup(), timespan.stop)
+        except Exception:
+            result = None
+        return [{'compare': result}]
+
+    def _temp_vh(self, value):
+        if value is None:
+            return None
+        vt = weewx.units.ValueTuple(float(value), 'degree_C', 'group_temperature')
+        return weewx.units.ValueHelper(vt, 'current', self.generator.formatter,
+                                       self.generator.converter)
+
+    def _compare(self, db_manager, now_ts):
+        import time
+        table = db_manager.table_name
+        now_ts = int(now_ts)
+        lt = time.localtime(now_ts)
+        secs_into_day = lt.tm_hour * 3600 + lt.tm_min * 60 + lt.tm_sec
+        day_start = now_ts - secs_into_day
+
+        def temp_c(value, usUnits):
+            """outTemp to degC (US stores degF)."""
+            if value is None:
+                return None
+            return (value - 32.0) * 5.0 / 9.0 if usUnits == 1 else value
+
+        # unit system for conversions
+        try:
+            sysid = db_manager.std_unit_system
+        except Exception:
+            sysid = 16
+        us = (sysid == 1)
+
+        out = {}
+
+        # --- Today's max so far vs yesterday up to the same time of day ---
+        row_t = db_manager.getSql(
+            "SELECT MAX(outTemp) FROM %s WHERE dateTime > ?" % table, (day_start,))
+        row_y = db_manager.getSql(
+            "SELECT MAX(outTemp) FROM %s WHERE dateTime > ? AND dateTime <= ?" % table,
+            (day_start - 86400, day_start - 86400 + secs_into_day))
+        if row_t and row_t[0] is not None and row_y and row_y[0] is not None:
+            t_c = temp_c(row_t[0], us)
+            y_c = temp_c(row_y[0], us)
+            delta_c = t_c - y_c
+            if abs(delta_c) >= 0.1:
+                out['temp_vs_yesterday'] = {
+                    'delta': self._temp_vh(abs(delta_c)),
+                    'warmer': delta_c > 0,
+                }
+
+        # --- This month's rain vs the same month in prior years ---
+        mm = time.strftime('%m', lt)
+        cur_year = time.strftime('%Y', lt)
+        totals = {}
+        for yr, tot in db_manager.genSql(
+                "SELECT strftime('%%Y', dateTime, 'unixepoch', 'localtime') yr, "
+                "SUM(rain) FROM %s WHERE strftime('%%m', dateTime, 'unixepoch', "
+                "'localtime') = ? GROUP BY yr" % table, (mm,)):
+            if tot is not None:
+                totals[yr] = tot
+        this_month = totals.get(cur_year)
+        prior = [v for y, v in totals.items() if y != cur_year]
+        if this_month is not None and len(prior) >= 2:
+            avg = sum(prior) / len(prior)
+            if avg > 0:
+                pct = int(round((this_month - avg) / avg * 100.0))
+                if abs(pct) >= 1:
+                    out['month_rain'] = {
+                        'pct': abs(pct), 'more': pct > 0,
+                        'month_name_key': self.MONTHS[int(mm) - 1],
+                        'years': len(prior),
+                    }
+
+        # --- Today's high vs the same calendar date one year ago ---
+        # A single day year-to-year is weather, not climate, but it is a fun
+        # data point; phrased as a plain warmer/cooler difference.
+        ly = '%04d-%s' % (int(cur_year) - 1, time.strftime('%m-%d', lt))
+        row_ly = db_manager.getSql(
+            "SELECT MAX(outTemp) FROM %s WHERE "
+            "strftime('%%Y-%%m-%%d', dateTime, 'unixepoch', 'localtime') = ?" % table,
+            (ly,))
+        if (row_ly and row_ly[0] is not None
+                and row_t and row_t[0] is not None):
+            ly_c = temp_c(row_ly[0], us)
+            today_c = temp_c(row_t[0], us)
+            delta_c = today_c - ly_c
+            if abs(delta_c) >= 0.1:
+                out['vs_lastyear'] = {
+                    'delta': self._temp_vh(abs(delta_c)),
+                    'warmer': delta_c > 0,
+                }
+
+        return out or None

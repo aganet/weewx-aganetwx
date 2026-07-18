@@ -1,3 +1,11 @@
+1.8.3  2026-07-18
+  * New "Compared to the past" card (Current page, off by default via
+    Extras.compare): today vs yesterday at the same time of day, this month's
+    rain vs the same month in prior years, and today vs this date last year, all
+    from your own archive. Each line appears only with enough history.
+  * Documented both the summary (Extras.summary) and compare (Extras.compare)
+    cards, with how to enable/disable each. Translated in all seven languages.
+
 1.8.2  2026-07-18
   * The "Today in one sentence" summary now appends active weather alerts
     (extreme heat, frost, strong wind, heavy rain, very high UV, very humid)

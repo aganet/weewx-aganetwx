@@ -177,6 +177,34 @@ $lbl('High so far') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#
       </div>
       #end if
 
+      ## Compare card: today vs yesterday, this month vs prior years, this date
+      ## last year. All from the station's own archive. $compare is None unless
+      ## Extras.compare is set and there is enough history.
+      #if $show_current and $getVar('compare', None)
+      #set $C = $compare
+      <div class="col_sub gradient boxshadow dist compare-card">
+        <div class="headline">$lbl('Compared to the past')</div>
+        #if $C.get('temp_vs_yesterday')
+        <div class="cmp-row">
+          <span class="cmp-val #if $C.temp_vs_yesterday.warmer#cmp-up#else#cmp-down#end if#">$C.temp_vs_yesterday.delta.format()</span>
+          <span class="cmp-lbl">#if $C.temp_vs_yesterday.warmer#$lbl('warmer than yesterday')#else#$lbl('cooler than yesterday')#end if#</span>
+        </div>
+        #end if
+        #if $C.get('month_rain')
+        <div class="cmp-row">
+          <span class="cmp-val #if $C.month_rain.more#cmp-up#else#cmp-down#end if#">$C.month_rain.pct%</span>
+          <span class="cmp-lbl">#if $C.month_rain.more#$lbl('more rain than a typical')#else#$lbl('less rain than a typical')#end if# $lbl($C.month_rain.month_name_key) <span class="cmp-note">($lbl('from') $C.month_rain.years $lbl('years'))</span></span>
+        </div>
+        #end if
+        #if $C.get('vs_lastyear')
+        <div class="cmp-row">
+          <span class="cmp-val #if $C.vs_lastyear.warmer#cmp-up#else#cmp-down#end if#">$C.vs_lastyear.delta.format()</span>
+          <span class="cmp-lbl">#if $C.vs_lastyear.warmer#$lbl('warmer than the same date last year')#else#$lbl('cooler than the same date last year')#end if#</span>
+        </div>
+        #end if
+      </div>
+      #end if
+
       #if $show_current
       ## Live current values. Each row is gated by Extras.rows.*
       <div class="col_sub gradient boxshadow dist">
