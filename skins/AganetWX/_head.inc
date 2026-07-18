@@ -170,7 +170,8 @@
   </div>
 
 ## Live webcam banner (aligned to content width). Toggle/configure via
-## [Extras][[webcam]]. The image is cache-busted and refreshed client-side.
+## [Extras][[webcam]]. Initial frame is cache-busted at generation; if
+## auto_refresh is on the client reloads it on an interval.
 #set $wc = $getVar('Extras.webcam', {})
 #if $getVar('show_current', False) and $wc and $tf($wc.get('enable', False)) and $wc.get('url')
   ## Effective refresh: 0 (static image, no badge) unless auto_refresh is on.
@@ -188,11 +189,17 @@
   #end if
   ## Without a click-through link, the image is click-to-enlarge (lightbox).
   #set $wc_zoom = not $wc.get('link')
+  ## Cache-bust the initial src with the generation time so a returning visitor
+  ## gets a fresh frame on load, without the client overwriting src (which would
+  ## risk hiding the banner on a transient failure). data-src stays the clean
+  ## base URL the client cache-busts on each refresh tick.
+  #set $wc_url = $wc.get('url')
+  #set $wc_sep = '&' if '?' in $wc_url else '?'
   <div class="webcam-wrap wc-$wc_align">
     <div class="webcam-box"#if $wc_style# style="$wc_style"#end if#>
       #if $wc.get('link')#<a href="$wc.get('link')" target="_blank" rel="noopener">#end if#
-      <img id="webcam-img" class="webcam-img#if $wc_zoom# webcam-zoomable#end if#" src="$wc.get('url')" alt="$wc.get('title', 'Webcam')"
-           data-src="$wc.get('url')" data-refresh="$wc_refresh"#if $wc_zoom# tabindex="0" role="button"#end if#>
+      <img id="webcam-img" class="webcam-img#if $wc_zoom# webcam-zoomable#end if#" src="${wc_url}${wc_sep}_t=$current.dateTime.raw" alt="$wc.get('title', 'Webcam')"
+           data-src="$wc_url" data-refresh="$wc_refresh"#if $wc_zoom# tabindex="0" role="button"#end if#>
       #if $wc.get('link')#</a>#end if#
       #if $wc_refresh > 0
       <div class="webcam-live"><span class="webcam-dot"></span>$lbl('Refreshing in') <span id="webcam-count">$wc_refresh</span>$lbl('s (short for seconds)')</div>

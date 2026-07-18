@@ -475,16 +475,21 @@
     var countEl = document.getElementById("webcam-count");
     var wrap = document.querySelector(".webcam-wrap");
     var loadedOnce = false;
+    var failCount = 0;
     function bust() {
       img.src = src + (src.indexOf("?") >= 0 ? "&" : "?") + "_t=" + (new Date()).getTime();
     }
-    // A failed frame is treated as transient: keep the banner visible if it has
-    // ever loaded, and retry shortly. Only a camera that never loads at all is
-    // hidden, and even then we keep retrying so it self-heals when it returns.
-    img.addEventListener("load", function () { loadedOnce = true; if (wrap) wrap.style.display = ""; });
+    // A failed frame is transient: once any frame has loaded the banner stays
+    // visible (a later failure keeps the last good frame on screen, never
+    // blanks it). Before the first success we tolerate a few misses so a single
+    // hiccup does not hide the banner, then hide only if it truly never loads.
+    // Either way we keep retrying so it self-heals when the camera returns.
+    img.addEventListener("load", function () {
+      loadedOnce = true; failCount = 0; if (wrap) wrap.style.display = "";
+    });
     img.addEventListener("error", function () {
-      if (!loadedOnce && wrap) wrap.style.display = "none";  // never worked: hide for now
-      setTimeout(bust, 5000);                                 // but always retry
+      if (!loadedOnce && ++failCount >= 3 && wrap) wrap.style.display = "none";
+      setTimeout(bust, 5000);
     });
     // Reload the frame only when it actually changed: a lightweight HEAD request
     // reads Last-Modified/ETag and we swap the image only if it differs. Saves
@@ -501,8 +506,9 @@
         if (tag !== lastTag) { lastTag = tag; bust(); }
       }).catch(function () { headOk = false; bust(); });  // CORS/network: just reload
     }
-    // Fetch a fresh frame on load so nothing stale shows before the first tick.
-    bust();
+    // Let the plain src="..." already in the HTML load as the first frame (it is
+    // the freshest one right after generation); only cache-bust on later ticks.
+    // This avoids a failed cache-busted request hiding the banner on page load.
     if (every > 0) {
       var left = every;
       // Stop auto-refreshing after this many seconds so a forgotten/idle tab
