@@ -1,0 +1,63 @@
+## Compare page: overlay a chosen metric across every year in the archive, for
+## a chosen calendar month (day-by-day). Data comes from data/compare.json,
+## built by the AganetWXCompareData search-list extension. Off unless
+## Extras.compare_page is set.
+#errorCatcher Echo
+#def lbl($key)
+<span class="i18n" data-i18n="$key">$gettext($key)</span>#slurp
+#end def
+#def tf($v)
+#return $str($v).strip().lower() not in ('false','0','no','off','')
+#end def
+#set global $active = 'compare'
+#include "_head.inc"
+
+  <main class="content" id="main">
+    <div class="compare-page">
+      #if $tf($getVar('Extras.compare_page', False))
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('Compare across years')</div>
+        <div class="cmpx-controls">
+          <label class="cmpx-field">
+            <span>$lbl('Month')</span>
+            <select id="cmpx-month">
+              #for $i, $mn in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])
+              <option value="#echo '%02d' % ($i + 1)#">$lbl($mn)</option>
+              #end for
+            </select>
+          </label>
+          <label class="cmpx-field">
+            <span>$lbl('Metric')</span>
+            <select id="cmpx-metric">
+              <option value="temp">$lbl('Temperature')</option>
+              <option value="rain">$lbl('Rain')</option>
+              <option value="wind">$lbl('Wind Speed')</option>
+              <option value="humidity">$lbl('Humidity')</option>
+              <option value="pressure">$lbl('Barometer')</option>
+              <option value="uv">$lbl('UV Index')</option>
+              <option value="radiation">$lbl('Solar Radiation')</option>
+            </select>
+          </label>
+        </div>
+        <div class="cmpx-years">
+          <div class="cmpx-years-head">
+            <span>$lbl('Years')</span>
+            <button type="button" id="cmpx-all" class="cmpx-btn">$lbl('All')</button>
+            <button type="button" id="cmpx-none" class="cmpx-btn">$lbl('None')</button>
+          </div>
+          <div id="cmpx-year-list" class="cmpx-year-list"></div>
+        </div>
+        <div id="cmpx-chart" class="cmpx-chart" role="img" aria-label="$gettext('Compare across years')"></div>
+        <div id="cmpx-empty" class="cmpx-empty" hidden>$lbl('Not enough history yet for this selection.')</div>
+      </div>
+      #else
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('Compare across years')</div>
+        <div class="cmpx-hint">$lbl('This page is turned off. Enable it with compare_page in weewx.conf.')</div>
+      </div>
+      #end if
+    </div>
+    <div class="clear"></div>
+  </main>
+
+#include "_foot.inc"

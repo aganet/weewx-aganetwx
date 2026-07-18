@@ -1,0 +1,11 @@
+## Multi-year comparison dataset for the Compare page. Built by the
+## AganetWXCompareData search-list extension (see bin/user/aganetwx_extras.py):
+## {metric: {"MM": {"YYYY": [day1..day31]}}}, values in display units.
+## Empty object when Extras.compare_page is off.
+#errorCatcher Echo
+#encoding utf8
+#if $getVar('compare_data', None)
+{"years": [#echo ', '.join(['"' + $y + '"' for $y in $compare_years])#], "data": $compare_data}
+#else
+{"years": [], "data": {}}
+#end if

@@ -768,4 +768,115 @@
     el.classList.toggle("hero-ink-dark", lum > 150);
   }
   initHeroColor();
+
+  // Compare page: overlay a chosen metric across every year, for a chosen month
+  // (day-by-day). Reads data/compare.json (built server-side). x-axis is the
+  // day of the month (1..31), so no timezone handling is needed.
+  function initCompare() {
+    var host = document.getElementById("cmpx-chart");
+    if (!host) return;
+    var monthSel = document.getElementById("cmpx-month");
+    var metricSel = document.getElementById("cmpx-metric");
+    var empty = document.getElementById("cmpx-empty");
+    var yearList = document.getElementById("cmpx-year-list");
+    var btnAll = document.getElementById("cmpx-all");
+    var btnNone = document.getElementById("cmpx-none");
+    var unitFor = {
+      temp: u("temp", "°C"), rain: u("rain", "mm"), wind: u("wind", "km/h"),
+      humidity: "%", pressure: u("pressure", "hPa"), uv: "", radiation: u("radiation", "W/m²")
+    };
+    var chart = null, DB = null;
+    var selected = {};   // year -> shown?
+
+    // Default the month dropdown to the current month.
+    var thisMonth = ("0" + (new Date().getMonth() + 1)).slice(-2);
+    if (monthSel) monthSel.value = thisMonth;
+
+    // The newest shown year is a strong accent; older years fade towards grey
+    // and thin out, so the most recent stands out among many lines.
+    function colourFor(rank, total) {
+      // rank 0 = newest. Blend the accent (newest) toward a muted grey (oldest).
+      var accent = [10, 92, 168];        // #0a5ca8-ish
+      var grey = [150, 158, 168];
+      var t = total <= 1 ? 0 : rank / (total - 1);
+      var mix = function (a, b) { return Math.round(a + (b - a) * t); };
+      return "rgb(" + mix(accent[0], grey[0]) + "," + mix(accent[1], grey[1]) + "," + mix(accent[2], grey[2]) + ")";
+    }
+
+    function shownYears() {
+      return DB.years.filter(function (y) { return selected[y]; });
+    }
+
+    function draw() {
+      if (!DB || !DB.years || !DB.years.length) { host.style.display = "none"; if (empty) empty.hidden = false; return; }
+      var mo = monthSel.value, metric = metricSel.value;
+      var byYear = (DB.data[metric] || {})[mo] || {};
+      // Newest first so rank 0 = most recent.
+      var years = shownYears().slice().sort().reverse();
+      var series = [];
+      years.forEach(function (yr, rank) {
+        var arr = byYear[yr];
+        if (!arr) return;
+        var pts = [];
+        for (var d = 0; d < arr.length; d++) if (arr[d] != null) pts.push([d + 1, arr[d]]);
+        if (!pts.length) return;
+        var newest = (rank === 0);
+        series.push({
+          name: yr, type: "line", showSymbol: false, smooth: true,
+          connectNulls: true, z: newest ? 10 : 1,
+          lineStyle: { width: newest ? 2.6 : 1.4, color: colourFor(rank, years.length),
+                       opacity: newest ? 1 : 0.75 },
+          itemStyle: { color: colourFor(rank, years.length) }, data: pts
+        });
+      });
+      if (!series.length) { host.style.display = "none"; if (empty) empty.hidden = false; return; }
+      host.style.display = ""; if (empty) empty.hidden = true;
+      if (!chart) chart = echarts.init(host);
+      var un = unitFor[metric] || "";
+      var suffix = un ? (un.charAt(0) === "°" || un === "%" ? un : " " + un) : "";
+      chart.setOption({
+        tooltip: { trigger: "axis", valueFormatter: function (v) { return v + suffix; } },
+        legend: { show: false },
+        grid: { left: 56, right: 16, top: 12, bottom: 30 },
+        xAxis: { type: "value", min: 1, max: 31, minInterval: 1,
+                 axisLabel: { fontSize: 10, color: AX },
+                 splitLine: { lineStyle: { color: GRID } } },
+        yAxis: { type: "value", scale: true,
+                 axisLabel: { fontSize: 10, color: AX, formatter: function (v) { return v + suffix; } },
+                 splitLine: { lineStyle: { color: GRID } } },
+        series: series
+      }, true);
+    }
+
+    function buildYearBoxes() {
+      yearList.innerHTML = "";
+      DB.years.slice().sort().reverse().forEach(function (yr) {
+        selected[yr] = true;
+        var id = "cmpx-y-" + yr;
+        var lab = document.createElement("label");
+        lab.className = "cmpx-year";
+        lab.innerHTML = '<input type="checkbox" id="' + id + '" checked> ' + yr;
+        lab.querySelector("input").addEventListener("change", function (e) {
+          selected[yr] = e.target.checked; draw();
+        });
+        yearList.appendChild(lab);
+      });
+    }
+    function setAll(on) {
+      DB.years.forEach(function (y) { selected[y] = on; });
+      Array.prototype.forEach.call(yearList.querySelectorAll("input"), function (cb) { cb.checked = on; });
+      draw();
+    }
+
+    fetch("data/compare.json", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { DB = d; buildYearBoxes(); draw(); })
+      .catch(function (e) { console.error("AganetWX: compare data failed", e); });
+    monthSel.addEventListener("change", draw);
+    metricSel.addEventListener("change", draw);
+    if (btnAll) btnAll.addEventListener("click", function () { setAll(true); });
+    if (btnNone) btnNone.addEventListener("click", function () { setAll(false); });
+    window.addEventListener("resize", function () { if (chart) chart.resize(); });
+  }
+  initCompare();
 })();

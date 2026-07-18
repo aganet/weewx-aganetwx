@@ -1,3 +1,15 @@
+1.8.7  2026-07-18
+  * New optional History page (own nav tab, off by default via compare_page):
+    overlay a chosen metric across every year in your archive, day-by-day for a
+    chosen month. Month + metric dropdowns, per-year checkboxes with All/None,
+    the newest year drawn bold and older years fading to grey. Metrics:
+    temperature, rain, wind, humidity, pressure, UV, solar radiation. The
+    whole-archive aggregation is cached on disk and rebuilt only once a day
+    (compare_refresh), so it adds no real cost to report cycles. Seven languages.
+  * Files changed (for anyone with local edits): bin/user/aganetwx_extras.py,
+    skins/AganetWX/_nav.inc, skins/AganetWX/aganetwx.js, aganetwx.css and new
+    compare.html.tmpl + data/compare.json.tmpl.
+
 1.8.6  2026-07-18
   * More realistic moon: a textured lit disc (maria, craters, spherical
     shading) with a correct terminator, so the phase and which side is lit read

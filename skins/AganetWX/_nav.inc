@@ -30,6 +30,9 @@
     #if $tf($getVar('Extras.nav.archive', True))
     $navlink('archive',   'archive.html',   'Archive')
     #end if
+    #if $tf($getVar('Extras.compare_page', False))
+    $navlink('compare',   'compare.html',   'History')
+    #end if
     #if $tf($getVar('Extras.nav.about', True))
     $navlink('about',     'about.html',     'About')
     #end if

@@ -496,3 +496,123 @@ class AganetWXCompare(SearchList):
                 }
 
         return out or None
+
+
+class AganetWXCompareData(SearchList):
+    """Builds the dataset for the interactive Compare page: for each metric,
+    the value on every day-of-month, grouped by calendar month and year, across
+    the whole archive. Lets a visitor overlay, say, July's daily mean
+    temperature for every year. Exposed as $compare_data (a JSON string) and
+    $compare_years. Only built when Extras.compare_page is on, and only for the
+    Compare page (period_key == 'compare'), so it costs nothing elsewhere.
+
+    Shape: {metric: {"07": {"2023": [d1..d31 or null], ...}, ...}, ...}
+    Values are in the report's display units (converted from the DB)."""
+
+    # metric key -> (db column, aggregate, unit group)
+    METRICS = [
+        ('temp',      'outTemp',     'avg', 'group_temperature'),
+        ('rain',      'rain',        'sum', 'group_rain'),
+        ('wind',      'windSpeed',   'avg', 'group_speed'),
+        ('humidity',  'outHumidity', 'avg', 'group_percent'),
+        ('pressure',  'barometer',   'avg', 'group_pressure'),
+        ('uv',        'UV',          'max', 'group_uv'),
+        ('radiation', 'radiation',   'avg', 'group_radiation'),
+    ]
+
+    # Held in-process for the report run (the SLE runs for every template).
+    _cached = None
+
+    def get_extension_list(self, timespan, db_lookup):
+        extras = self.generator.skin_dict.get('Extras', {})
+        enabled = str(extras.get('compare_page', 'false')).strip().lower() \
+            not in ('false', '0', 'no', 'off', '')
+        if not enabled:
+            return [{'compare_data': None, 'compare_years': []}]
+        if AganetWXCompareData._cached is None:
+            AganetWXCompareData._cached = self._load_or_build(extras, db_lookup)
+        return [AganetWXCompareData._cached]
+
+    def _load_or_build(self, extras, db_lookup):
+        """Aggregating the whole archive is expensive, and the history barely
+        changes within a day, so the result is cached on disk and rebuilt only
+        when older than compare_refresh seconds (default 86400 = once a day)."""
+        try:
+            ttl = int(extras.get('compare_refresh', 86400))
+        except (TypeError, ValueError):
+            ttl = 86400
+        path = self._cache_path()
+        cached = self._read_cache(path, ttl)
+        if cached is not None:
+            return cached
+        try:
+            data, years = self._build(db_lookup())
+            result = {
+                'compare_data': json.dumps(data, ensure_ascii=True) if data else None,
+                'compare_years': years,
+            }
+        except Exception:
+            result = {'compare_data': None, 'compare_years': []}
+        self._write_cache(path, result)
+        return result
+
+    def _cache_path(self):
+        import tempfile
+        return os.path.join(tempfile.gettempdir(), 'aganetwx_compare.json')
+
+    def _read_cache(self, path, ttl):
+        import time
+        try:
+            if time.time() - os.path.getmtime(path) >= ttl:
+                return None
+            with open(path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return None
+
+    def _write_cache(self, path, result):
+        try:
+            tmp = path + '.tmp'
+            with open(tmp, 'w', encoding='utf-8') as f:
+                json.dump(result, f)
+            os.replace(tmp, path)
+        except Exception:
+            pass
+
+    def _convert(self, value, group, sysid):
+        """Convert a native-unit DB value to the report's display units."""
+        if value is None:
+            return None
+        # Native unit for this group in the database's unit system.
+        unit = weewx.units.std_groups.get(sysid, {}).get(group)
+        vt = weewx.units.ValueTuple(float(value), unit, group)
+        try:
+            return round(self.generator.converter.convert(vt)[0], 2)
+        except Exception:
+            return round(float(value), 2)
+
+    def _build(self, db_manager):
+        table = db_manager.table_name
+        try:
+            sysid = db_manager.std_unit_system
+        except Exception:
+            sysid = 16
+
+        years = set()
+        data = {}
+        for key, col, agg, group in self.METRICS:
+            month_map = {}
+            sql = ("SELECT strftime('%%m', dateTime, 'unixepoch', 'localtime') mo, "
+                   "strftime('%%Y', dateTime, 'unixepoch', 'localtime') yr, "
+                   "CAST(strftime('%%d', dateTime, 'unixepoch', 'localtime') AS INTEGER) dy, "
+                   "%s(%s) FROM %s WHERE %s IS NOT NULL GROUP BY mo, yr, dy"
+                   % (agg.upper(), col, table, col))
+            for mo, yr, dy, val in db_manager.genSql(sql):
+                if val is None or dy is None:
+                    continue
+                years.add(yr)
+                arr = month_map.setdefault(mo, {}).setdefault(yr, [None] * 31)
+                if 1 <= dy <= 31:
+                    arr[dy - 1] = self._convert(val, group, sysid)
+            data[key] = month_map
+        return data, sorted(years)
