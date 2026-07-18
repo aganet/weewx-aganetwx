@@ -134,6 +134,37 @@
       #else
       #set $_cond = 'A hot day'
       #end if
+      ## Active weather alerts for today, from the SAME [[alerts]] thresholds
+      ## used for row highlighting, checked against today's own extremes. Each
+      ## crossed limit appends one flagged sentence to the summary paragraph.
+      #set $_al = $getVar('Extras.alerts', {})
+      #set $_flags = []
+      #if hasattr($_al, 'get')
+      ## Heat: today's max temperature above the outTemp high limit.
+      #if $_al.get('outTemp') and $_al.outTemp.get('high') and $day.outTemp.max.has_data and $day.outTemp.max.raw >= float($_al.outTemp.high)
+      #silent $_flags.append($lbl('Extreme heat') + ' ' + $day.outTemp.max.format(add_label=False) + $unit.label.outTemp + '.')
+      #end if
+      ## Frost: today's min temperature below the outTemp low limit.
+      #if $_al.get('outTemp') and $_al.outTemp.get('low') and $day.outTemp.min.has_data and $day.outTemp.min.raw <= float($_al.outTemp.low)
+      #silent $_flags.append($lbl('Frost') + ' ' + $day.outTemp.min.format(add_label=False) + $unit.label.outTemp + '.')
+      #end if
+      ## Strong wind: today's peak gust above the windSpeed high limit.
+      #if $_al.get('windSpeed') and $_al.windSpeed.get('high') and $day.windGust.has_data and $day.windGust.max.raw and $day.windGust.max.raw >= float($_al.windSpeed.high)
+      #silent $_flags.append($lbl('Strong wind, gusts to') + ' ' + $day.windGust.max.format() + '.')
+      #end if
+      ## Heavy rain: today's peak rain rate above the rainRate high limit.
+      #if $_al.get('rainRate') and $_al.rainRate.get('high') and $day.rainRate.has_data and $day.rainRate.max.raw and $day.rainRate.max.raw >= float($_al.rainRate.high)
+      #silent $_flags.append($lbl('Heavy rain') + '.')
+      #end if
+      ## Very high UV: today's peak UV above the UV high limit.
+      #if $_al.get('UV') and $_al.UV.get('high') and $day.UV.has_data and $day.UV.max.raw and $day.UV.max.raw >= float($_al.UV.high)
+      #silent $_flags.append($lbl('Very high UV') + ' ' + $day.UV.max.format(add_label=False) + '.')
+      #end if
+      ## Very humid: today's peak humidity above the outHumidity high limit.
+      #if $_al.get('outHumidity') and $_al.outHumidity.get('high') and $day.outHumidity.has_data and $day.outHumidity.max.raw and $day.outHumidity.max.raw >= float($_al.outHumidity.high)
+      #silent $_flags.append($lbl('Very humid') + '.')
+      #end if
+      #end if
       <div class="col_sub gradient boxshadow dist summary-card">
         <div class="summary-text">#slurp
 $lbl($_cond) $lbl('so far')#slurp
@@ -141,6 +172,7 @@ $lbl($_cond) $lbl('so far')#slurp
 $lbl('High so far') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
 #if $day.windGust.has_data and $day.windGust.max.raw#, $lbl('gusts to') $day.windGust.max.format()#end if##slurp
 #if $_rained#, $day.rain.sum.format() $lbl('of rain')#else#, $lbl('no rain yet')#end if#.#slurp
+#for $_f in $_flags# <span class="alert-flag">&#9888; $_f</span>#end for##slurp
 </div>
       </div>
       #end if

@@ -1,3 +1,10 @@
+1.8.2  2026-07-18
+  * The "Today in one sentence" summary now appends active weather alerts
+    (extreme heat, frost, strong wind, heavy rain, very high UV, very humid)
+    when today's own extremes cross your [[alerts]] thresholds, e.g. "... Strong
+    wind, gusts to 55 km/h." Uses the same limits as the row highlighting, so
+    change them once in weewx.conf. Translated in all seven languages.
+
 1.8.1  2026-07-18
   * New "Today in one sentence" summary on the Current page: a plain-language
     line built from the station's own data (e.g. "A warm day so far. High so far

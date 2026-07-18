@@ -336,8 +336,9 @@ html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
 }
 /* "Today in one sentence" summary card. */
 .summary-card .summary-text {
-  padding: 12px 16px; font-size: 10.5pt; line-height: 1.5; color: var(--m-ink);
+  padding: 12px 16px; font-size: 10.5pt; line-height: 1.6; color: var(--m-ink);
 }
+.summary-card .alert-flag { font-weight: 700; color: #c0392b; white-space: nowrap; }
 .baro-trend .bt-arrow { margin-right: 3px; }
 .baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }
 .baro-trend.up   .bt-arrow { color: #c0392b; }
