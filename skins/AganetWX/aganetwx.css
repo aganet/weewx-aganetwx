@@ -497,7 +497,7 @@ body.layout-modern .col_sub:not(.hilows) .lright {
 .lright:has(.baro-trend) .vh-line { display: flex; flex-direction: row; align-items: center; gap: 10px; }
 .vrowhl .vh-range {
   display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
-  font-size: 7.5pt; font-weight: 600; line-height: 1.2; color: var(--m-muted);
+  font-size: 8.5pt; font-weight: 600; line-height: 1.2; color: var(--m-muted);
   white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 .vrowhl .vh-at { color: #99a3ad; font-weight: 400; margin: 0 2px 0 4px; }

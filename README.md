@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.15.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.16.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.15.zip
+sudo weectl extension install /path/to/AganetWX-1.8.16.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -90,7 +90,7 @@ weectl extension uninstall AganetWX
 ## Configuration
 
 Everything is optional. Defaults live in `skins/AganetWX/skin.conf`; override any of
-them per-report in `weewx.conf` under `[StdReport] [[AganetWXReport]]` - **without
+them per-report in `weewx.conf` under `[StdReport] [[AganetWXReport]]`, **without
 touching a template**.
 
 > **Put your settings in `weewx.conf`, not in `skin.conf`.** An extension update
@@ -135,6 +135,7 @@ Example:
                 show_footer_coords = true
                 link_url = "https://example.com"
                 link_text = "My site"
+                show_theme_credit = false   # remove the "theme by anegio.com" footer credit
 ```
 
 ### Config reference
@@ -168,8 +169,11 @@ Example:
 | `theme.accent` | CSS color | `#0a5ca8` | Chart titles, links, headings |
 | `theme.gradient_top` / `gradient_bottom` | CSS color | gold/cream | Header and panel gradient |
 | `theme.page_bg` | CSS color | `#FFFDCA` | Page background |
-| `theme.font` | CSS font stack | Verdana | Body font |
+| `theme.font` | CSS font stack | system stack | Body font |
+| `theme.base_font_size` | CSS size | `9.5pt` | Base font size for the page |
 | `theme.density` | `comfortable`,`compact` | `comfortable` | Row and chart sizing |
+| `theme.dark_bg` / `dark_panel` / `dark_ink` | CSS color | dark-blue palette | Dark-mode page background, panel background, and text colour |
+| `theme.dark_gradient_top` / `dark_gradient_bottom` | CSS color | dark-blue palette | Dark-mode header/panel gradient |
 | `nav.<tab>` | bool | `true` | Show/hide a tab (`current`,`yesterday`,`week`,`month`,`year`,`lastyear`,`archive`,`about`) |
 | `charts.<metric>` | bool | `true` | Show/hide a chart (`temp`,`humidity`,`pressure`,`windspeed`,`windvec`,`windvector`,`windrose`,`rain`,`rainrate`,`uv`,`radiation`,`et`,`cloudbase`) |
 | `rows.<row>` | bool | `true` | Show/hide a metric across all three left-column boxes (Current Values, Today's Hi/Lows, All-Time Records). Names: `humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation` (the full list is the `[[rows]]` block in `skin.conf`) |
@@ -178,6 +182,7 @@ Example:
 | `Extras.baro_trend_words` | bool | `false` | Barometer 3h trend as just the arrow and the 3h change (minimalist, default); `true` adds the "Rising/Falling/Steady" word |
 | `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
 | `Extras.solar` | bool | `false` | HF propagation card (HamQSL solar data + band conditions) |
+| `Extras.solar_refresh` | seconds | `3600` | How often the HamQSL reading is re-fetched (cached on disk between fetches) |
 | `Extras.solar_timeout` | seconds | `15` | Timeout for the server-side HamQSL fetch |
 | `alerts.<obs>.high` / `.low` | number | Greek-climate defaults | Highlight a Current-Values row when the value crosses this limit (in your displayed units); defaults set for temp, apparent temp, wind, humidity, rain rate, UV |
 | `about.prose_en` / `prose_el` | string | empty | About-page description (inline HTML ok) |

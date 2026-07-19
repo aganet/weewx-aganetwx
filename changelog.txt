@@ -1,3 +1,10 @@
+1.8.16  2026-07-19
+  * The today's high/low shown beside each current value is a touch larger
+    (8.5pt, was 7.5pt), so it reads more easily.
+  * Documentation: the README config reference now lists every option,
+    including the dark-mode palette, base font size, solar_refresh and the
+    theme-credit toggle.
+
 1.8.15  2026-07-19
   * The minimalist barometer 3h trend (arrow + change, no "Rising/Falling/
     Steady" word) is now the default. Set Extras.baro_trend_words = true to get
