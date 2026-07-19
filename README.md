@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.14.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.15.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.14.zip
+sudo weectl extension install /path/to/AganetWX-1.8.15.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -172,10 +172,10 @@ Example:
 | `theme.density` | `comfortable`,`compact` | `comfortable` | Row and chart sizing |
 | `nav.<tab>` | bool | `true` | Show/hide a tab (`current`,`yesterday`,`week`,`month`,`year`,`lastyear`,`archive`,`about`) |
 | `charts.<metric>` | bool | `true` | Show/hide a chart (`temp`,`humidity`,`pressure`,`windspeed`,`windvec`,`windvector`,`windrose`,`rain`,`rainrate`,`uv`,`radiation`,`et`,`cloudbase`) |
-| `rows.<row>` | bool | `true` | Show/hide a row (`humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation`). Applies across all three left-column boxes at once (Current Values, Today's Hi/Lows, All-Time Records) |
+| `rows.<row>` | bool | `true` | Show/hide a metric across all three left-column boxes (Current Values, Today's Hi/Lows, All-Time Records). Names: `humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation` (the full list is the `[[rows]]` block in `skin.conf`) |
 | `rows.last_rain_date` | bool | `true` | Show the date/time on the Last Rain row; `false` keeps only "N days ago" |
 | `Extras.rows_show_range` | bool | `true` | Today's high/low (with time) beside each current value |
-| `Extras.baro_trend_words` | bool | `true` | Barometer 3h trend as arrow + "Rising/Falling/Steady"; `false` for just the arrow and the 3h change (minimalist) |
+| `Extras.baro_trend_words` | bool | `false` | Barometer 3h trend as just the arrow and the 3h change (minimalist, default); `true` adds the "Rising/Falling/Steady" word |
 | `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
 | `Extras.solar` | bool | `false` | HF propagation card (HamQSL solar data + band conditions) |
 | `Extras.solar_timeout` | seconds | `15` | Timeout for the server-side HamQSL fetch |
@@ -186,6 +186,7 @@ Example:
 | `about.show_coordinates` | bool | `true` | Show exact coords and map link on About; `false` for privacy |
 | `branding.show_footer_coords` | bool | `true` | Lat/long/altitude in footer |
 | `branding.link_url` / `link_text` | string | empty | Optional footer link |
+| `branding.show_theme_credit` | bool | `true` | Show the "theme by anegio.com" footer credit; `false` removes it (the AganetWX project link stays) |
 | `links.show` | bool | `true` | Show the "Useful Links" card (bottom of the left column) |
 | `links.<entry>` | `url`,`text` | Greece maps | Each `[[[entry]]]` adds a link; edit/add/remove freely |
 | `webcam.enable` | bool | `false` | Show the webcam banner above the nav |

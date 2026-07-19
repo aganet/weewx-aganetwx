@@ -271,7 +271,7 @@ $lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
         ## baro_trend_words=false drops the Rising/Falling/Steady word for a
         ## minimalist arrow (like the temperature trend); the arrow keeps its
         ## title for accessibility, and the 3h change stays.
-        #if $tf($getVar('Extras.baro_trend_words', True))
+        #if $tf($getVar('Extras.baro_trend_words', False))
         #set $btrend = '<div class="baro-trend ' + $btcls + '"><span class="bt-arrow">' + $btarrow + '</span> ' + $lbl($btkey) + ' <span class="bt-val">' + $trend.barometer.format(add_label=False) + $unit.label.barometer + ' / 3h</span></div>'
         #else
         #set $btrend = '<div class="baro-trend ' + $btcls + '"><span class="bt-arrow" title="' + $gettext($btkey) + '">' + $btarrow + '</span> <span class="bt-val">' + $trend.barometer.format(add_label=False) + $unit.label.barometer + ' / 3h</span></div>'

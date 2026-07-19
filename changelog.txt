@@ -1,3 +1,10 @@
+1.8.15  2026-07-19
+  * The minimalist barometer 3h trend (arrow + change, no "Rising/Falling/
+    Steady" word) is now the default. Set Extras.baro_trend_words = true to get
+    the worded style back.
+  * New Extras.branding.show_theme_credit: set false to remove the "theme by
+    anegio.com" credit from the footer (the AganetWX project link stays).
+
 1.8.14  2026-07-19
   * Left-column refinements. The [[rows]] show/hide toggles now apply across all
     three left-column boxes at once (Current Values, Today's Hi/Lows, All-Time
