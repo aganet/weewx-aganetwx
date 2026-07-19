@@ -411,6 +411,9 @@ html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
 .cmpx-rec-tag { color: var(--m-muted); font-size: 8.5pt; cursor: help; }
 .baro-trend .bt-arrow { margin-right: 3px; }
 .baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }
+/* Last Rain reuses .baro-trend, but its "N days ago" is the primary value, so
+   show it at full strength in the normal text colour, not dimmed. */
+.baro-trend.last-rain .bt-val { opacity: 1; color: var(--m-ink); margin-left: 0; }
 .baro-trend.up   .bt-arrow { color: #c0392b; }
 .baro-trend.down .bt-arrow { color: #2980b9; }
 .baro-trend.steady .bt-arrow { color: #7f8c8d; }
