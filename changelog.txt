@@ -1,3 +1,12 @@
+1.8.13  2026-07-19
+  * New optional Cameras page (own nav tab) for multiple cameras, configured in
+    a separate [[cameras_page]] block: a grid of cameras with a configurable
+    column count (1..6, or auto), each with the same cache-busted refresh,
+    countdown and click-to-enlarge lightbox as the main banner. The existing
+    [[webcam]] main camera on the Current page is unchanged; the new block is
+    independent and off by default, so single-camera setups see no difference.
+    Seven languages.
+
 1.8.12  2026-07-19
   * History page: optional "Monthly records" tables. Temperature shows the
     hottest and coldest for each calendar month across the whole archive, with

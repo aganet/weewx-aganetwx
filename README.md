@@ -43,7 +43,7 @@ Live demo: [aganet.gr](https://aganet.gr)
 - Seven languages built in (English, Greek, Spanish, French, German, Italian, Portuguese), with a header dropdown that relabels the whole page, charts included, without a reload. The browser language is picked on the first visit. Adding one is a single `lang/<code>.conf` file, no template edits.
 - NOAA monthly and yearly reports, linked from the Archive page.
 - An About page that reads the station hardware, coordinates, altitude and software versions on its own, plus your own prose and contact fields. One toggle hides the exact coordinates.
-- An optional webcam banner above the nav on the Current page. It only reloads the image when the frame actually changed (or stays static), shows a countdown, and opens full-size in a lightbox on click. Size, position and a click-through link are yours to set.
+- An optional webcam banner above the nav on the Current page. It only reloads the image when the frame actually changed (or stays static), shows a countdown, and opens full-size in a lightbox on click. Size, position and a click-through link are yours to set. For more than one camera, a separate Cameras page (own nav tab) shows a configurable grid, leaving the main banner untouched.
 - A "Useful Links" card, a few external links (a lightning map, Windy, a satellite view; Greek by default) you edit in config.
 - An optional HF propagation card for radio amateurs: solar flux, sunspots, A- and K-index, and a colour-coded band-conditions table from HamQSL. Off unless you turn it on.
 - It follows your WeeWX units (us, metric or metricwx) and timezone rather than imposing its own, so every value, axis and label matches the rest of your setup. Override per-report if you want this one page to differ.
@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.12.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.13.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.12.zip
+sudo weectl extension install /path/to/AganetWX-1.8.13.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -194,6 +194,9 @@ Example:
 | `webcam.height` | px | `380` | Cap the display height |
 | `webcam.align` | `left`,`center`,`right` | `center` | Position a narrower image |
 | `webcam.title` / `link` | string | empty | Optional caption and click-through URL |
+| `cameras_page.enable` | bool | `false` | Dedicated Cameras page (own nav tab) for extra cameras, separate from the main banner |
+| `cameras_page.columns` | 1..6 | `0` | Cameras-page grid columns; `0`/empty fits as many as sensible per row |
+| `cameras_page.[[[name]]]` | section | none | One per extra camera: `url`, `title`, `link`, optional per-camera `refresh`/`height`/etc. |
 
 ### Units
 
@@ -456,6 +459,38 @@ banner runs edge to edge. If a frame fails to load the banner doesn't panic: it
 keeps the last good image, retries, and comes back on its own once the camera
 does, so a brief network hiccup won't leave you staring at a gap.
 
+### Cameras page (multiple cameras)
+
+The `[[webcam]]` banner above is a single camera on the Current page. For more
+cameras, use the separate `[[cameras_page]]` block: it adds a dedicated Cameras
+tab with a grid of cameras, and leaves the main banner exactly as it is. Both
+are independent and off by default, so nothing changes for a single-camera
+setup. Add a sub-section per camera (any name); each keeps the same refresh,
+countdown and lightbox behaviour as the main banner and can override the shared
+values. `columns` sets the grid width (1..6; 0 or empty fits as many as
+sensible per row). The tab appears only when this block is enabled and has at
+least one camera.
+
+```ini
+        [[[Extras]]]
+            [[[[webcam]]]]              # main camera, Current page (unchanged)
+                enable = true
+                url = "cam.jpg"
+                title = "Main view"
+
+            [[[[cameras_page]]]]        # dedicated Cameras page
+                enable = true
+                columns = 2
+                refresh = 30            # shared default
+                [[[[[garden]]]]]
+                    url = "cam-garden.jpg"
+                    title = "Garden"
+                [[[[[sky]]]]]
+                    url = "cam-sky.jpg"
+                    title = "Sky"
+                    refresh = 60        # per-camera override
+```
+
 Both the webcam refresh and the whole-page auto-reload **stop after about 60
 minutes** so a forgotten, idle tab does not keep polling; the webcam badge then
 shows "Paused". Reloading the page starts a fresh 60-minute session.
@@ -504,6 +539,22 @@ It is off by default:
 ```
 
 ## Troubleshooting
+
+**The History page (or its Monthly records tables) is empty after enabling it,
+or shows old data.** The whole-archive aggregation behind the History page is
+cached on disk (`/tmp/aganetwx_compare.json`) and rebuilt only once a day
+(`compare_refresh`). Right after you turn something on (`compare_page`,
+`monthly_records`), the cache from before your change is still served, so the
+page can look empty. Clear the cache and run the reports once to rebuild it now:
+
+```bash
+sudo rm -f /tmp/aganetwx_compare.json
+sudo weectl report run
+```
+
+Use `weectl report run` with no report name so it also runs the FTP/upload step
+if you publish that way. After the rebuild the data appears (hard-refresh the
+page once if your browser cached the old version).
 
 **Charts don't show up.** Load the page through your web server
 (`http://.../aganetwx/`), not by double-clicking the HTML file. The charts pull

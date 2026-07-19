@@ -233,6 +233,18 @@ body.layout-modern {
 .trend-arrow.steady { color: #8a97a3; }
 html[data-theme="dark"] .trend-arrow.up   { color: #ff7a68; }
 html[data-theme="dark"] .trend-arrow.down { color: #7fc0ff; }
+/* Webcam grid: one or more cams, aligned to the content width. A single cam
+   spans full width (as the original banner did); multiple cams tile. `columns`
+   in the config sets an explicit column count via inline style; otherwise the
+   grid auto-fits as many ~320px columns as fit. */
+.webcam-grid {
+  max-width: 1100px; margin: 16px auto 4px; padding: 0 20px;
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.webcam-grid-single { grid-template-columns: 1fr; }
+/* Inside the grid each wrap is just a cell; its own width/centering is off. */
+.webcam-grid .webcam-wrap { max-width: none; margin: 0; padding: 0; }
 /* Live webcam banner: aligned to the content width, above the nav. */
 .webcam-wrap {
   max-width: 1100px; margin: 16px auto 4px; padding: 0 20px;
@@ -250,8 +262,10 @@ html[data-theme="dark"] .trend-arrow.down { color: #7fc0ff; }
   background: #000; line-height: 0;
 }
 .webcam-img { display: block; width: 100%; height: auto; object-fit: cover; }
-/* Mobile: webcam goes edge-to-edge (no gutters, radius, border or shadow). */
+/* Mobile: webcams stack one per row and go edge-to-edge (no gutters, radius,
+   border or shadow), regardless of the configured column count. */
 @media (max-width: 820px) {
+  .webcam-grid { grid-template-columns: 1fr !important; gap: 4px; padding: 0; margin: 0 0 4px; }
   .webcam-wrap { padding: 0; margin: 0 0 4px; }
   .webcam-box {
     width: 100% !important; max-width: none !important;
@@ -265,7 +279,7 @@ html[data-theme="dark"] .trend-arrow.down { color: #7fc0ff; }
   color: #fff; font-size: 9pt;
 }
 .webcam-live {
-  position: absolute; bottom: 8px; left: 8px;
+  position: absolute; top: 8px; right: 8px;
   display: flex; align-items: center; gap: 6px;
   padding: 3px 9px; border-radius: 12px;
   background: rgba(0,0,0,0.5); color: #fff; font-size: 8.5pt; line-height: 1;

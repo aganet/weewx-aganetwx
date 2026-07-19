@@ -1,0 +1,30 @@
+## Cameras page: shows the ADDITIONAL cameras (the nested sub-sections of
+## [Extras][[webcam]]) in a grid. The main camera stays on the Current page.
+## Cams and layout come from $extra_webcams / $webcam_columns (normalized by
+## the AganetWXExtras search-list extension). Only linked in the nav when there
+## is at least one extra camera.
+#errorCatcher Echo
+#def lbl($key)
+<span class="i18n" data-i18n="$key">$gettext($key)</span>#slurp
+#end def
+#def tf($v)
+#return $str($v).strip().lower() not in ('false','0','no','off','')
+#end def
+#set global $active = 'cameras'
+#include "_head.inc"
+
+  <main class="content" id="main">
+    <div class="cameras-page">
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('Cameras')</div>
+        #if $tf($getVar('Extras.cameras_page', {}).get('enable', False)) and $getVar('extra_webcams', [])
+        #include "_webcams.inc"
+        #else
+        <div class="cmpx-hint">$lbl('No cameras are configured. Add them under [[cameras_page]] in weewx.conf.')</div>
+        #end if
+      </div>
+    </div>
+    <div class="clear"></div>
+  </main>
+
+#include "_foot.inc"

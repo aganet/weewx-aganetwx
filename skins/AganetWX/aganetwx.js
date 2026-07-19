@@ -616,26 +616,61 @@
   }
   initTheme();
 
-  // Live webcam: reload the image on an interval with a cache-busting query so
-  // the browser always fetches the current frame. Hides itself if the image
-  // fails to load (camera offline).
-  function initWebcam() {
-    var img = document.getElementById("webcam-img");
-    if (!img) return;
+  // Live webcams: reload each image on an interval with a cache-busting query
+  // so the browser always fetches the current frame. Each cam hides itself if
+  // its image fails to load (camera offline). One shared lightbox serves all.
+  function initWebcams() {
+    var imgs = document.querySelectorAll(".webcam-img");
+    if (!imgs.length) return;
+    var box = document.getElementById("webcam-lightbox");
+    var big = box ? box.querySelector(".webcam-lightbox-img") : null;
+    var closeBtn = box ? box.querySelector(".webcam-lightbox-close") : null;
+    var lastFocus = null;
+
+    function openBox(fromImg) {
+      if (!box || !big) return;
+      lastFocus = fromImg;
+      big.src = fromImg.currentSrc || fromImg.src;   // the frame currently shown
+      box.hidden = false;
+      document.body.style.overflow = "hidden";
+      if (closeBtn) closeBtn.focus();
+    }
+    function closeBox() {
+      if (!box) return;
+      box.hidden = true;
+      document.body.style.overflow = "";
+      if (lastFocus) lastFocus.focus();
+    }
+    if (box) {
+      if (closeBtn) closeBtn.addEventListener("click", closeBox);
+      box.addEventListener("click", function (e) { if (e.target === box) closeBox(); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !box.hidden) closeBox();
+      });
+    }
+
+    Array.prototype.forEach.call(imgs, function (img) {
+      initOneCam(img, openBox);
+    });
+  }
+
+  function initOneCam(img, openBox) {
     var src = img.getAttribute("data-src");
     var every = parseInt(img.getAttribute("data-refresh"), 10) || 0;
-    var countEl = document.getElementById("webcam-count");
-    var wrap = document.querySelector(".webcam-wrap");
+    // Countdown and wrap are scoped to this cam's own card.
+    var card = img.closest(".webcam-box") || img.parentNode;
+    var countEl = card ? card.querySelector(".webcam-count") : null;
+    var wrap = img.closest(".webcam-wrap") || card;
     var loadedOnce = false;
     var failCount = 0;
     function bust() {
       img.src = src + (src.indexOf("?") >= 0 ? "&" : "?") + "_t=" + (new Date()).getTime();
     }
-    // A failed frame is transient: once any frame has loaded the banner stays
-    // visible (a later failure keeps the last good frame on screen, never
-    // blanks it). Before the first success we tolerate a few misses so a single
-    // hiccup does not hide the banner, then hide only if it truly never loads.
-    // Either way we keep retrying so it self-heals when the camera returns.
+    // A failed frame is transient: once any frame has loaded the cam stays
+    // visible (a later failure keeps the last good frame, never blanks it).
+    // Before the first success we tolerate a few misses so a single hiccup
+    // does not hide it, then hide only if it truly never loads. Either way we
+    // keep retrying so it self-heals when the camera returns.
     img.addEventListener("load", function () {
       loadedOnce = true; failCount = 0; if (wrap) wrap.style.display = "";
     });
@@ -660,7 +695,6 @@
     }
     // Let the plain src="..." already in the HTML load as the first frame (it is
     // the freshest one right after generation); only cache-bust on later ticks.
-    // This avoids a failed cache-busted request hiding the banner on page load.
     if (every > 0) {
       var left = every;
       // Stop auto-refreshing after this many seconds so a forgotten/idle tab
@@ -684,35 +718,14 @@
     }
 
     // Click-to-enlarge (lightbox), when the image is not a click-through link.
-    var box = document.getElementById("webcam-lightbox");
-    if (img.classList.contains("webcam-zoomable") && box) {
-      var big = box.querySelector(".webcam-lightbox-img");
-      var closeBtn = box.querySelector(".webcam-lightbox-close");
-      function openBox() {
-        big.src = img.currentSrc || img.src;   // the frame currently shown
-        box.hidden = false;
-        document.body.style.overflow = "hidden";
-        closeBtn.focus();
-      }
-      function closeBox() {
-        box.hidden = true;
-        document.body.style.overflow = "";
-        img.focus();
-      }
-      img.addEventListener("click", openBox);
+    if (img.classList.contains("webcam-zoomable") && openBox) {
+      img.addEventListener("click", function () { openBox(img); });
       img.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openBox(); }
-      });
-      closeBtn.addEventListener("click", closeBox);
-      box.addEventListener("click", function (e) {
-        if (e.target === box) closeBox();   // click backdrop, not the image
-      });
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && !box.hidden) closeBox();
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openBox(img); }
       });
     }
   }
-  initWebcam();
+  initWebcams();
 
   // Stale-data banner: compare the latest observation's epoch (absolute, so it
   // is timezone-independent) to the visitor's clock, and warn if the station

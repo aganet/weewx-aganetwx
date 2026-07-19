@@ -125,9 +125,71 @@ class AganetWXExtras(SearchList):
         # Optional custom temperature-chart series.
         series, labels = self._temp_chart(extras)
 
+        # Extra cameras (nested sub-sections) for the Cameras page. The main
+        # camera stays the flat [[webcam]] config, rendered as-is on Current.
+        extra_webcams, webcam_columns = self._webcams(extras)
+
         return [{'extra_groups': groups, 'has_extra_sensors': len(groups) > 0,
                  'last_rain': last_rain,
-                 'temp_chart_series': series, 'temp_chart_labels': labels}]
+                 'temp_chart_series': series, 'temp_chart_labels': labels,
+                 'extra_webcams': extra_webcams, 'webcam_columns': webcam_columns}]
+
+    def _webcams(self, extras):
+        """Cameras for the dedicated Cameras page, from a SEPARATE
+        [[cameras_page]] config block (independent of [[webcam]], which stays
+        the single main camera on the Current page). Each [[[name]]] sub-section
+        is a camera and inherits the block's shared defaults (refresh,
+        auto_refresh, height, max_width, align) unless it overrides them. The
+        page is shown only when [[cameras_page]] is enabled and has cameras.
+        Returns (cams, columns)."""
+        cp = extras.get('cameras_page', {})
+        if not hasattr(cp, 'get'):
+            return [], 0
+        enabled = str(cp.get('enable', 'false')).strip().lower() \
+            not in ('false', '0', 'no', 'off', '')
+        if not enabled:
+            return [], 0
+        try:
+            columns = int(cp.get('columns', 0) or 0)
+        except (TypeError, ValueError):
+            columns = 0
+        columns = max(0, min(columns, 6))
+
+        def _bool(v, dflt=True):
+            return str(v).strip().lower() not in ('false', '0', 'no', 'off', '') \
+                if v is not None else dflt
+
+        shared = {
+            'auto_refresh': cp.get('auto_refresh', True),
+            'refresh': cp.get('refresh', 30),
+            'height': cp.get('height', ''),
+            'max_width': cp.get('max_width', ''),
+            'align': cp.get('align', 'center'),
+        }
+        subs = [(k, v) for k, v in cp.items() if hasattr(v, 'get')]
+
+        def _one(cfg, fallback_title=''):
+            url = cfg.get('url', '')
+            if not url:
+                return None
+            refresh = int(cfg.get('refresh', shared['refresh']) or 0) \
+                if _bool(cfg.get('auto_refresh', shared['auto_refresh'])) else 0
+            return {
+                'url': url,
+                'title': cfg.get('title', fallback_title) or '',
+                'link': cfg.get('link', '') or '',
+                'refresh': refresh,
+                'height': cfg.get('height', shared['height']) or '',
+                'max_width': cfg.get('max_width', shared['max_width']) or '',
+                'align': str(cfg.get('align', shared['align'])).strip().lower(),
+            }
+
+        cams = []
+        for name, sub in subs:
+            cam = _one(sub, name)
+            if cam:
+                cams.append(cam)
+        return cams, columns
 
     # Built-in temperature series the temp chart already knows.
     _TEMP_BUILTIN = ('outTemp', 'dewpoint', 'appTemp', 'heatindex', 'windchill')

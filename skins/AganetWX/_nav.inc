@@ -33,6 +33,9 @@
     #if $tf($getVar('Extras.compare_page', False))
     $navlink('compare',   'compare.html',   'History')
     #end if
+    #if $tf($getVar('Extras.cameras_page', {}).get('enable', False)) and $getVar('extra_webcams', [])
+    $navlink('cameras',   'cameras.html',   'Cameras')
+    #end if
     #if $tf($getVar('Extras.nav.about', True))
     $navlink('about',     'about.html',     'About')
     #end if
