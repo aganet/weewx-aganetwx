@@ -1,3 +1,8 @@
+1.8.17  2026-07-19
+  * The Last Rain row now shows just "N days ago" by default; the date/time is
+    dropped as the days-since is what matters. Set rows.last_rain_date = true
+    to bring the date/time back.
+
 1.8.16  2026-07-19
   * The today's high/low shown beside each current value is a touch larger
     (8.5pt, was 7.5pt), so it reads more easily.

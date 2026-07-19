@@ -295,7 +295,7 @@ $lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
         $vrow('Yearly Rain', $year.rain.sum.format("%.0f"))
         #end if
         #if $tf($getVar('Extras.rows.last_rain', True)) and $getVar('last_rain', None)
-        <div class="line"><div class="lleft">$lbl('Last Rain')</div><div class="lright">#if $tf($getVar('Extras.rows.last_rain_date', True))#<div class="vh-line">$last_rain.time</div>#end if#<div class="baro-trend"><span class="bt-val">#if $last_rain.days == 0#$lbl('Today')#else#$last_rain.days $lbl('days ago')#end if#</span></div></div></div>
+        <div class="line"><div class="lleft">$lbl('Last Rain')</div><div class="lright">#if $tf($getVar('Extras.rows.last_rain_date', False))#<div class="vh-line">$last_rain.time</div>#end if#<div class="baro-trend"><span class="bt-val">#if $last_rain.days == 0#$lbl('Today')#else#$last_rain.days $lbl('days ago')#end if#</span></div></div></div>
         #end if
         #if $tf($getVar('Extras.rows.et', True)) and $day.ET.has_data
         $vrow("Today's ET", $day.ET.sum.format())

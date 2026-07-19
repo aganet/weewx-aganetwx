@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.16.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.17.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.16.zip
+sudo weectl extension install /path/to/AganetWX-1.8.17.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -177,7 +177,7 @@ Example:
 | `nav.<tab>` | bool | `true` | Show/hide a tab (`current`,`yesterday`,`week`,`month`,`year`,`lastyear`,`archive`,`about`) |
 | `charts.<metric>` | bool | `true` | Show/hide a chart (`temp`,`humidity`,`pressure`,`windspeed`,`windvec`,`windvector`,`windrose`,`rain`,`rainrate`,`uv`,`radiation`,`et`,`cloudbase`) |
 | `rows.<row>` | bool | `true` | Show/hide a metric across all three left-column boxes (Current Values, Today's Hi/Lows, All-Time Records). Names: `humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation` (the full list is the `[[rows]]` block in `skin.conf`) |
-| `rows.last_rain_date` | bool | `true` | Show the date/time on the Last Rain row; `false` keeps only "N days ago" |
+| `rows.last_rain_date` | bool | `false` | Last Rain row shows just "N days ago" (default); `true` also shows the date/time |
 | `Extras.rows_show_range` | bool | `true` | Today's high/low (with time) beside each current value |
 | `Extras.baro_trend_words` | bool | `false` | Barometer 3h trend as just the arrow and the 3h change (minimalist, default); `true` adds the "Rising/Falling/Steady" word |
 | `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
