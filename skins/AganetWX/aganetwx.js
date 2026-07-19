@@ -798,15 +798,20 @@
     var thisMonth = ("0" + (new Date().getMonth() + 1)).slice(-2);
     if (monthSel) monthSel.value = thisMonth;
 
-    // The newest shown year is a strong accent; older years fade towards grey
-    // and thin out, so the most recent stands out among many lines.
-    function colourFor(rank, total) {
-      // rank 0 = newest. Blend the accent (newest) toward a muted grey (oldest).
-      var accent = [10, 92, 168];        // #0a5ca8-ish
-      var grey = [150, 158, 168];
-      var t = total <= 1 ? 0 : rank / (total - 1);
-      var mix = function (a, b) { return Math.round(a + (b - a) * t); };
-      return "rgb(" + mix(accent[0], grey[0]) + "," + mix(accent[1], grey[1]) + "," + mix(accent[2], grey[2]) + ")";
+    // Each year gets its own distinct, fixed hue so lines are easy to tell
+    // apart and the colour matches the swatch in the year list. The colour is
+    // keyed to the year's position in the full (newest-first) list, so toggling
+    // years on and off never recolours the others. The newest year (index 0)
+    // still stands out via a heavier line width in draw().
+    // A colourblind-friendly categorical palette; cycles if there are more
+    // years than colours.
+    var YEAR_PALETTE = [
+      "#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4", "#42a5c8",
+      "#bcbd22", "#f032e6", "#008080", "#9a6324", "#808000", "#3d5afe"
+    ];
+    var yearColour = {};   // year -> fixed hex, filled by buildYearBoxes
+    function colourFor(yr) {
+      return yearColour[yr] || YEAR_PALETTE[0];
     }
 
     function shownYears() {
@@ -835,9 +840,8 @@
         series.push({
           name: yr, type: "line", showSymbol: mode === "year", symbolSize: 4,
           smooth: true, connectNulls: true, z: newest ? 10 : 1,
-          lineStyle: { width: newest ? 2.6 : 1.4, color: colourFor(rank, years.length),
-                       opacity: newest ? 1 : 0.75 },
-          itemStyle: { color: colourFor(rank, years.length) }, data: pts
+          lineStyle: { width: newest ? 3 : 1.8, color: colourFor(yr) },
+          itemStyle: { color: colourFor(yr) }, data: pts
         });
       });
       if (!series.length) { host.style.display = "none"; if (empty) empty.hidden = false; return; }
@@ -877,12 +881,15 @@
 
     function buildYearBoxes() {
       yearList.innerHTML = "";
-      DB.years.slice().sort().reverse().forEach(function (yr) {
+      yearColour = {};
+      DB.years.slice().sort().reverse().forEach(function (yr, i) {
         selected[yr] = true;
+        yearColour[yr] = YEAR_PALETTE[i % YEAR_PALETTE.length];
         var id = "cmpx-y-" + yr;
         var lab = document.createElement("label");
         lab.className = "cmpx-year";
-        lab.innerHTML = '<input type="checkbox" id="' + id + '" checked> ' + yr;
+        lab.innerHTML = '<input type="checkbox" id="' + id + '" checked>' +
+          '<span class="cmpx-swatch" style="background:' + yearColour[yr] + '"></span>' + yr;
         lab.querySelector("input").addEventListener("change", function (e) {
           selected[yr] = e.target.checked; draw();
         });

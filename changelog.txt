@@ -1,3 +1,10 @@
+1.8.10  2026-07-19
+  * History page: each year now has its own distinct colour instead of shades
+    of one accent fading to grey, so lines are far easier to tell apart. A
+    matching colour swatch sits next to each year's checkbox, and the colour is
+    fixed per year, so toggling years on and off no longer recolours the rest.
+    The newest year is still drawn bold. Colourblind-friendly palette.
+
 1.8.9  2026-07-18
   * Cache-busting for the skin's own assets: the CSS, JavaScript and bundled
     ECharts are now requested with a ?v=<version> query tied to SKIN_VERSION, so
