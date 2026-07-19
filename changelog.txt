@@ -1,3 +1,11 @@
+1.8.11  2026-07-19
+  * Fix temp_chart_series dropping built-in temperatures. A built-in series
+    named by its observation (e.g. outTemp, dewpoint, appTemp, heatindex,
+    windchill) was silently skipped because the colour lookup used the obs name
+    instead of its colour key, so "temp_chart_series = outTemp, extraTemp2"
+    showed only extraTemp2. Built-in temperatures are now resolved correctly and
+    appear in the chart in the order listed.
+
 1.8.10  2026-07-19
   * History page: each year now has its own distinct colour instead of shades
     of one accent fading to grey, so lines are far easier to tell apart. A
