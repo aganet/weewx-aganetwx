@@ -1,3 +1,14 @@
+1.8.14  2026-07-19
+  * Left-column refinements. The [[rows]] show/hide toggles now apply across all
+    three left-column boxes at once (Current Values, Today's Hi/Lows, All-Time
+    Records), so hiding a metric hides it everywhere. UV and solar radiation in
+    the Hi/Lows now show only the daily high (the low is always zero at night).
+    New Extras.baro_trend_words = false shows the barometer 3h trend as just an
+    arrow plus the change, without the "Rising/Falling/Steady" word (minimalist,
+    like the temperature trend). New rows.last_rain_date = false reduces the
+    Last Rain row to "N days ago" without the date/time. All default to the
+    previous behaviour.
+
 1.8.13  2026-07-19
   * New optional Cameras page (own nav tab) for multiple cameras, configured in
     a separate [[cameras_page]] block: a grid of cameras with a configurable

@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.13.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.14.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.13.zip
+sudo weectl extension install /path/to/AganetWX-1.8.14.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -128,7 +128,7 @@ Example:
             [[[[charts]]]]            # show/hide individual charts
                 cloudbase = false
 
-            [[[[rows]]]]              # show/hide Current-Values rows
+            [[[[rows]]]]              # show/hide rows (all three left-column boxes)
                 heatindex = false
 
             [[[[branding]]]]
@@ -172,8 +172,10 @@ Example:
 | `theme.density` | `comfortable`,`compact` | `comfortable` | Row and chart sizing |
 | `nav.<tab>` | bool | `true` | Show/hide a tab (`current`,`yesterday`,`week`,`month`,`year`,`lastyear`,`archive`,`about`) |
 | `charts.<metric>` | bool | `true` | Show/hide a chart (`temp`,`humidity`,`pressure`,`windspeed`,`windvec`,`windvector`,`windrose`,`rain`,`rainrate`,`uv`,`radiation`,`et`,`cloudbase`) |
-| `rows.<row>` | bool | `true` | Show/hide a Current-Values row (`humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation`) |
+| `rows.<row>` | bool | `true` | Show/hide a row (`humidity`,`dewpoint`,`wind`,`barometer`,`rain_today`,`rain_rate`,`rain_month`,`rain_year`,`last_rain`,`et`,`windchill`,`heatindex`,`apptemp`,`uv`,`radiation`). Applies across all three left-column boxes at once (Current Values, Today's Hi/Lows, All-Time Records) |
+| `rows.last_rain_date` | bool | `true` | Show the date/time on the Last Rain row; `false` keeps only "N days ago" |
 | `Extras.rows_show_range` | bool | `true` | Today's high/low (with time) beside each current value |
+| `Extras.baro_trend_words` | bool | `true` | Barometer 3h trend as arrow + "Rising/Falling/Steady"; `false` for just the arrow and the 3h change (minimalist) |
 | `Extras.records` | bool | `true` | All-time records card (below Today's Hi/Lows) |
 | `Extras.solar` | bool | `false` | HF propagation card (HamQSL solar data + band conditions) |
 | `Extras.solar_timeout` | seconds | `15` | Timeout for the server-side HamQSL fetch |
@@ -250,6 +252,15 @@ happened: temperature, wind gust, humidity, barometer and rain rate. Set
 `Extras.records = false` to hide it. The current temperature, humidity and UV
 rows also show a small rising / steady / falling trend arrow, and a "Last Rain"
 row shows when it last rained and how many days ago.
+
+The `[[rows]]` toggles apply across all three left-column boxes together, so
+hiding, say, `barometer` drops it from Current Values, Today's Hi/Lows and
+All-Time Records at once (Ian's "synchronise" idea). For UV and solar radiation,
+only the daily high is shown in the Hi/Lows (the low is always zero at night, so
+it carries no information). Two more knobs: `Extras.baro_trend_words = false`
+shows the barometer trend as just an arrow plus the 3h change (no "Rising"
+word), and `rows.last_rain_date = false` reduces the Last Rain row to "N days
+ago" without the date/time.
 
 ## Today in one sentence
 
