@@ -914,9 +914,62 @@
       draw();
     }
 
+    // Monthly all-time records tables (optional; only when the block exists).
+    function buildRecords() {
+      var host = document.getElementById("cmpx-records");
+      if (!host || !DB || !DB.data || !DB.data.records) return;
+      var rec = DB.data.records;
+      var tUnit = unitFor.temp || "";
+      var rUnit = unitFor.rain || "";
+      // Full date for the hover title, in the station's rendered locale.
+      function dstr(ts) {
+        try { return new Date(ts * 1000).toLocaleDateString(); }
+        catch (e) { return ""; }
+      }
+      // A cell showing "value (year)" with the exact date on hover.
+      function cell(val, unit, tag, title) {
+        if (val == null) return "<td>-</td>";
+        var suffix = (unit && unit.charAt(0) !== "°" && unit !== "%") ? " " + unit : (unit || "");
+        var t = title ? ' title="' + title + '"' : "";
+        return "<td" + t + ">" + val + suffix +
+               (tag ? ' <span class="cmpx-rec-tag">(' + tag + ")</span>" : "") + "</td>";
+      }
+      function monthName(i) { return decode(tr(MONTHS_SHORT[i]) || MONTHS_SHORT[i]); }
+
+      if (host.getAttribute("data-temp") === "1" && rec.temp && Object.keys(rec.temp).length) {
+        var block = document.getElementById("cmpx-rec-temp");
+        var body = block.querySelector("tbody");
+        var rows = "";
+        for (var m = 1; m <= 12; m++) {
+          var r = rec.temp[("0" + m).slice(-2)];
+          if (!r) continue;
+          var hiYr = r.hi_ts ? new Date(r.hi_ts * 1000).getFullYear() : "";
+          var loYr = r.lo_ts ? new Date(r.lo_ts * 1000).getFullYear() : "";
+          rows += "<tr><td>" + monthName(m - 1) + "</td>" +
+                  cell(r.hi, tUnit, hiYr, r.hi_ts ? dstr(r.hi_ts) : "") +
+                  cell(r.lo, tUnit, loYr, r.lo_ts ? dstr(r.lo_ts) : "") + "</tr>";
+        }
+        if (rows) { body.innerHTML = rows; block.hidden = false; }
+      }
+
+      if (host.getAttribute("data-rain") === "1" && rec.rain && Object.keys(rec.rain).length) {
+        var rblock = document.getElementById("cmpx-rec-rain");
+        var rbody = rblock.querySelector("tbody");
+        var rrows = "";
+        for (var mm = 1; mm <= 12; mm++) {
+          var rr = rec.rain[("0" + mm).slice(-2)];
+          if (!rr) continue;
+          rrows += "<tr><td>" + monthName(mm - 1) + "</td>" +
+                   cell(rr.max, rUnit, rr.max_yr, "") +
+                   cell(rr.avg, rUnit, "", "") + "</tr>";
+        }
+        if (rrows) { rbody.innerHTML = rrows; rblock.hidden = false; }
+      }
+    }
+
     fetch("data/compare.json", { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (d) { DB = d; buildYearBoxes(); draw(); })
+      .then(function (d) { DB = d; buildYearBoxes(); draw(); buildRecords(); })
       .catch(function (e) { console.error("AganetWX: compare data failed", e); });
     monthSel.addEventListener("change", draw);
     metricSel.addEventListener("change", draw);

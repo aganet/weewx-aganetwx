@@ -632,4 +632,62 @@ class AganetWXCompareData(SearchList):
                 if 1 <= mo <= 12:
                     arr[mo - 1] = self._convert(val, group, sysid)
             data[key + '_year'] = year_map
+
+        data['records'] = self._monthly_records(db_manager, table, sysid)
         return data, sorted(years)
+
+    def _monthly_records(self, db_manager, table, sysid):
+        """All-time records per calendar month, across the whole archive:
+        - temp: hottest and coldest day-value, each with the date it happened.
+        - rain: wettest monthly total (with its year) and the average monthly
+          total. Rain day/wet-day counts are deliberately omitted since sparse
+          historic rain data would make them misleading.
+        Shape: {'temp': {mo: {hi/hi_ts/lo/lo_ts}}, 'rain': {mo: {max/max_yr/avg}}}."""
+        temp = {}
+        # Hottest/coldest daily reading and when. MAX/MIN of the raw column with
+        # the matching dateTime via a correlated subquery per month is costly;
+        # instead scan daily extremes and track the peak per month in Python.
+        tsql = ("SELECT CAST(strftime('%%m', dateTime, 'unixepoch', 'localtime') AS INTEGER) mo, "
+                "dateTime, outTemp FROM %s WHERE outTemp IS NOT NULL" % table)
+        hi = {}
+        lo = {}
+        for mo, ts, val in db_manager.genSql(tsql):
+            if mo is None or val is None:
+                continue
+            v = float(val)
+            if mo not in hi or v > hi[mo][0]:
+                hi[mo] = (v, ts)
+            if mo not in lo or v < lo[mo][0]:
+                lo[mo] = (v, ts)
+        for mo in range(1, 13):
+            if mo in hi or mo in lo:
+                rec = {}
+                if mo in hi:
+                    rec['hi'] = self._convert(hi[mo][0], 'group_temperature', sysid)
+                    rec['hi_ts'] = int(hi[mo][1])
+                if mo in lo:
+                    rec['lo'] = self._convert(lo[mo][0], 'group_temperature', sysid)
+                    rec['lo_ts'] = int(lo[mo][1])
+                temp['%02d' % mo] = rec
+
+        # Rain: wettest calendar-month total (which year) and the mean total.
+        rain = {}
+        rsql = ("SELECT CAST(strftime('%%m', dateTime, 'unixepoch', 'localtime') AS INTEGER) mo, "
+                "strftime('%%Y', dateTime, 'unixepoch', 'localtime') yr, "
+                "SUM(rain) FROM %s WHERE rain IS NOT NULL GROUP BY mo, yr" % table)
+        totals = {}
+        for mo, yr, val in db_manager.genSql(rsql):
+            if mo is None or val is None:
+                continue
+            totals.setdefault(mo, []).append((float(val), yr))
+        for mo, items in totals.items():
+            vals = [v for v, _ in items]
+            if not vals:
+                continue
+            best_val, best_yr = max(items, key=lambda p: p[0])
+            rain['%02d' % mo] = {
+                'max': self._convert(best_val, 'group_rain', sysid),
+                'max_yr': best_yr,
+                'avg': self._convert(sum(vals) / len(vals), 'group_rain', sysid),
+            }
+        return {'temp': temp, 'rain': rain}

@@ -1,3 +1,12 @@
+1.8.12  2026-07-19
+  * History page: optional "Monthly records" tables. Temperature shows the
+    hottest and coldest for each calendar month across the whole archive, with
+    the year in the cell and the exact date on hover; rain shows the wettest
+    monthly total (with its year) and the average monthly total. Built from the
+    same cached aggregation, so no extra cost. Off by default (monthly_records,
+    needs compare_page); records_temp and records_rain toggle each table.
+    Seven languages.
+
 1.8.11  2026-07-19
   * Fix temp_chart_series dropping built-in temperatures. A built-in series
     named by its observation (e.g. outTemp, dewpoint, appTemp, heatindex,

@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.11.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.12.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.11.zip
+sudo weectl extension install /path/to/AganetWX-1.8.12.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -152,6 +152,9 @@ Example:
 | `Extras.compare` | bool | `false` | "Compared to the past" card: vs yesterday, vs the monthly average, vs this date last year (Current page) |
 | `Extras.compare_page` | bool | `false` | History page (own nav tab): overlay a metric across every year, day-by-day for a chosen month |
 | `Extras.compare_refresh` | seconds | `86400` | How often the History page's whole-archive aggregation is rebuilt (cached on disk) |
+| `Extras.monthly_records` | bool | `false` | History page: all-time monthly records tables (hottest/coldest, wettest/average rain). Needs `compare_page` |
+| `Extras.records_temp` | bool | `true` | Show the temperature records table (when `monthly_records` is on) |
+| `Extras.records_rain` | bool | `true` | Show the rain records table (when `monthly_records` is on) |
 | `Extras.celestial` | bool | `true` | Sun and Moon card |
 | `Extras.disclaimer` | bool | `true` | Amateur-station disclaimer in the footer |
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |
@@ -315,6 +318,23 @@ report generation fast even on many years of data. Off by default:
             compare_refresh = 86400
 ```
 
+### Monthly records
+
+Optionally, the History page can show all-time records per calendar month,
+drawn from the same cached aggregation (so no extra cost). Two tables:
+temperature (hottest and coldest for each month, with the year in the cell and
+the exact date on hover) and rain (wettest monthly total, with its year, plus
+the average monthly total). Off by default; needs `compare_page` on. Each table
+can be turned off on its own:
+
+```ini
+        [[[Extras]]]
+            compare_page = true
+            monthly_records = true    # show the records tables
+            records_temp = true       # temperature table (default true)
+            records_rain = true       # rain table (default true)
+```
+
 ## Choosing sensors and temperature-chart series
 
 Two settings let you tailor what shows without editing any template:
@@ -350,6 +370,36 @@ is remembered (localStorage). All languages ride in one build (a small strings
 dictionary per language, a few KB each), so there is no duplicated per-language
 output. Set `lang = <code>` for the server-rendered default and fallback; leave
 `Extras.languages` with a single code to pin one language and hide the switcher.
+
+### Changing wording (headings, sub-heading, disclaimer)
+
+Every visible label is a key under `[Texts]` in `lang/<code>.conf`, so you can
+reword or blank any of them. Common ones people ask about:
+
+| What you see | Key in `lang/<code>.conf` |
+| --- | --- |
+| The "Diagrams" column heading | `"Diagrams"` |
+| The sub-heading under the station name ("Observations are powered by a Personal Weather Station") | `"Weather Station"` |
+| The amateur-station disclaimer text | `"Disclaimer"` |
+
+To change the wording, edit the right-hand side of the key in every language
+file you serve (at least `en`):
+
+```ini
+[Texts]
+    "Diagrams"        = "Charts"
+    "Weather Station" = "Live data from my back garden"
+    "Disclaimer"      = "Hobby station. Data may be inaccurate; do not use for any critical decision."
+```
+
+To hide the text instead of rewording it, set the value to an empty string
+(`"Diagrams" = ""`). The disclaimer bar has its own on/off switch:
+`Extras.disclaimer = false` (in `weewx.conf`) removes it entirely.
+
+Note: `lang/*.conf` is part of the skin, so an extension update overwrites
+these edits. Keep a copy of your changed keys and reapply them after an
+upgrade. I plan to make these overridable from `weewx.conf` so they survive
+updates.
 
 To add a language:
 

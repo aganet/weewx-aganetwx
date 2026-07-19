@@ -54,6 +54,28 @@
         <div id="cmpx-chart" class="cmpx-chart" role="img" aria-label="$gettext('Compare across years')"></div>
         <div id="cmpx-empty" class="cmpx-empty" hidden>$lbl('Not enough history yet for this selection.')</div>
       </div>
+      #if $tf($getVar('Extras.monthly_records', False))
+      <div class="col_sub allround gradient boxshadow dist" id="cmpx-records"
+           data-temp="#if $tf($getVar('Extras.records_temp', True))#1#else#0#end if#"
+           data-rain="#if $tf($getVar('Extras.records_rain', True))#1#else#0#end if#">
+        <div class="headline">$lbl('Monthly records')</div>
+        <div class="cmpx-rec-hint">$lbl('All-time highs and lows for each calendar month, across your whole archive. Hover a value for the date.')</div>
+        <div id="cmpx-rec-temp" class="cmpx-rec-block" hidden>
+          <div class="cmpx-rec-title">$lbl('Temperature')</div>
+          <table class="cmpx-rec-table">
+            <thead><tr><th>$lbl('Month')</th><th>$lbl('Hottest')</th><th>$lbl('Coldest')</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="cmpx-rec-rain" class="cmpx-rec-block" hidden>
+          <div class="cmpx-rec-title">$lbl('Rain')</div>
+          <table class="cmpx-rec-table">
+            <thead><tr><th>$lbl('Month')</th><th>$lbl('Wettest')</th><th>$lbl('Average')</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      #end if
       #else
       <div class="col_sub allround gradient boxshadow dist">
         <div class="headline">$lbl('Compare across years')</div>
