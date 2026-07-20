@@ -1,3 +1,9 @@
+1.8.23  2026-07-19
+  * The footer credit line can now be removed entirely: branding.show_skin_credit
+    = false hides the whole "AganetWX <version> theme by anegio.com" line.
+    (branding.show_theme_credit still drops just the "theme by anegio.com" part
+    while keeping the version.)
+
 1.8.22  2026-07-19
   * Header tidy-up. The sub-line under the station name now shows the station
     hardware by default (set Extras.header_subtitle for your own text). The old

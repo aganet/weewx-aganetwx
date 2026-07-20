@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.22.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.23.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.22.zip
+sudo weectl extension install /path/to/AganetWX-1.8.23.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -193,7 +193,8 @@ Example:
 | `about.show_coordinates` | bool | `true` | Show exact coords and map link on About; `false` for privacy |
 | `branding.show_footer_coords` | bool | `true` | Lat/long/altitude in footer |
 | `branding.link_url` / `link_text` | string | empty | Optional footer link |
-| `branding.show_theme_credit` | bool | `true` | Show the "theme by anegio.com" footer credit; `false` removes it (the AganetWX project link stays) |
+| `branding.show_skin_credit` | bool | `true` | Show the "AganetWX &lt;version&gt; theme by anegio.com" footer line; `false` removes the whole line |
+| `branding.show_theme_credit` | bool | `true` | Within that line, show the "theme by anegio.com" part; `false` keeps "AganetWX &lt;version&gt;" but drops the credit |
 | `links.show` | bool | `true` | Show the "Useful Links" card (bottom of the left column) |
 | `links.<entry>` | `url`,`text` | Greece maps | Each `[[[entry]]]` adds a link; edit/add/remove freely |
 | `webcam.enable` | bool | `false` | Show the webcam banner above the nav |
