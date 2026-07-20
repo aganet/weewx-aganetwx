@@ -1,3 +1,11 @@
+1.8.19  2026-07-19
+  * The Cameras nav tab now appears as soon as [[cameras_page]] enable = true,
+    even before any cameras are added (the page then shows a short hint on how
+    to add them). Previously the tab stayed hidden until a camera was present,
+    which was confusing.
+  * Monthly records tables: alternating row shading and even-width figures for
+    easier reading.
+
 1.8.18  2026-07-19
   * The Last Rain "N days ago" now shows in the normal text colour instead of
     the dimmed style it inherited from the barometer trend.

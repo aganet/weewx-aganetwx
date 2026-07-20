@@ -402,12 +402,15 @@ html[data-theme="dark"] .solar-bands .cond-poor { color: #f28378; }
 .cmpx-rec-hint { padding: 2px 16px 10px; font-size: 8.5pt; color: var(--m-muted); }
 .cmpx-rec-block { padding: 0 16px 14px; overflow-x: auto; }
 .cmpx-rec-title { font-size: 10pt; font-weight: 600; color: var(--m-ink); margin: 4px 0 6px; }
-.cmpx-rec-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+.cmpx-rec-table { width: 100%; border-collapse: collapse; font-size: 9.5pt;
+  font-variant-numeric: tabular-nums; }
 .cmpx-rec-table th { text-align: left; font-weight: 600; color: var(--m-muted);
-  border-bottom: 1px solid var(--m-border, #ccc); padding: 4px 10px 4px 0; }
-.cmpx-rec-table td { padding: 4px 10px 4px 0; color: var(--m-ink);
-  border-bottom: 1px solid var(--m-border, #eee); white-space: nowrap; }
+  border-bottom: 1px solid var(--m-border, #ccc); padding: 4px 10px 4px 8px; }
+.cmpx-rec-table td { padding: 4px 10px 4px 8px; color: var(--m-ink); white-space: nowrap; }
 .cmpx-rec-table td:first-child, .cmpx-rec-table th:first-child { color: var(--m-muted); }
+/* Zebra striping for readability across the twelve month rows. */
+.cmpx-rec-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.035); }
+html[data-theme="dark"] .cmpx-rec-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.045); }
 .cmpx-rec-tag { color: var(--m-muted); font-size: 8.5pt; cursor: help; }
 .baro-trend .bt-arrow { margin-right: 3px; }
 .baro-trend .bt-val { opacity: 0.75; margin-left: 4px; }
