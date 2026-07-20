@@ -1,3 +1,12 @@
+1.8.21  2026-07-19
+  * Header tidy-up. The sub-line under the station name now shows the station
+    hardware by default (set Extras.header_subtitle for your own text). The old
+    "Latest update" line, which duplicated the time in the values box, is gone;
+    turn on Extras.header_version for a "WeeWX x.y.z skinned with AganetWX a.b.c"
+    line instead. With Extras.update_check on as well, the skin checks GitHub
+    once a day (client-side, cached) and shows a small "update available" link
+    when a newer release exists. All off by default.
+
 1.8.20  2026-07-19
   * Barometer 3h trend: the arrow now follows the sign of the change (up when
     rising, down when falling) and the value always carries its sign (+0.3 /

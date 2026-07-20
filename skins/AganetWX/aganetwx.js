@@ -758,6 +758,51 @@
   }
   initStale();
 
+  // Optional update check: ask GitHub for the latest release tag and reveal the
+  // "update available" flag in the header when the running version is older.
+  // Off unless Extras.header_version and Extras.update_check are both on. The
+  // result is cached in localStorage for a day so it is at most one call/day.
+  function initUpdateCheck() {
+    if (!window.AGANETWX_UPDATE_CHECK) return;
+    var flag = document.getElementById("update-flag");
+    if (!flag) return;
+    var current = String(window.AGANETWX_VERSION || "");
+    if (!current) return;
+
+    // Compare dotted numeric versions: returns true if b is newer than a.
+    function isNewer(a, b) {
+      var pa = a.replace(/^v/, "").split("."), pb = b.replace(/^v/, "").split(".");
+      for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+        var na = parseInt(pa[i] || "0", 10), nb = parseInt(pb[i] || "0", 10);
+        if (nb > na) return true;
+        if (nb < na) return false;
+      }
+      return false;
+    }
+    function apply(latest) {
+      if (latest && isNewer(current, latest)) flag.hidden = false;
+    }
+
+    var KEY = "aganetwx_latest", TS = "aganetwx_latest_ts";
+    try {
+      var cached = localStorage.getItem(KEY);
+      var ts = parseInt(localStorage.getItem(TS) || "0", 10);
+      if (cached && (Date.now() - ts) < 86400000) { apply(cached); return; }
+    } catch (e) {}
+
+    fetch("https://api.github.com/repos/aganet/weewx-aganetwx/releases/latest",
+          { headers: { "Accept": "application/vnd.github+json" } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.tag_name) return;
+        var latest = String(d.tag_name);
+        try { localStorage.setItem(KEY, latest); localStorage.setItem(TS, String(Date.now())); } catch (e) {}
+        apply(latest);
+      })
+      .catch(function () {});   // offline / rate-limited: silently skip
+  }
+  initUpdateCheck();
+
   // Temperature-reactive hero: tint the hero from cold (blue) to hot (red) by
   // interpolating hue across the configured range. Unit-independent (reads the
   // raw Celsius value emitted server-side). Only runs when hero-dynamic is set.

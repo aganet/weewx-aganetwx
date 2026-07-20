@@ -100,6 +100,11 @@
   </script>
 #end if
   <script>
+    // Skin version + optional update check (see initUpdateCheck in aganetwx.js).
+    window.AGANETWX_VERSION = "$getVar('SKIN_VERSION', '')";
+    window.AGANETWX_UPDATE_CHECK = #echo 'true' if $tf($getVar('Extras.header_version', False)) and $tf($getVar('Extras.update_check', False)) else 'false'#;
+  </script>
+  <script>
     // Resolve the active theme before paint to avoid a flash. A visitor's saved
     // preset (localStorage) wins over the configured default. Presets map to a
     // color mode (data-theme) and a layout; the layout class is applied to
@@ -141,8 +146,19 @@
         <div class="header_top">
           <div>
             <div class="station_name">$station.location</div>
+            ## Sub-line: Extras.header_subtitle if set, else the station hardware
+            ## (e.g. "Davis Vantage Pro2"), else the translated generic line.
+            #set $hsub = $getVar('Extras.header_subtitle', '')
+            #if $hsub
+            <div class="station_sub">$hsub</div>
+            #elif $getVar('station.hardware', '')
+            <div class="station_sub">$station.hardware</div>
+            #else
             <div class="station_sub"><span class="i18n" data-i18n="Weather Station">$gettext("Weather Station")</span></div>
-            <div class="station_update"><span class="i18n" data-i18n="Latest update">$gettext('Latest update')</span>: $current.dateTime</div>
+            #end if
+            #if $tf($getVar('Extras.header_version', False))
+            <div class="station_update">WeeWX $station.version #if $getVar('SKIN_VERSION', '')#$lbl('skinned with') AganetWX $getVar('SKIN_VERSION', '')#end if#<span id="update-flag" hidden> &middot; <a href="https://github.com/aganet/weewx-aganetwx/releases/latest" target="_blank" rel="noopener">$lbl('update available')</a></span></div>
+            #end if
           </div>
           <div class="header_meta">
 #if $tf($getVar('Extras.theme.switcher', True))
