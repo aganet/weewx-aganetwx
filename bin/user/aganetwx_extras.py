@@ -642,16 +642,32 @@ class AganetWXCompareData(SearchList):
             pass
 
     def _convert(self, value, group, sysid):
-        """Convert a native-unit DB value to the report's display units."""
+        """Convert a native-unit DB value to the report's display units, rounded
+        to the same number of decimals the skin uses elsewhere (from WeeWX's
+        [[StringFormats]] for the display unit), so History/records values match
+        the rest of the site instead of showing spurious extra decimals."""
         if value is None:
             return None
         # Native unit for this group in the database's unit system.
         unit = weewx.units.std_groups.get(sysid, {}).get(group)
         vt = weewx.units.ValueTuple(float(value), unit, group)
         try:
-            return round(self.generator.converter.convert(vt)[0], 2)
+            out = self.generator.converter.convert(vt)
+            return round(out[0], self._decimals(out[1]))
         except Exception:
-            return round(float(value), 2)
+            return round(float(value), 1)
+
+    def _decimals(self, unit):
+        """Decimal places for a display unit, read from the skin's
+        [[StringFormats]] (e.g. '%.1f' -> 1). Defaults to 1 if unknown."""
+        try:
+            fmts = self.generator.skin_dict.get('Units', {}).get('StringFormats', {})
+            fmt = fmts.get(unit, '%.1f')
+            import re
+            m = re.search(r'\.(\d+)f', str(fmt))
+            return int(m.group(1)) if m else 1
+        except Exception:
+            return 1
 
     def _build(self, db_manager):
         table = db_manager.table_name

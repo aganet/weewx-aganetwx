@@ -1,3 +1,14 @@
+1.8.20  2026-07-19
+  * Barometer 3h trend: the arrow now follows the sign of the change (up when
+    rising, down when falling) and the value always carries its sign (+0.3 /
+    -0.3); the flat "steady" bar is gone.
+  * History/records temperatures now use one decimal (matching the rest of the
+    site) instead of two.
+  * The column-2 heading reads "Charts" instead of "Diagrams" in English (the
+    other languages already used the natural word).
+  * skin.conf documents the weewx.conf bracket depth for [[cameras_page]] and
+    its cameras, a common copy/paste trip-up.
+
 1.8.19  2026-07-19
   * The Cameras nav tab now appears as soon as [[cameras_page]] enable = true,
     even before any cameras are added (the page then shows a short hint on how

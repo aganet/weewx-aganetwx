@@ -261,20 +261,24 @@ $lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
         #if $tf($getVar('Extras.rows.barometer', True))
         #if $trend.barometer.has_data
         #set $bt = $trend.barometer.raw
-        #if $bt > 1.0
-        #set $btkey, $btarrow, $btcls = 'Rising', '&#9650;', 'up'
-        #elif $bt < -1.0
+        ## Direction from the sign of the 3h change: up when rising, down when
+        ## falling. The signed value (+/-) is kept alongside the arrow.
+        #if $bt < 0
         #set $btkey, $btarrow, $btcls = 'Falling', '&#9660;', 'down'
         #else
-        #set $btkey, $btarrow, $btcls = 'Steady', '&#9644;', 'steady'
+        #set $btkey, $btarrow, $btcls = 'Rising', '&#9650;', 'up'
         #end if
-        ## baro_trend_words=false drops the Rising/Falling/Steady word for a
-        ## minimalist arrow (like the temperature trend); the arrow keeps its
-        ## title for accessibility, and the 3h change stays.
+        ## Signed magnitude: always show + or - (WeeWX's format() only adds the
+        ## minus). The arrow direction matches the sign.
+        #set $btsign = '-' if $bt < 0 else '+'
+        #set $btval = $btsign + $trend.barometer.format(add_label=False).lstrip('-+') + $unit.label.barometer + ' / 3h'
+        ## baro_trend_words=false drops the Rising/Falling word for a minimalist
+        ## arrow (like the temperature trend); the arrow keeps its title for
+        ## accessibility, and the signed 3h change stays.
         #if $tf($getVar('Extras.baro_trend_words', False))
-        #set $btrend = '<div class="baro-trend ' + $btcls + '"><span class="bt-arrow">' + $btarrow + '</span> ' + $lbl($btkey) + ' <span class="bt-val">' + $trend.barometer.format(add_label=False) + $unit.label.barometer + ' / 3h</span></div>'
+        #set $btrend = '<div class="baro-trend ' + $btcls + '"><span class="bt-arrow">' + $btarrow + '</span> ' + $lbl($btkey) + ' <span class="bt-val">' + $btval + '</span></div>'
         #else
-        #set $btrend = '<div class="baro-trend ' + $btcls + '"><span class="bt-arrow" title="' + $gettext($btkey) + '">' + $btarrow + '</span> <span class="bt-val">' + $trend.barometer.format(add_label=False) + $unit.label.barometer + ' / 3h</span></div>'
+        #set $btrend = '<div class="baro-trend ' + $btcls + '"><span class="bt-arrow" title="' + $gettext($btkey) + '">' + $btarrow + '</span> <span class="bt-val">' + $btval + '</span></div>'
         #end if
         #else
         #set $btrend = ''
