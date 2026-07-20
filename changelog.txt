@@ -1,11 +1,16 @@
-1.8.21  2026-07-19
+1.8.22  2026-07-19
   * Header tidy-up. The sub-line under the station name now shows the station
     hardware by default (set Extras.header_subtitle for your own text). The old
-    "Latest update" line, which duplicated the time in the values box, is gone;
-    turn on Extras.header_version for a "WeeWX x.y.z skinned with AganetWX a.b.c"
-    line instead. With Extras.update_check on as well, the skin checks GitHub
-    once a day (client-side, cached) and shows a small "update available" link
-    when a newer release exists. All off by default.
+    "Latest update" line, which duplicated the time in the values box, is
+    removed. Version info stays in the footer only (WeeWX and AganetWX versions,
+    with the anegio.com credit removable via branding.show_theme_credit).
+  * New Extras.update_check (off by default): once a day, client-side and
+    cached, checks GitHub for a newer AganetWX release and shows a small
+    "update available" link next to the footer version.
+
+1.8.21  2026-07-19
+  * Superseded by 1.8.22 (the header version line added here was moved to the
+    footer only).
 
 1.8.20  2026-07-19
   * Barometer 3h trend: the arrow now follows the sign of the change (up when

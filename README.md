@@ -58,14 +58,14 @@ Live demo: [aganet.gr](https://aganet.gr)
 Install straight from the latest release (no download step needed):
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.21.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.22.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
 Or, if you already downloaded the zip, point at its full path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.21.zip
+sudo weectl extension install /path/to/AganetWX-1.8.22.zip
 ```
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
@@ -149,8 +149,7 @@ Example:
 | `Extras.extra_sensor_groups` | group list | all | Limit which sensor groups show in that panel, in order (`temp`,`humidity`,`soil`,`leaf`,`air`,`lightning`,`other`,`status`); empty shows all |
 | `Extras.temp_chart_series` | obs list | default | Which series the Temperature chart draws, in order, incl. extra sensors (e.g. `outTemp, extraTemp2`); empty = default set |
 | `Extras.header_subtitle` | string | empty | Header sub-line under the station name; empty uses the station hardware from WeeWX (e.g. "Davis Vantage Pro2") |
-| `Extras.header_version` | bool | `false` | Show a "WeeWX x.y.z skinned with AganetWX a.b.c" line in the header (replaces the old "Latest update" line, which duplicated the values box) |
-| `Extras.update_check` | bool | `false` | With `header_version` on, check GitHub once a day (client-side, cached) for a newer AganetWX release and show an "update available" link |
+| `Extras.update_check` | bool | `false` | Check GitHub once a day (client-side, cached) for a newer AganetWX release and show an "update available" link next to the version in the footer |
 | `Extras.hero` | bool | `true` | Current-conditions hero card (Current page) |
 | `Extras.summary` | bool | `true` | "Today in one sentence" plain-language summary with active weather alerts (Current page) |
 | `Extras.compare` | bool | `false` | "Compared to the past" card: vs yesterday, vs the monthly average, vs this date last year (Current page) |

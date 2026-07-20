@@ -14,7 +14,7 @@
 $station.latitude[0]°$station.latitude[1]'$station.latitude[2] $station.longitude[0]°$station.longitude[1]'$station.longitude[2] | $station.altitude | #slurp
     #end if
 Powered by <a href="https://weewx.com">WeeWX</a> $station.version</small>
-    <small><a href="https://github.com/aganet/weewx-aganetwx">AganetWX</a> $getVar('SKIN_VERSION', '')#if $tf($getVar('Extras.branding.show_theme_credit', True))# theme by <a href="https://anegio.com" rel="author">anegio.com</a>#end if#</small>
+    <small><a href="https://github.com/aganet/weewx-aganetwx">AganetWX</a> $getVar('SKIN_VERSION', '')#if $tf($getVar('Extras.branding.show_theme_credit', True))# theme by <a href="https://anegio.com" rel="author">anegio.com</a>#end if#<span id="update-flag" hidden> &middot; <a href="https://github.com/aganet/weewx-aganetwx/releases/latest" target="_blank" rel="noopener">$lbl('update available')</a></span></small>
   </div>
 
   <script src="aganetwx.js?v=$getVar('SKIN_VERSION', '')" defer></script>
