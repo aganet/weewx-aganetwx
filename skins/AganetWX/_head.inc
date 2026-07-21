@@ -146,15 +146,18 @@
         <div class="header_top">
           <div>
             <div class="station_name">$station.location</div>
-            ## Sub-line: Extras.header_subtitle if set, else the station hardware
-            ## (e.g. "Davis Vantage Pro2"), else the translated generic line.
-            #set $hsub = $getVar('Extras.header_subtitle', '')
+            ## Sub-line under the station name. header_subtitle_show turns it on
+            ## or off. When on, header_subtitle sets the text; empty uses the
+            ## station hardware (e.g. "Davis Vantage Pro2"), then a generic line.
+            #if $tf($getVar('Extras.header_subtitle_show', False))
+            #set $hsub = $str($getVar('Extras.header_subtitle', '')).strip()
             #if $hsub
             <div class="station_sub">$hsub</div>
             #elif $getVar('station.hardware', '')
             <div class="station_sub">$station.hardware</div>
             #else
             <div class="station_sub"><span class="i18n" data-i18n="Weather Station">$gettext("Weather Station")</span></div>
+            #end if
             #end if
           </div>
           <div class="header_meta">

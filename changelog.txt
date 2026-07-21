@@ -1,3 +1,9 @@
+1.8.24  2026-07-20
+  * The header sub-line under the station name is now off by default (the header
+    shows just the station name). Turn it on with Extras.header_subtitle_show =
+    true; Extras.header_subtitle then sets the text, or empty uses the station
+    hardware.
+
 1.8.23  2026-07-19
   * The footer credit line can now be removed entirely: branding.show_skin_credit
     = false hides the whole "AganetWX <version> theme by anegio.com" line.
