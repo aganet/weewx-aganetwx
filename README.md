@@ -628,3 +628,7 @@ so on.
 AganetWX is a skin for [WeeWX](https://weewx.com), released under the GNU GPL v3.
 Bundled [Apache ECharts](https://echarts.apache.org/) is under the Apache-2.0
 license.
+
+## Acknowledgments
+
+Special thanks to Ian ([IanR24now](https://github.com/IanR24now)) for his valuable testing and feedback, which shaped several features and fixes in this skin.
