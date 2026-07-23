@@ -390,13 +390,13 @@ $lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
         $hlrow('Apparent Temperature', $P.appTemp)
         #end if
         #if $tf($getVar('Extras.rows.barometer', True))
-        <div class="line twocol"><div class="lleft">$lbl('Barometer')</div><div class="lright"><span>&#9650; $P.barometer.max.format()<span class="hl-at">at</span><span class="hl-time">$P.barometer.maxtime</span></span><span>&#9660; $P.barometer.min.format()<span class="hl-at">at</span><span class="hl-time">$P.barometer.mintime</span></span></div></div>
+        <div class="line twocol"><div class="lleft">$lbl('Barometer')</div><div class="lright"><span><b class="hl-up">&#9650;</b> $P.barometer.max.format()<span class="hl-time">$P.barometer.maxtime</span></span><span><b class="hl-dn">&#9660;</b> $P.barometer.min.format()<span class="hl-time">$P.barometer.mintime</span></span></div></div>
         #end if
         #if $tf($getVar('Extras.rows.wind', True))
-        <div class="line twocol"><div class="lleft">$lbl('High Wind Gust')</div><div class="lright"><span>&#9650; $P.wind.max.format()<span class="hl-at">at</span><span class="hl-time">$P.wind.maxtime</span></span></div></div>
+        <div class="line twocol"><div class="lleft">$lbl('High Wind Gust')</div><div class="lright"><span><b class="hl-up">&#9650;</b> $P.wind.max.format()<span class="hl-time">$P.wind.maxtime</span></span></div></div>
         #end if
         #if $tf($getVar('Extras.rows.rain_rate', True))
-        <div class="line twocol"><div class="lleft">$lbl('High Rain Rate')</div><div class="lright"><span>&#9650; $P.rainRate.max.format()<span class="hl-at">at</span><span class="hl-time">$P.rainRate.maxtime</span></span></div></div>
+        <div class="line twocol"><div class="lleft">$lbl('High Rain Rate')</div><div class="lright"><span><b class="hl-up">&#9650;</b> $P.rainRate.max.format()<span class="hl-time">$P.rainRate.maxtime</span></span></div></div>
         #end if
         <div class="line"><div class="lleft">$lbl('Total Rain')</div><div class="lright">$P.rain.sum.format()</div></div>
         #if $tf($getVar('Extras.rows.uv', True)) and $P.UV.has_data

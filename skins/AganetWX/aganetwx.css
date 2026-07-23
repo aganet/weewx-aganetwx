@@ -174,7 +174,10 @@ html[data-theme="dark"] .line.alert-low  .lright, html[data-theme="dark"] .line.
 }
 .line.twocol .lright > span { white-space: nowrap; }
 .hl-at { color: #999; font-size: 8pt; margin: 0 3px 0 6px; }
-.hl-time { color: #777; font-size: 8pt; }
+.hl-time { color: #777; font-size: 8pt; white-space: nowrap; margin-left: 6px; }
+/* High/low arrows: red for the high, blue for the low. */
+.hl-up { color: #c0392b; font-weight: 700; }
+.hl-dn { color: #2980b9; font-weight: 700; }
 
 /* Diagrams (right column = interactive charts) */
 .diagrams_holder {
@@ -516,11 +519,11 @@ body.layout-modern .hilows .line {
 }
 body.layout-modern .hilows .line + .line { border-top: 1px solid var(--m-rule); }
 body.layout-modern .hilows .lleft {
-  flex: 0 0 38%; background: transparent; padding: 0;
+  flex: 0 0 34%; background: transparent; padding: 0;
   font-size: 11pt; font-weight: 600; color: var(--m-ink);
 }
 body.layout-modern .hilows .lright {
-  flex: 1 1 auto; background: transparent; padding: 0;
+  flex: 1 1 auto; min-width: 0; background: transparent; padding: 0;
   font-size: 10.5pt; font-weight: 600; color: var(--m-ink);
   font-variant-numeric: tabular-nums;
 }

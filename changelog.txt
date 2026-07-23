@@ -1,3 +1,10 @@
+1.8.26  2026-07-20
+  * Hi/Low rows (Week/Month/Year etc.): the timestamp no longer gets clipped at
+    the card edge in narrow layouts. The week time reads "11:50 Sun" instead of
+    the longer "11:50 on Sunday", the redundant "at" is dropped, there is a
+    small gap before the time, and the high/low arrows are coloured (red for the
+    high, blue for the low).
+
 1.8.25  2026-07-20
   * Fix a stray ">" that could leak into the page (below the footer) on some
     stations. The moon element built its "data-waning" attribute with an inline

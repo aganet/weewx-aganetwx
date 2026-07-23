@@ -15,7 +15,7 @@
         <div class="line vrowhl$cls"><div class="lleft">$lbl($key)</div><div class="lright"><span class="vh-now">$value</span><span class="vh-range"><span>&#9650; $hi<span class="vh-at">at</span>$hit</span>#if not $hi_only#<span>&#9660; $lo<span class="vh-at">at</span>$lot</span>#end if#</span></div></div>
 #end def
 #def hlrow($key, $stat, $hi_only=False)
-        <div class="line twocol"><div class="lleft">$lbl($key)</div><div class="lright"><span>&#9650; $stat.max.format()<span class="hl-at">at</span><span class="hl-time">$stat.maxtime</span></span>#if not $hi_only#<span>&#9660; $stat.min.format()<span class="hl-at">at</span><span class="hl-time">$stat.mintime</span></span>#end if#</div></div>
+        <div class="line twocol"><div class="lleft">$lbl($key)</div><div class="lright"><span><b class="hl-up">&#9650;</b> $stat.max.format()<span class="hl-time">$stat.maxtime</span></span>#if not $hi_only#<span><b class="hl-dn">&#9660;</b> $stat.min.format()<span class="hl-time">$stat.mintime</span></span>#end if#</div></div>
 #end def
 #set global $active = 'current'
 #set global $P = $day
