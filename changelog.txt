@@ -1,3 +1,10 @@
+1.8.25  2026-07-20
+  * Fix a stray ">" that could leak into the page (below the footer) on some
+    stations. The moon element built its "data-waning" attribute with an inline
+    template test that used a "<" comparison next to the tag's closing ">",
+    which Cheetah could mis-parse when the moon rise/set data was missing. The
+    comparison is now computed on its own line, so the tag always closes cleanly.
+
 1.8.24  2026-07-20
   * The header sub-line under the station name is now off by default (the header
     shows just the station name). Turn it on with Extras.header_subtitle_show =

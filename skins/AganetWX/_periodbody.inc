@@ -348,8 +348,13 @@ $lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
         <div class="headline">$lbl('Sun & Moon')</div>
         <div class="celestial">
           <div class="moon-wrap">
-            <div class="moon" data-fullness="$almanac.moon_fullness"
-                 #if $almanac.moon.rise.raw and $almanac.moon.set.raw and $almanac.moon.set.raw < $almanac.moon.rise.raw#data-waning="1"#end if#></div>
+            ## Compute waning first so the "<" comparison is not adjacent to the
+            ## tag-closing ">" (that inline pattern can mis-parse in Cheetah and
+            ## leak a stray ">" into the page).
+            #set $_mrise = $almanac.moon.rise.raw
+            #set $_mset = $almanac.moon.set.raw
+            #set $_waning = $_mrise is not None and $_mset is not None and $_mset < $_mrise
+            <div class="moon" data-fullness="$almanac.moon_fullness"#if $_waning# data-waning="1"#end if#></div>
             <div class="moon-pct">$almanac.moon_phase, $almanac.moon_fullness%</div>
           </div>
           <div class="celestial-info">
