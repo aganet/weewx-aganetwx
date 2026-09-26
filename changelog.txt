@@ -1,14 +1,22 @@
 1.8.27  2026-09-26
-  * New floating "back to top" arrow, bottom right, appearing once the page is
-    scrolled. On by default; set Extras.back_to_top = false to remove it.
-  * New optional "Buy me a coffee" button in the bottom right corner. It keeps
-    the bottom slot (it is always visible) and the back-to-top arrow stacks
-    above it once the page is scrolled.
-    Off by default: set Extras.support.enable = true and Extras.support.url to
-    your page (Buy Me a Coffee, Ko-fi, GitHub Sponsors, PayPal, any link).
-    Extras.support.text sets the label; leave it empty for a compact icon-only
-    button. It is a plain link, so nothing third-party loads unless a visitor
-    clicks it. Both labels are translated in all seven languages.
+  * New floating "back to top" arrow in the bottom right corner, appearing once
+    the page is scrolled. On by default; set Extras.back_to_top = false to
+    remove it. Its accessible name ("Scroll to top") is translated.
+  * New optional support button, bottom right. Off by default: set
+    Extras.support.enable = true and Extras.support.url to any tip/donate page
+    (Ko-fi, Buy Me a Coffee, GitHub Sponsors, PayPal). It is a plain link, so
+    nothing third-party loads unless a visitor clicks it. The support button
+    keeps the bottom slot since it is always visible, and the back-to-top arrow
+    stacks above it when both are on.
+  * The button is not tied to one service: its icon is a steaming cup with a red
+    heart (drawn for the skin, not taken from an icon set) and the default label
+    is "Support this station". Set Extras.support.text for your own wording
+    ("Buy me a coffee", "Tip on Ko-fi"), or "" for a compact icon-only button.
+  * The button's hover text and accessible name say what it is for ("Support
+    this weather station") rather than repeating the visible label: a screen
+    reader announcing "Buy me a coffee" says nothing about supporting the
+    station. Extras.support.tooltip overrides it. Both strings stay in English
+    in every language; set them per-station for your own wording.
 
 1.8.26  2026-07-20
   * Hi/Low rows (Week/Month/Year etc.): the timestamp no longer gets clipped at

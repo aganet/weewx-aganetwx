@@ -229,10 +229,12 @@ body.density-compact #chart-windrose { height: 360px; }
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .support-float:hover { color: #1c1917; text-decoration: none; transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / 0.22); }
-.support-float svg { width: 20px; height: 20px; flex: none; }
+.support-float svg { width: 26px; height: 26px; flex: none; }
+/* Cup takes the button's ink colour; the heart keeps its own red. */
+.support-float .support-heart { fill: #e2342f; }
 /* Icon-only (empty text), and the phone layout of the labelled button. */
 .support-float-icon { padding: 0; width: 44px; justify-content: center; }
-.support-float-icon svg { width: 22px; height: 22px; }
+.support-float-icon svg { width: 28px; height: 28px; }
 @media (max-width: 640px) {
   .support-float { padding: 0; width: 44px; justify-content: center; }
   .support-float span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
