@@ -1038,4 +1038,29 @@
     window.addEventListener("resize", function () { if (chart) chart.resize(); });
   }
   initCompare();
+
+  // Scroll-to-top button: revealed past 400px, honours reduced motion.
+  // Lifted above the support button when one is present.
+  function initToTop() {
+    var btn = document.querySelector(".to-top");
+    if (!btn) return;
+    if (document.querySelector(".support-float")) {
+      document.body.classList.add("has-support");
+    }
+    btn.hidden = false;
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var ticking = false;
+    function update() {
+      btn.classList.toggle("is-visible", window.scrollY > 400);
+      ticking = false;
+    }
+    window.addEventListener("scroll", function () {
+      if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+    update();
+    btn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    });
+  }
+  initToTop();
 })();

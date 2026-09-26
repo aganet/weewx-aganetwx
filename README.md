@@ -136,7 +136,16 @@ Example:
                 link_url = "https://example.com"
                 link_text = "My site"
                 show_theme_credit = false   # remove the "theme by anegio.com" footer credit
+
+            [[[[support]]]]           # optional "Buy me a coffee" button
+                enable = true
+                url = "https://www.buymeacoffee.com/yourname"
+                text = "Buy me a coffee"   # empty = icon-only button
 ```
+
+Note that `lang` must come *before* `[[[Extras]]]`: any key placed after a
+subsection is parsed as part of that subsection, so a `lang` below it is
+silently ignored.
 
 ### Config reference
 
@@ -196,6 +205,10 @@ Example:
 | `branding.link_url` / `link_text` | string | empty | Optional footer link |
 | `branding.show_skin_credit` | bool | `true` | Show the "AganetWX &lt;version&gt; theme by anegio.com" footer line; `false` removes the whole line |
 | `branding.show_theme_credit` | bool | `true` | Within that line, show the "theme by anegio.com" part; `false` keeps "AganetWX &lt;version&gt;" but drops the credit |
+| `Extras.back_to_top` | bool | `true` | Floating "back to top" arrow (bottom right, appears once scrolled); `false` removes it |
+| `support.enable` | bool | `false` | Floating "Buy me a coffee" button in the bottom right corner; the back-to-top arrow stacks above it |
+| `support.url` | string | empty | Link target (Buy Me a Coffee, Ko-fi, GitHub Sponsors, PayPal, any URL). Empty hides the button even when enabled. A plain link: no third-party script loads |
+| `support.text` | string | `Buy me a coffee` | Button label; empty gives a compact icon-only button (the translated label is still used for the tooltip and screen readers) |
 | `links.show` | bool | `true` | Show the "Useful Links" card (bottom of the left column) |
 | `links.<entry>` | `url`,`text` | Greece maps | Each `[[[entry]]]` adds a link; edit/add/remove freely |
 | `webcam.enable` | bool | `false` | Show the webcam banner above the nav |

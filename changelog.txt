@@ -1,3 +1,15 @@
+1.8.27  2026-09-26
+  * New floating "back to top" arrow, bottom right, appearing once the page is
+    scrolled. On by default; set Extras.back_to_top = false to remove it.
+  * New optional "Buy me a coffee" button in the bottom right corner. It keeps
+    the bottom slot (it is always visible) and the back-to-top arrow stacks
+    above it once the page is scrolled.
+    Off by default: set Extras.support.enable = true and Extras.support.url to
+    your page (Buy Me a Coffee, Ko-fi, GitHub Sponsors, PayPal, any link).
+    Extras.support.text sets the label; leave it empty for a compact icon-only
+    button. It is a plain link, so nothing third-party loads unless a visitor
+    clicks it. Both labels are translated in all seven languages.
+
 1.8.26  2026-07-20
   * Hi/Low rows (Week/Month/Year etc.): the timestamp no longer gets clipped at
     the card edge in narrow layouts. The week time reads "11:50 Sun" instead of

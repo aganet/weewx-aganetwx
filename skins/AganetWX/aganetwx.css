@@ -201,6 +201,51 @@ body.density-compact #chart-windrose { height: 360px; }
 .footer .st_type { color: var(--m-blue); font-size: 1.3em; font-weight: bold; }
 .footer small { display: block; margin-top: 6px; color: #555; }
 
+/* Scroll-to-top arrow and the optional support link. Both are fixed, bottom
+   right. The support link is always on, so it takes the bottom slot; the arrow
+   stacks above it once the page is scrolled. */
+.to-top {
+  position: fixed; right: 20px; bottom: 20px; z-index: 30;
+  width: 44px; height: 44px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--m-border); border-radius: 50%;
+  background: var(--m-panel-bg); color: var(--m-blue);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+  cursor: pointer; opacity: 0; pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity .2s ease, transform .2s ease, color .2s ease, border-color .2s ease;
+}
+.to-top.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.to-top:hover { color: var(--m-accent); border-color: var(--m-accent); }
+.to-top svg { width: 20px; height: 20px; display: block; }
+
+.support-float {
+  position: fixed; right: 20px; bottom: 20px; z-index: 30;
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 44px; padding: 0 16px 0 13px;
+  background: #ffdd00; color: #1c1917;
+  border-radius: 999px; font-weight: 700; font-size: 0.95em;
+  text-decoration: none; box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.support-float:hover { color: #1c1917; text-decoration: none; transform: translateY(-2px); box-shadow: 0 6px 16px rgb(0 0 0 / 0.22); }
+.support-float svg { width: 20px; height: 20px; flex: none; }
+/* Icon-only (empty text), and the phone layout of the labelled button. */
+.support-float-icon { padding: 0; width: 44px; justify-content: center; }
+.support-float-icon svg { width: 22px; height: 22px; }
+@media (max-width: 640px) {
+  .support-float { padding: 0; width: 44px; justify-content: center; }
+  .support-float span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
+/* With the support button present, the arrow sits above it. */
+body.has-support .to-top { bottom: 74px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .to-top { transition: opacity .2s ease; }
+  .support-float { transition: none; }
+}
+@media print { .to-top, .support-float { display: none !important; } }
+
 /* Compact density: tighter rows & charts (min-height, no clipping) */
 body.density-compact .line { min-height: 36px; }
 body.density-compact .lleft,
