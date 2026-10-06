@@ -137,6 +137,10 @@ Example:
                 link_text = "My site"
                 show_theme_credit = false   # remove the "theme by anegio.com" footer credit
 
+            [[[[analytics]]]]         # optional tracking snippet
+                # One line; triple quotes keep the snippet's own quotes.
+                head = '''<script defer src="https://umami.example.com/script.js" data-website-id="your-id"></script>'''
+
             [[[[support]]]]           # optional support button
                 enable = true
                 url = "https://ko-fi.com/yourname"
@@ -202,6 +206,8 @@ silently ignored.
 | `about.operator` / `website_url` / `website_text` / `email` | string | empty | About-page contact fields |
 | `about.hardware` | string | empty | Override the hardware label (else WeeWX's value) |
 | `about.show_coordinates` | bool | `true` | Show exact coords and map link on About; `false` for privacy |
+| `analytics.head` | string | empty | Tracking / verification snippet injected verbatim just before `</head>` on every page. Any provider (Umami, Plausible, Matomo, GA4, self-hosted). Empty = nothing loads |
+| `analytics.body` | string | empty | Same, injected just before `</body>` (for snippets that ask to go at the end of the body) |
 | `branding.show_footer_coords` | bool | `true` | Lat/long/altitude in footer |
 | `branding.link_url` / `link_text` | string | empty | Optional footer link |
 | `branding.show_skin_credit` | bool | `true` | Show the "AganetWX &lt;version&gt; theme by anegio.com" footer line; `false` removes the whole line |

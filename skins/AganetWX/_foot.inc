@@ -40,5 +40,9 @@ Powered by <a href="https://weewx.com">WeeWX</a> $station.version</small>
 #end if
 
   <script src="aganetwx.js?v=$getVar('SKIN_VERSION', '')" defer></script>
+#set $an_body = $str($getVar('Extras.analytics.body', '')).strip()
+#if $an_body != ''
+$an_body
+#end if
 </body>
 </html>

@@ -129,6 +129,12 @@
       d.setAttribute("data-layout", PRESETS[choice].layout);
     })();
   </script>
+## Site-wide analytics / verification snippet, injected verbatim. See
+## Extras.analytics in skin.conf.
+#set $an_head = $str($getVar('Extras.analytics.head', '')).strip()
+#if $an_head != ''
+$an_head
+#end if
 </head>
 <body class="lang-$lang density-$th_density layout-$th_layout" data-lang="$lang">
   <script>

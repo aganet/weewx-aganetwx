@@ -1,3 +1,11 @@
+1.8.28  2026-10-06
+  * New Extras.analytics block for a site-wide tracking or verification
+    snippet. analytics.head is injected verbatim just before </head> and
+    analytics.body just before </body>, on every page. Provider-agnostic
+    (Umami, Plausible, Matomo, GA4, self-hosted): paste the provider's own
+    snippet. Both empty by default, so nothing third-party loads unless you
+    set one.
+
 1.8.27  2026-09-26
   * New floating "back to top" arrow in the bottom right corner, appearing once
     the page is scrolled. On by default; set Extras.back_to_top = false to
