@@ -1,3 +1,18 @@
+1.8.29  2026-10-22
+  * Extra-sensor rows now show readable names instead of the raw database
+    key. WeeWX ships labels for the legacy Davis fields but none for the
+    numbered families, so a WeatherLink Live showed "batteryStatus1" rather
+    than "Transmitter Battery 1" (issue #4). The skin now labels all 74
+    otherwise-unlabelled types: batteryStatusN, signalN, extraTempN,
+    extraHumidN, soilTempN, soilMoistN, leafTempN, leafWetN, the air-quality
+    gases and particulates (CO, CO2, NH3, NO2, O3, SO2, PM1.0, PM2.5, PM10),
+    the lightning detail counters, snow and hail, and the hail/snow/UV
+    battery fields. Translated in all seven languages. A label you set
+    yourself in [Labels][[Generic]] still wins.
+  * Air-quality grouping fixed: NH3, SO2, CO and lead were filed under
+    "Other Sensors" instead of "Air Quality".
+  * Removed a duplicate "Heat Index" key from each language file.
+
 1.8.28  2026-10-06
   * New Extras.analytics block for a site-wide tracking or verification
     snippet. analytics.head is injected verbatim just before </head> and

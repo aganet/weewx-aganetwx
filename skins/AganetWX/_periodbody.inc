@@ -444,7 +444,7 @@ $lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
         <div class="extra-group">$gettext($grp.title_key)</div>
         #for $o in $grp.obs
         <div class="extra-row">
-          <span class="extra-label">$obs.label[$o.key]</span>
+          <span class="extra-label">#if $o.get('label')#$o.label#else#$obs.label[$o.key]#end if#</span>
           <span class="extra-value">$o.value.format()</span>
         </div>
         #end for

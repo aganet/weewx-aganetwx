@@ -33,15 +33,68 @@ def _bucket(key):
         return 'soil'
     if k.startswith('leafwet') or k.startswith('leaftemp') or k.startswith('leaf'):
         return 'leaf'
-    if k.startswith('pm') or 'pm2_5' in k or 'pm10' in k or k.startswith('co2') \
-            or k.startswith('aqi') or k.startswith('no2') or k.startswith('o3'):
-        return 'air'
-    if 'lightning' in k:
-        return 'lightning'
     if 'battery' in k or k.endswith('_batt') or 'voltage' in k or k.startswith('supplyvolt') \
             or k.startswith('consbattery') or 'signal' in k or 'rssi' in k:
         return 'status'
+    if k.startswith('pm') or k.startswith('aqi') or k.startswith('co2') \
+            or k in ('co', 'nh3', 'no2', 'o3', 'so2', 'pb'):
+        return 'air'
+    if 'lightning' in k:
+        return 'lightning'
     return 'other'
+
+
+# Numbered sensor families WeeWX ships no [Labels][[Generic]] entry for, so
+# $obs.label falls back to the raw key ("batteryStatus1"). Maps the family to a
+# [Texts] key; the trailing number is appended. Davis/WLL report batteryStatus1
+# per transmitter, Ecowitt-style stations fill extraTempN / soilMoistN etc.
+NUMBERED = {
+    'apptemp': 'Apparent Temperature',
+    'dewpoint': 'Dewpoint',
+    'heatindex': 'Heat Index',
+    'humidex': 'Humidex',
+    'batterystatus': 'Transmitter Battery',
+    'signal': 'Signal',
+    'extratemp': 'Extra Temperature',
+    'extrahumid': 'Extra Humidity',
+    'soiltemp': 'Soil Temperature',
+    'soilmoist': 'Soil Moisture',
+    'leaftemp': 'Leaf Temperature',
+    'leafwet': 'Leaf Wetness',
+}
+
+
+# Single (non-numbered) types WeeWX also ships no label for. Same [Texts]
+# treatment: air quality, lightning detail, snow, and the battery fields
+# weewx/defaults.py happens to omit.
+UNLABELLED = {
+    'humidex': 'Humidex',
+    'inDewpoint': 'Inside Dewpoint', 'heatingTemp': 'Heating Temperature',
+    'illuminance': 'Illuminance', 'luminosity': 'Luminosity',
+    'noise': 'Noise', 'forecast': 'Forecast',
+    'co': 'CO', 'co2': 'CO2', 'nh3': 'NH3', 'no2': 'NO2', 'o3': 'O3',
+    'so2': 'SO2', 'pb': 'Lead',
+    'pm1_0': 'PM1.0', 'pm2_5': 'PM2.5', 'pm10_0': 'PM10',
+    'lightning_energy': 'Lightning Energy',
+    'lightning_noise_count': 'Lightning Noise Count',
+    'lightning_disturber_count': 'Lightning Disturber Count',
+    'snow': 'Snow', 'snowRate': 'Snow Rate', 'snowDepth': 'Snow Depth',
+    'snowMoisture': 'Snow Moisture',
+    'hail': 'Hail', 'hailRate': 'Hail Rate',
+    'hailBatteryStatus': 'Hail Battery', 'snowBatteryStatus': 'Snow Battery',
+    'uvBatteryStatus': 'UV Battery',
+}
+
+
+def _numbered(key):
+    """Split 'batteryStatus1' into ('Transmitter Battery', '1'), else None."""
+    i = len(key)
+    while i > 0 and key[i - 1].isdigit():
+        i -= 1
+    if i == len(key) or i == 0:
+        return None
+    base = NUMBERED.get(key[:i].lower())
+    return (base, key[i:]) if base else None
 
 
 # Display order and heading text (a [Texts] key).
@@ -115,7 +168,17 @@ class AganetWXExtras(SearchList):
                 vh = binder.last
                 if not vh.has_data:
                     continue
-                obs.append({'key': key, 'value': vh})
+                # WeeWX labels the legacy battery/sensor fields but not the
+                # numbered ones, where $obs.label returns the key itself.
+                label = None
+                if self._label_of(key) == key:
+                    if key in UNLABELLED:
+                        label = self._text(UNLABELLED[key])
+                    else:
+                        parts = _numbered(key)
+                        if parts:
+                            label = '%s %s' % (self._text(parts[0]), parts[1])
+                obs.append({'key': key, 'value': vh, 'label': label})
             if obs:
                 groups.append({'group': grp_key, 'title_key': title, 'obs': obs})
 
@@ -215,6 +278,16 @@ class AganetWXExtras(SearchList):
             return labels.get(obs, obs)
         except Exception:
             return obs
+
+    def _label_of(self, key):
+        """What $obs.label would render for this key."""
+        labels = self.generator.skin_dict.get('Labels', {}).get('Generic', {})
+        return labels.get(key, key)
+
+    def _text(self, key):
+        """A [Texts] string for the active language, falling back to the key."""
+        texts = self.generator.skin_dict.get('Texts', {})
+        return texts.get(key, key)
 
     def _last_rain(self, db_manager, now_ts):
         """ValueHelper for the timestamp of the last rain, plus an 'ago' string.
