@@ -360,10 +360,20 @@ $lbl('High') $day.outTemp.max.format(add_label=False)$unit.label.outTemp#slurp
           <div class="celestial-info">
             <div class="cel-row"><span class="cel-lbl">$lbl('Sunrise')</span><b>$almanac.sun.rise</b></div>
             <div class="cel-row"><span class="cel-lbl">$lbl('Sunset')</span><b>$almanac.sun.set</b></div>
+            #if $getVar('daylight', None)
+            <div class="cel-row"><span class="cel-lbl">$lbl('Daylight')</span><b>$daylight#if $getVar('daylight_change', None)# <span class="cel-delta">$daylight_change</span>#end if#</b></div>
+            #end if
             <div class="cel-row"><span class="cel-lbl">$lbl('Moonrise')</span><b>$almanac.moon.rise</b></div>
             <div class="cel-row"><span class="cel-lbl">$lbl('Moonset')</span><b>$almanac.moon.set</b></div>
             <div class="cel-row"><span class="cel-lbl">$lbl('Next full')</span><b>$almanac.next_full_moon</b></div>
             <div class="cel-row"><span class="cel-lbl">$lbl('Next new')</span><b>$almanac.next_new_moon</b></div>
+            #try
+            <div class="cel-row"><span class="cel-lbl">$lbl('Moon age')</span><b>$("%.1f" % $almanac.moon.moon_phase) $lbl('days')</b></div>
+            #except
+            #pass
+            #end try
+            <div class="cel-row"><span class="cel-lbl">$lbl('Solstice')</span><b>$almanac.next_solstice</b></div>
+            <div class="cel-row"><span class="cel-lbl">$lbl('Equinox')</span><b>$almanac.next_equinox</b></div>
           </div>
         </div>
       </div>

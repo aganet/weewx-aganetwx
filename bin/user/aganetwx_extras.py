@@ -4,12 +4,21 @@ loads the [Texts] of each configured language for the in-page switcher ($i18n)."
 
 import json
 import os
+import time
 
 import configobj
 
+import weewx.almanac
 import weewx.units
 from weewx.cheetahgenerator import SearchList
 from weewx.tags import ObservationBinder
+
+# WeeWX assigns no unit group to the numbered battery/signal fields, so they
+# format with the %f fallback and a battery reads "0.000000". They are plain
+# integers: file them under group_count so the "count" format (%d) applies.
+for _n in range(1, 9):
+    weewx.units.obs_group_dict.setdefault('batteryStatus%d' % _n, 'group_count')
+    weewx.units.obs_group_dict.setdefault('signal%d' % _n, 'group_count')
 
 
 
@@ -185,6 +194,10 @@ class AganetWXExtras(SearchList):
         # When did it last rain? Newest archive record with rain > 0.
         last_rain = self._last_rain(db_manager, timespan.stop)
 
+        # Daylight length and the day-over-day change, both as "10h 58m" /
+        # "-2m 18s" strings; the raw almanac values are seconds.
+        daylight, daylight_change = self._daylight()
+
         # Optional custom temperature-chart series.
         series, labels = self._temp_chart(extras)
 
@@ -194,6 +207,7 @@ class AganetWXExtras(SearchList):
 
         return [{'extra_groups': groups, 'has_extra_sensors': len(groups) > 0,
                  'last_rain': last_rain,
+                 'daylight': daylight, 'daylight_change': daylight_change,
                  'temp_chart_series': series, 'temp_chart_labels': labels,
                  'extra_webcams': extra_webcams, 'webcam_columns': webcam_columns}]
 
@@ -278,6 +292,31 @@ class AganetWXExtras(SearchList):
             return labels.get(obs, obs)
         except Exception:
             return obs
+
+    @staticmethod
+    def _hm(secs, sign=False):
+        """Seconds as '10h 58m', or '2m 18s' when under an hour."""
+        s = int(round(abs(secs)))
+        pre = '' if not sign else ('+' if secs >= 0 else '-')
+        if s >= 3600:
+            return '%s%dh %dm' % (pre, s // 3600, (s % 3600) // 60)
+        return '%s%dm %ds' % (pre, s // 60, s % 60)
+
+    def _daylight(self):
+        """Length of today's daylight, and the change from yesterday."""
+        try:
+            stn = self.generator.stn_info
+            alm = weewx.almanac.Almanac(
+                time.time(), stn.latitude_f, stn.longitude_f,
+                altitude=weewx.units.convert(stn.altitude_vt, 'meter')[0])
+            visible = alm.sun.visible.raw
+            change = alm.sun.visible_change().raw
+        except Exception:
+            return None, None
+        if visible is None:
+            return None, None
+        return self._hm(visible), (None if change is None
+                                   else self._hm(change, sign=True))
 
     def _label_of(self, key):
         """What $obs.label would render for this key."""

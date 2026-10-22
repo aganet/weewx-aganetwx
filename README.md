@@ -173,7 +173,7 @@ silently ignored.
 | `Extras.monthly_records` | bool | `false` | History page: all-time monthly records tables (hottest/coldest, wettest/average rain). Needs `compare_page` |
 | `Extras.records_temp` | bool | `true` | Show the temperature records table (when `monthly_records` is on) |
 | `Extras.records_rain` | bool | `true` | Show the rain records table (when `monthly_records` is on) |
-| `Extras.celestial` | bool | `true` | Sun and Moon card |
+| `Extras.celestial` | bool | `true` | Sun and Moon card: rise/set times, moon phase and age, daylight length with the change since yesterday, and the next solstice and equinox |
 | `Extras.disclaimer` | bool | `true` | Amateur-station disclaimer in the footer |
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |
 | `Extras.stale_alert_secs` | seconds | `3600` | Warn (banner) when the latest observation is older than this; `0` disables |

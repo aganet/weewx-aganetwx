@@ -196,6 +196,9 @@ html[data-theme="dark"] .line.alert-low  .lright, html[data-theme="dark"] .line.
 #chart-windrose { height: 420px; }
 body.density-compact #chart-windrose { height: 360px; }
 
+/* Day-over-day daylight change, next to the daylight length. */
+.cel-delta { color: var(--m-muted); font-weight: normal; font-size: 0.9em; }
+
 /* Footer */
 .footer { max-width: 1100px; margin: 24px auto; padding: 0 20px; text-align: center; }
 .footer .st_type { color: var(--m-blue); font-size: 1.3em; font-weight: bold; }

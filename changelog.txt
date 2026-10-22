@@ -1,3 +1,13 @@
+1.8.30  2026-10-22
+  * Battery and signal rows no longer read "0.000000". WeeWX assigns no unit
+    group to batteryStatus1..8 and signal1..8, so they fell back to a float
+    format; the skin now files them under group_count and they display as
+    plain integers (issue #4). On a Davis WeatherLink Live, 0 means the
+    transmitter battery is okay and 1 means low.
+  * Sun & Moon card gains four rows: daylight length with the change since
+    yesterday ("10h 34m -3m 9s"), moon age in days, and the dates of the next
+    solstice and equinox. All from WeeWX's own almanac, no extra dependency.
+
 1.8.29  2026-10-22
   * Extra-sensor rows now show readable names instead of the raw database
     key. WeeWX ships labels for the legacy Davis fields but none for the
