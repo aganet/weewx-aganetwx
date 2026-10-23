@@ -1,0 +1,77 @@
+## Status page: station data health (records, coverage, archive gaps).
+## Deliberately no host information: no OS, Python, disk or load figures.
+#errorCatcher Echo
+#def lbl($key)
+<span class="i18n" data-i18n="$key">$gettext($key)</span>#slurp
+#end def
+#def tf($v)
+#return $str($v).strip().lower() not in ('false','0','no','off','')
+#end def
+#def vrow($key, $value)
+        <div class="line"><div class="lleft">$lbl($key)</div><div class="lright">$value</div></div>
+#end def
+#set global $active = 'status'
+#include "_head.inc"
+
+#set $h = $getVar('status', {})
+
+  <main class="content" id="main">
+    <div class="about-page">
+
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('Software')</div>
+        $vrow('WeeWX', $station.version)
+        $vrow('Skin', 'AganetWX ' + $getVar('SKIN_VERSION', ''))
+        #if $getVar('station.hardware', '')
+        $vrow('Hardware', $station.hardware)
+        #end if
+        $vrow('WeeWX uptime', $station.uptime.long_form)
+        #try
+        $vrow('Server uptime', $station.os_uptime.long_form)
+        #except
+        #pass
+        #end try
+      </div>
+
+      #if $h.get('ok')
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('Database')</div>
+        $vrow('Records', $h.records_human)
+        <div class="line"><div class="lleft">$lbl('Period of record')</div><div class="lright">$h.first_record &ndash; $h.last_record</div></div>
+        #if $h.get('interval')
+        $vrow('Archive interval', '%s min' % $h.interval)
+        #end if
+        #if $h.get('expected_24h')
+        <div class="line"><div class="lleft">$lbl('Records in last 24h')</div><div class="lright">$h.last_24h / $h.expected_24h#if $h.get('coverage') is not None# <span class="status-pct">($h.coverage%)</span>#end if#</div></div>
+        #end if
+        #if $h.get('size_human')
+        $vrow('Database size', $h.size_human)
+        #end if
+      </div>
+
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('Recent gaps')</div>
+        #if $h.gap_count
+        <div class="status-note">$h.gap_count $lbl('gap(s) in the last') $h.gap_days $lbl('days')</div>
+        #for $g in $h.gaps
+        <div class="line"><div class="lleft">$g.start &rarr; $g.end</div><div class="lright">$g.minutes $lbl('min')</div></div>
+        #end for
+        #if $h.gap_count > $len($h.gaps)
+        <div class="status-note">$lbl('Showing the most recent') $len($h.gaps).</div>
+        #end if
+        #else
+        <div class="status-note">$lbl('No gaps in the last') $h.gap_days $lbl('days')</div>
+        #end if
+      </div>
+      #else
+      <div class="col_sub allround gradient boxshadow dist">
+        <div class="headline">$lbl('Database')</div>
+        <div class="status-note">$lbl('No archive data available.')</div>
+      </div>
+      #end if
+
+      <div class="status-foot">$lbl('Generated') $h.get('generated', '')#if $h.get('refresh_minutes')#, $lbl('refreshed every') $h.refresh_minutes $lbl('minutes')#end if#</div>
+    </div>
+  </main>
+
+#include "_foot.inc"

@@ -199,6 +199,12 @@ body.density-compact #chart-windrose { height: 360px; }
 /* Day-over-day daylight change, next to the daylight length. */
 .cel-delta { color: var(--m-muted); font-weight: normal; font-size: 0.9em; }
 
+/* Status page */
+.status-note { padding: 8px 10px; color: var(--m-muted); }
+.status-pct  { color: var(--m-muted); }
+.status-foot { max-width: 1100px; margin: 12px auto; padding: 0 20px;
+               text-align: center; color: var(--m-muted); font-size: 0.9em; }
+
 /* Footer */
 .footer { max-width: 1100px; margin: 24px auto; padding: 0 20px; text-align: center; }
 .footer .st_type { color: var(--m-blue); font-size: 1.3em; font-weight: bold; }

@@ -1,5 +1,5 @@
 ## Shared top navigation bar. The caller sets $active to one of:
-## current | yesterday | week | month | year | lastyear | archive | about
+## current | yesterday | week | month | year | lastyear | archive | about | status
 #def navlink($id, $href, $key)
 #if $id == $active
 <a class="navtab active" href="$href" aria-current="page"><span class="i18n" data-i18n="$key">$gettext($key)</span></a>#slurp
@@ -38,6 +38,9 @@
     #end if
     #if $tf($getVar('Extras.nav.about', True))
     $navlink('about',     'about.html',     'About')
+    #end if
+    #if $tf($getVar('Extras.nav.status', False))
+    $navlink('status',    'status.html',    'Status')
     #end if
   </div>
 </nav>

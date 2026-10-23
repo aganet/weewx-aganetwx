@@ -17,7 +17,7 @@ def loader():
 class AganetWXInstaller(ExtensionInstaller):
     def __init__(self):
         super(AganetWXInstaller, self).__init__(
-            version="1.8.30",
+            version="1.8.31",
             name="AganetWX",
             description="AganetWX: a configurable WeeWX dashboard skin with interactive charts, multiple layouts, and i18n.",
             author="George Anestopoulos",
@@ -52,6 +52,7 @@ class AganetWXInstaller(ExtensionInstaller):
                     "skins/AganetWX/lastyear.html.tmpl",
                     "skins/AganetWX/archive.html.tmpl",
                     "skins/AganetWX/about.html.tmpl",
+                    "skins/AganetWX/status.html.tmpl",
                     "skins/AganetWX/compare.html.tmpl",
                     "skins/AganetWX/cameras.html.tmpl",
                     "skins/AganetWX/about.inc.example",

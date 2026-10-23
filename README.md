@@ -173,6 +173,9 @@ silently ignored.
 | `Extras.monthly_records` | bool | `false` | History page: all-time monthly records tables (hottest/coldest, wettest/average rain). Needs `compare_page` |
 | `Extras.records_temp` | bool | `true` | Show the temperature records table (when `monthly_records` is on) |
 | `Extras.records_rain` | bool | `true` | Show the rain records table (when `monthly_records` is on) |
+| `Extras.nav.status` | bool | `false` | Show the Status page tab: record count, coverage over the last 24h, database size and recent archive gaps. Data only, no host or OS information |
+| `status.refresh` | seconds | `3600` | How long the Status figures are cached (counting rows every report cycle is wasted work) |
+| `status.gap_days` / `gap_limit` | number | `7` / `10` | Gap detection window, and how many gaps to list |
 | `Extras.celestial` | bool | `true` | Sun and Moon card: rise/set times, moon phase and age, daylight length with the change since yesterday, and the next solstice and equinox |
 | `Extras.disclaimer` | bool | `true` | Amateur-station disclaimer in the footer |
 | `Extras.auto_refresh` | `auto`,seconds,`off` | `auto` | Auto-reload the page to follow new data |

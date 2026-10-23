@@ -881,3 +881,152 @@ class AganetWXCompareData(SearchList):
                 'avg': self._convert(sum(vals) / len(vals), 'group_rain', sysid),
             }
         return {'temp': temp, 'rain': rain}
+
+
+class AganetWXStatus(SearchList):
+    """Station data health for the Status page, as $status.
+
+    Scope is deliberately the data, not the host: record counts, coverage,
+    archive gaps and database size. No OS, Python, disk or load figures, which
+    would fingerprint the server on a public page without saying anything about
+    whether the station is logging.
+
+    Counting rows and scanning for gaps is wasted work on a station that
+    reports every minute, so both are cached for status refresh seconds
+    (default 3600) in a module-level cache shared by every page of a run.
+    """
+
+    _cache = None
+    _cache_time = 0.0
+
+    def get_extension_list(self, timespan, db_lookup):
+        extras = self.generator.skin_dict.get('Extras', {})
+        conf = extras.get('status', {})
+        try:
+            refresh = int(conf.get('refresh', 3600))
+        except Exception:
+            refresh = 3600
+        try:
+            gap_days = int(conf.get('gap_days', 7))
+        except Exception:
+            gap_days = 7
+        try:
+            gap_limit = int(conf.get('gap_limit', 10))
+        except Exception:
+            gap_limit = 10
+
+        now = time.time()
+        if (AganetWXStatus._cache is None
+                or now - AganetWXStatus._cache_time > refresh):
+            AganetWXStatus._cache = self._gather(db_lookup, gap_days, gap_limit)
+            AganetWXStatus._cache_time = now
+
+        status = dict(AganetWXStatus._cache)
+        status['generated'] = time.strftime('%Y-%m-%d %H:%M')
+        status['refresh_minutes'] = refresh // 60
+        return [{'status': status}]
+
+    def _gather(self, db_lookup, gap_days, gap_limit):
+        info = {
+            'records': None, 'records_human': None,
+            'first_record': None, 'last_record': None,
+            'interval': None,
+            'last_24h': None, 'expected_24h': None, 'coverage': None,
+            'size_human': None,
+            'gaps': [], 'gap_count': 0, 'gap_days': gap_days,
+            'ok': False,
+        }
+        try:
+            dbm = db_lookup()
+        except Exception:
+            return info
+
+        try:
+            row = next(dbm.genSql(
+                'SELECT COUNT(*), MIN(dateTime), MAX(dateTime) FROM archive'))
+        except Exception:
+            return info
+        if not row or not row[0]:
+            return info
+
+        info['ok'] = True
+        info['records'] = row[0]
+        info['records_human'] = '{:,}'.format(row[0])
+        info['first_record'] = self._stamp(row[1])
+        info['last_record'] = self._stamp(row[2])
+        last_ts = row[2]
+
+        # Interval from the newest record: what is actually being written,
+        # rather than what the config says should be.
+        try:
+            info['interval'] = next(dbm.genSql(
+                'SELECT interval FROM archive ORDER BY dateTime DESC LIMIT 1'))[0]
+        except Exception:
+            pass
+
+        if last_ts:
+            try:
+                got = next(dbm.genSql(
+                    'SELECT COUNT(*) FROM archive WHERE dateTime > ?',
+                    (last_ts - 86400,)))[0]
+                info['last_24h'] = got
+                if info['interval']:
+                    want = int(round(1440.0 / info['interval']))
+                    info['expected_24h'] = want
+                    if want:
+                        info['coverage'] = int(round(got * 100.0 / want))
+            except Exception:
+                pass
+
+            info['gaps'], info['gap_count'] = self._gaps(
+                dbm, last_ts, gap_days, info['interval'], gap_limit)
+
+        info['size_human'] = self._db_size(dbm)
+        return info
+
+    def _gaps(self, dbm, last_ts, gap_days, interval, limit):
+        """Archive gaps in the window: consecutive records further apart than
+        twice the archive interval. Returns (rows, total_count)."""
+        if not interval:
+            return [], 0
+        since = last_ts - gap_days * 86400
+        tol = interval * 60 * 2
+        rows, prev = [], None
+        try:
+            for (ts,) in dbm.genSql(
+                    'SELECT dateTime FROM archive WHERE dateTime >= ? '
+                    'ORDER BY dateTime', (since,)):
+                if prev is not None and ts - prev > tol:
+                    rows.append({'start': self._stamp(prev, short=True),
+                                 'end': self._stamp(ts, short=True),
+                                 'minutes': int(round((ts - prev) / 60.0))})
+                prev = ts
+        except Exception:
+            return [], 0
+        rows.reverse()
+        return rows[:limit], len(rows)
+
+    def _db_size(self, dbm):
+        """Database file size, when the backend is a local file (SQLite)."""
+        try:
+            path = dbm.connection.file_path
+        except Exception:
+            return None
+        try:
+            return self._bytes(os.path.getsize(path))
+        except Exception:
+            return None
+
+    @staticmethod
+    def _stamp(ts, short=False):
+        if not ts:
+            return None
+        fmt = '%Y-%m-%d %H:%M' if short else '%Y-%m-%d %H:%M:%S'
+        return time.strftime(fmt, time.localtime(ts))
+
+    @staticmethod
+    def _bytes(n):
+        for unit in ('B', 'KB', 'MB', 'GB'):
+            if n < 1024 or unit == 'GB':
+                return '%.1f %s' % (n, unit) if unit != 'B' else '%d B' % n
+            n /= 1024.0

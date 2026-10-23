@@ -1,3 +1,18 @@
+1.8.31  2026-10-23
+  * New optional Status page: record count, period of record, archive
+    interval, how many records arrived in the last 24h against how many were
+    expected, database size, and any archive gaps in the last 7 days. Off by
+    default; enable the tab with Extras.nav.status = true.
+    It reports on the DATA only. There is deliberately no OS, Python, disk,
+    load or installed-extension information: that would fingerprint the
+    server on a public page without saying anything about whether the station
+    is logging. WeeWX and server uptime are included because a restart
+    explains a gap.
+    Thanks to Ian Rattew, who wrote the original health page this is based on
+    and suggested folding it into the skin.
+  * Options under Extras.status: refresh (cache seconds, default 3600),
+    gap_days (default 7) and gap_limit (default 10).
+
 1.8.30  2026-10-22
   * Battery and signal rows no longer read "0.000000". WeeWX assigns no unit
     group to batteryStatus1..8 and signal1..8, so they fell back to a float
