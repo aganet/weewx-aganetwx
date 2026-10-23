@@ -55,18 +55,31 @@ Live demo: [aganet.gr](https://aganet.gr)
 
 ## Install
 
-Install straight from the latest release (no download step needed):
+Install straight from GitHub. This URL names no version, so it always gets
+the current code and never goes stale:
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX-1.8.26.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/archive/refs/heads/main.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
-Or, if you already downloaded the zip, point at its full path:
+To pin a specific release instead, take the zip from the
+[releases page](https://github.com/aganet/weewx-aganetwx/releases/latest)
+and give `weectl` either its URL or a local path:
 
 ```bash
-sudo weectl extension install /path/to/AganetWX-1.8.26.zip
+sudo weectl extension install /path/to/AganetWX-x.y.z.zip
 ```
+
+Upgrading is the same command; uninstall first if you want the old
+templates cleared out:
+
+```bash
+sudo weectl extension uninstall AganetWX
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/archive/refs/heads/main.zip
+```
+
+Your settings in `weewx.conf` are preserved.
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
 `skins/AganetWX`, and the sensor-discovery helper to `bin/user/aganetwx_extras.py`.
