@@ -50,14 +50,14 @@
       </div>
 
       <div class="col_sub allround gradient boxshadow dist">
-        <div class="headline">$lbl('Recent gaps')</div>
+        <div class="headline">$lbl('Recent data gaps')</div>
         #if $h.gap_count
-        <div class="status-note">$h.gap_count $lbl('gap(s) in the last') $h.gap_days $lbl('days')</div>
+        <div class="status-note">#if $h.gap_count == 1#$lbl('One gap in the last')#else#$h.gap_count $lbl('gaps in the last')#end if# $h.gap_days $lbl('days')</div>
         #for $g in $h.gaps
         <div class="line"><div class="lleft">$g.start &rarr; $g.end</div><div class="lright">$g.minutes $lbl('min')</div></div>
         #end for
         #if $h.gap_count > $len($h.gaps)
-        <div class="status-note">$lbl('Showing the most recent') $len($h.gaps).</div>
+        <div class="status-note">$lbl('Showing the most recent') $len($h.gaps)</div>
         #end if
         #else
         <div class="status-note">$lbl('No gaps in the last') $h.gap_days $lbl('days')</div>

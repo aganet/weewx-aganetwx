@@ -1,3 +1,9 @@
+1.8.33  2026-10-23
+  * Status page wording: the card is now "Recent data gaps" rather than
+    "Recent gaps", which on a weather page could be read as a gap in the
+    weather. The count below it reads "One gap in the last 7 days" or
+    "2 gaps in the last 7 days" instead of the awkward "gap(s)".
+
 1.8.32  2026-10-23
   * Fix the Sun & Moon card clipping its values. The moon now sits on top
     with the rows at full width beneath it, instead of beside them. The card
