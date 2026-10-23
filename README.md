@@ -55,31 +55,31 @@ Live demo: [aganet.gr](https://aganet.gr)
 
 ## Install
 
-Install straight from GitHub. This URL names no version, so it always gets
-the current code and never goes stale:
+Install straight from the latest release. The URL names no version, so it
+stays correct and always gives you a released build:
 
 ```bash
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/archive/refs/heads/main.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX.zip
 sudo systemctl restart weewx          # or: sudo /etc/init.d/weewx restart
 ```
 
-To pin a specific release instead, take the zip from the
-[releases page](https://github.com/aganet/weewx-aganetwx/releases/latest)
-and give `weectl` either its URL or a local path:
+To pin a specific version instead, take its zip from the
+[releases page](https://github.com/aganet/weewx-aganetwx/releases) and give
+`weectl` either that URL or a local path:
 
 ```bash
 sudo weectl extension install /path/to/AganetWX-x.y.z.zip
 ```
 
-Upgrading is the same command; uninstall first if you want the old
-templates cleared out:
+Upgrading is the same command. Uninstall first if you want the old
+templates cleared out; your settings in `weewx.conf` are preserved either
+way:
 
 ```bash
 sudo weectl extension uninstall AganetWX
-sudo weectl extension install https://github.com/aganet/weewx-aganetwx/archive/refs/heads/main.zip
+sudo weectl extension install https://github.com/aganet/weewx-aganetwx/releases/latest/download/AganetWX.zip
+sudo weectl report run
 ```
-
-Your settings in `weewx.conf` are preserved.
 
 This adds a `[[AganetWXReport]]` report under `[StdReport]`, installs the skin to
 `skins/AganetWX`, and the sensor-discovery helper to `bin/user/aganetwx_extras.py`.

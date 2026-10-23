@@ -2,9 +2,10 @@
   * The README install command no longer names a version, so it cannot go
     stale again. It had been pinned at 1.8.26 and, worse, combined the
     /releases/latest/download/ path with that fixed filename, which 404s:
-    anyone following the README could not install the skin at all. It now
-    uses the version-less archive URL, with the releases page given
-    separately for pinning a specific version. Reported by Ian Rattew.
+    anyone following the README could not install the skin at all.
+    Each release now also carries a copy of the zip named AganetWX.zip, so
+    .../releases/latest/download/AganetWX.zip always resolves to the newest
+    release. Reported by Ian Rattew.
 
 1.8.34  2026-10-23
   * Fix a JavaScript error when switching themes. The re-tint sent one patch
