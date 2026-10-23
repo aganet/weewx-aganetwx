@@ -1,3 +1,10 @@
+1.8.32  2026-10-23
+  * Fix the Sun & Moon card clipping its values. The moon now sits on top
+    with the rows at full width beneath it, instead of beside them. The card
+    grew from six rows to ten in 1.8.30, which left the side-by-side layout
+    too narrow: with longer labels (German, Greek) the times were pushed past
+    the card edge and disappeared. Reported by Ian Rattew.
+
 1.8.31  2026-10-23
   * New optional Status page: record count, period of record, archive
     interval, how many records arrived in the last 24h against how many were

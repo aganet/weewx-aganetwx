@@ -672,11 +672,14 @@ body.layout-modern .hero-lo { color: #bfe0ff; }
 .hero.hero-dynamic.hero-ink-dark .hero-temp { text-shadow: none; }
 
 /* Celestial card (Sun & Moon) */
+/* Moon on top, rows beneath at full width. Side-by-side worked while the card
+   had six rows, but it leaves the value column too narrow for ten: long
+   labels (German, Greek) then push the times past the card edge. */
 .celestial {
-  display: flex; align-items: center; gap: 20px;
+  display: flex; flex-direction: column; align-items: stretch; gap: 14px;
   padding: 16px 18px; background: var(--m-panel-bg);
 }
-.moon-wrap { text-align: center; flex: 0 0 auto; width: 96px; }
+.moon-wrap { text-align: center; flex: 0 0 auto; }
 .moon {
   width: 88px; height: 88px; border-radius: 50%;
   background: #161b22; margin: 0 auto;
