@@ -1,11 +1,3 @@
-1.8.34  2026-10-23
-  * Fix the broken "Satellite clouds" link in the default Useful Links card.
-    sat24 dropped its old /en/<country> paths, so the link returned 404. It
-    now points at https://www.sat24.com/en-gb/country/gr; swap the country
-    code for your own, or use /en-gb/continent/eu for the whole of Europe.
-    Reported by Daniel (wetterbrienz.ch). The lightning and Windy defaults
-    were checked at the same time and are still good.
-
 1.8.33  2026-10-23
   * Status page wording: the card is now "Recent data gaps" rather than
     "Recent gaps", which on a weather page could be read as a gap in the
