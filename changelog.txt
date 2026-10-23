@@ -1,3 +1,20 @@
+1.8.34  2026-10-23
+  * Fix a JavaScript error when switching themes. The re-tint sent one patch
+    to every chart containing both cartesian (xAxis/yAxis) and polar
+    (angleAxis/radiusAxis) options, so ECharts looked for a coordinate system
+    that wasn't there and threw "Cannot read properties of undefined (reading
+    'polar')". The exception aborted the re-tint partway, leaving the
+    remaining charts with the colours of the previous theme. Each chart is
+    now patched with only the axes it has, and one failing chart no longer
+    stops the others. Reported by Daniel (wetterbrienz.ch).
+  * Useful Links defaults are now region-neutral. The satellite link used
+    sat24's old /en/<country> path, which 404s; it is now
+    https://www.sat24.com/en-gb/. The lightning and Windy defaults were
+    hardcoded to Greek coordinates and now open on each site's own default
+    view, with a comment on each showing how to centre it on your station.
+    These are defaults only: anything set under [Extras][[links]] in
+    weewx.conf still wins.
+
 1.8.33  2026-10-23
   * Status page wording: the card is now "Recent data gaps" rather than
     "Recent gaps", which on a weather page could be read as a gap in the

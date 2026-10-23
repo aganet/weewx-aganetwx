@@ -92,16 +92,32 @@
   // rest of each option untouched. Much lighter than rebuilding every option.
   function retint() {
     readTheme();
-    var patch = {
+    var common = {
       title:  { textStyle: { color: TITLE } },
-      legend: { textStyle: { color: AX } },
-      xAxis:  { axisLabel: { color: AX }, splitLine: { lineStyle: { color: GRID } } },
-      yAxis:  { axisLabel: { color: AX }, splitLine: { lineStyle: { color: GRID } } },
-      radiusAxis: { axisLabel: { color: AX } },
-      angleAxis:  { axisLabel: { color: AX } }
+      legend: { textStyle: { color: AX } }
     };
+    // Patch only the axes a chart actually has. Sending polar axes to a
+    // cartesian chart (or the reverse) makes ECharts look for a coordinate
+    // system that isn't there and throw "Cannot read properties of undefined
+    // (reading 'polar')", which aborts the re-tint for every later chart.
     for (var id in charts) {
-      if (charts[id]) charts[id].setOption(patch, false);   // merge, keep everything else
+      var c = charts[id];
+      if (!c) continue;
+      var patch = Object.assign({}, common);
+      var opt = c.getOption() || {};
+      if (nonEmpty(opt.angleAxis) || nonEmpty(opt.radiusAxis)) {
+        patch.radiusAxis = { axisLabel: { color: AX } };
+        patch.angleAxis  = { axisLabel: { color: AX } };
+      } else {
+        patch.xAxis = { axisLabel: { color: AX }, splitLine: { lineStyle: { color: GRID } } };
+        patch.yAxis = { axisLabel: { color: AX }, splitLine: { lineStyle: { color: GRID } } };
+      }
+      try {
+        c.setOption(patch, false);   // merge, keep everything else
+      } catch (e) {
+        // One bad chart must not stop the rest from re-tinting.
+        console.error("AganetWX: re-tint failed for " + id, e);
+      }
     }
   }
   function nonEmpty(arr) { return Array.isArray(arr) && arr.length > 0; }
