@@ -186,6 +186,7 @@ silently ignored.
 | `Extras.monthly_records` | bool | `false` | History page: all-time monthly records tables (hottest/coldest, wettest/average rain). Needs `compare_page` |
 | `Extras.records_temp` | bool | `true` | Show the temperature records table (when `monthly_records` is on) |
 | `Extras.records_rain` | bool | `true` | Show the rain records table (when `monthly_records` is on) |
+| `Extras.extra_sensor_days` | days | `7` | How far back to look when deciding which extra sensors the station has. A lightning detector writes nothing between strikes, so the newest record alone would make it look absent. `0` uses the newest record only |
 | `Extras.nav.status` | bool | `false` | Show the Status page tab: record count, coverage over the last 24h, database size and recent archive gaps. Data only, no host or OS information |
 | `status.refresh` | seconds | `3600` | How long the Status figures are cached (counting rows every report cycle is wasted work) |
 | `status.gap_days` / `gap_limit` | number | `7` / `10` | Gap detection window, and how many gaps to list |

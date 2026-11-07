@@ -133,13 +133,19 @@ class AganetWXExtras(SearchList):
         except Exception:
             record = None
 
-        # Fields with a value now; fall back to schema keys if no record.
+        # Which types this station actually has. The newest record alone is not
+        # enough: an air-quality sensor may report AQI on a slower cycle than
+        # the archive interval, and a lightning detector writes nothing between
+        # strikes, so both are null in any given record and would look absent.
+        # Take the newest record, then fill in from a window of recent history.
         present = {}
         if record:
             for k, v in record.items():
                 if v is not None:
                     present[k] = v
-        else:
+        for k in self._recent_keys(db_manager, timespan.stop, sqlkeys):
+            present.setdefault(k, None)
+        if not present:
             for k in sqlkeys:
                 present[k] = None
 
@@ -317,6 +323,28 @@ class AganetWXExtras(SearchList):
             return None, None
         return self._hm(visible), (None if change is None
                                    else self._hm(change, sign=True))
+
+    def _recent_keys(self, db_manager, now_ts, sqlkeys, days=7):
+        """Schema columns that hold at least one value in the recent window.
+
+        One MAX() pass over the window: a column that is NULL in every row of
+        it has no sensor behind it, while one with any value does.
+        """
+        cols = [k for k in sqlkeys if k not in CORE]
+        if not cols:
+            return []
+        extras = self.generator.skin_dict.get('Extras', {})
+        try:
+            days = int(extras.get('extra_sensor_days', days))
+        except Exception:
+            pass
+        sql = 'SELECT %s FROM archive WHERE dateTime > ?' % ', '.join(
+            'MAX("%s")' % c for c in cols)
+        try:
+            row = next(db_manager.genSql(sql, (now_ts - days * 86400,)))
+        except Exception:
+            return []
+        return [c for c, v in zip(cols, row) if v is not None]
 
     def _label_of(self, key):
         """What $obs.label would render for this key."""

@@ -1,3 +1,11 @@
+1.8.36  2026-11-07
+  * Sensors that report intermittently are no longer missed. The extra-sensor
+    panel decided what a station has from the newest archive record alone, so
+    a lightning detector (which writes nothing between strikes) and any sensor
+    reporting on a slower cycle than the archive interval looked absent.
+    Discovery now also scans the last 7 days, set with
+    Extras.extra_sensor_days. Reported by Daniel (issue #6).
+
 1.8.35  2026-10-23
   * The README install command no longer names a version, so it cannot go
     stale again. It had been pinned at 1.8.26 and, worse, combined the
