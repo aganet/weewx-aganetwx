@@ -1,3 +1,14 @@
+1.8.37  2026-11-23
+  * The documented about.inc override now works. Dropping an about.inc next
+    to the template was supposed to replace the About page prose, but the
+    check looked for it under $SKIN_ROOT, which is the skins parent folder
+    rather than this skin's own, so it never matched and the override was
+    silently ignored. Reports run with the working directory set to the skin
+    folder (that is what makes the #include resolve), so the test is now the
+    bare filename.
+  * Verified against WeeWX 5.6.0: no changes needed. Generated output is
+    byte-identical to 5.5.2 apart from the WeeWX version string.
+
 1.8.36  2026-11-07
   * Sensors that report intermittently are no longer missed. The extra-sensor
     panel decided what a station has from the newest archive record alone, so
